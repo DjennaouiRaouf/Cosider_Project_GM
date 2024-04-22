@@ -122,13 +122,18 @@ class Sites(SafeDeleteModel):
 
     code_filiale = models.CharField(db_column='Code_Filiale', max_length=50,blank=True, null=True,
                                  verbose_name='Code Filiale')
-    code_division = models.CharField(db_column='Code_Division', max_length=50, blank=True, null=True,
-                                 verbose_name='Code division')
+
+
+    code_division  = models.ForeignKey('api_sch.TabDivision', on_delete=models.DO_NOTHING, db_constraint=False,
+                                       blank=True, null=True
+                                       , verbose_name='Division')
 
     code_region = models.CharField(db_column='Code_Region', max_length=20, blank=True, null=True,
                                  verbose_name='Code région')
-    code_commune_site = models.CharField(db_column='Code_Commune_Site', max_length=50, blank=True, null=True,
-                                 verbose_name='Code commune')
+
+    code_commune_site  = models.ForeignKey('api_sch.TabCommune', on_delete=models.DO_NOTHING, db_constraint=False,
+                                       blank=True, null=True
+                                       , verbose_name='Commune')
 
     date_ouverture_site = models.DateField(db_column='Date_Ouverture_Site', blank=True, null=True,
                                  verbose_name='Ouverture')
@@ -288,7 +293,7 @@ class DQE(SafeDeleteModel): # le prix final
     quantite = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,verbose_name='Quantité')
 
     aug_dim= models.DecimalField(max_digits=38, decimal_places=2, default=0,verbose_name='Augmentation/Diminution')
-    
+
     objects = DeletedModelManager()
 
     @property
