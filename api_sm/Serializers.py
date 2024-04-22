@@ -112,7 +112,7 @@ class NTSerializer(serializers.ModelSerializer):
 
 
 class DQESerializer(serializers.ModelSerializer):
-    prix_q = serializers.SerializerMethodField()
+    prix_q = serializers.SerializerMethodField(label="Montant")
 
     def get_prix_q(self, obj):
         return obj.prix_q

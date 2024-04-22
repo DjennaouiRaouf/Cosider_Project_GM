@@ -250,15 +250,14 @@ class ImportDQEAPIView(ImportMixin,  APIView):
         marche=request.data.get('id')
         try:
             Marche.objects.get(id=marche)
-
             imported_data = dataset.load(dqe.read())
             filtered_rows = [row for row in imported_data.dict if row['marche'] == marche]
             filtered_dataset = Dataset()
             filtered_dataset.headers = imported_data.headers
             filtered_dataset.extend([row.values() for row in filtered_rows])
-            result = resource.import_data(filtered_dataset, dry_run=True,raise_errors=True)
+            result = resource.import_data(filtered_dataset, dry_run=True)
 
-            if not result.has_errors:
+            if not result.has_errors():
                 resource.import_data(filtered_dataset, dry_run=False)
                 return Response({'message': 'Fichier importé'}, status=200)
             else:
