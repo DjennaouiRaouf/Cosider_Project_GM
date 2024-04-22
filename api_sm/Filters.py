@@ -96,9 +96,13 @@ class MarcheFilter(django_filters.FilterSet):
 
 
 class DQEFilter(django_filters.FilterSet):
+    marche = django_filters.CharFilter(field_name='marche', label="Marche",lookup_expr='exact')
+    code_tache= django_filters.CharFilter(field_name='Code Tache',lookup_expr='exact')
+    libelle = django_filters.CharFilter(field_name='libelle', lookup_expr='contains')
     class Meta:
         model = DQE
-        fields=['marche','code_tache']
+        fields=['marche','code_tache','libelle']
+
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
