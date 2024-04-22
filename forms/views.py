@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api_sch.Serializers import ProductionSerializer
-from api_sch.models import TabUniteDeMesure
+from api_sch.models import TabUniteDeMesure, TabProduction
 from api_sm.Filters import *
 from api_sm.Serializers import *
 
@@ -1600,31 +1600,50 @@ class AttFieldsStateApiView(APIView):
         fields = serializer.get_fields()
         field_info = []
 
+        idp=request.query_params.get('idp', None)
+        production=TabProduction.objects.get(id_production=idp)
+        if(production):
+            for field_name, field_instance in fields.items():
+                if(field_name in ['qte']):
+                    default_value=production.quantite_1
+                    field_info.append({field_name:default_value})
+                if (field_name in ['montant']):
+                    default_value = production.valeur_1
+                    field_info.append({field_name: default_value})
+                if (field_name in ['date']):
+                    default_value = production.mmaa
+                    field_info.append({field_name: default_value})
+                    state = {}
+                    for d in field_info:
+                        state.update(d)
 
-        for field_name, field_instance in fields.items():
-            default_value = None
-            if(  field_name in ['qte','montant',"date"] ):
+            return Response({'state': state}, status=status.HTTP_200_OK)
 
-                if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
-                    default_value = []
-                if str(field_instance.__class__.__name__) == 'BooleanField':
-                    default_value= True
+        else:
+            for field_name, field_instance in fields.items():
+                default_value = None
+                if(  field_name in ['qte','montant',"date"] ):
 
-                if str(field_instance.__class__.__name__) in ['PositiveSmallIntegerField','DecimalField','PositiveIntegerField',
-                                                              'IntegerField',]:
-                    default_value = 0
+                    if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
+                        default_value = []
+                    if str(field_instance.__class__.__name__) == 'BooleanField':
+                        default_value= True
 
-                field_info.append({
-                    field_name:default_value ,
+                    if str(field_instance.__class__.__name__) in ['PositiveSmallIntegerField','DecimalField','PositiveIntegerField',
+                                                                  'IntegerField',]:
+                        default_value = 0
 
-                })
+                    field_info.append({
+                        field_name:default_value ,
+
+                    })
 
 
-                state = {}
+                    state = {}
 
-            for d in field_info:
-                state.update(d)
-        return Response({'state': state}, status=status.HTTP_200_OK)
+                for d in field_info:
+                    state.update(d)
+            return Response({'state': state}, status=status.HTTP_200_OK)
 
 
 
