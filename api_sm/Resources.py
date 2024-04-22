@@ -129,7 +129,7 @@ class DQEResource(resources.ModelResource):
 
     def before_import_row(self, row, **kwargs):
         fields=['prix_u','annule','marche','code_tache','libelle','unite','est_tache_composite',
-                'est_tache_complementaire','quantite',]
+                'est_tache_complementaire','quantite','aug_dim',]
         for field in fields:
             if  row.get(field) == None :
                 raise Exception(f"le champ {field} est obligatoir ")
