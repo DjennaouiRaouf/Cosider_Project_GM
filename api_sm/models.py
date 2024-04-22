@@ -179,11 +179,11 @@ class NT(SafeDeleteModel):
     nt = models.CharField(db_column='NT', max_length=20, verbose_name='Numero du travail')
     code_situation = models.ForeignKey('api_sch.TabSituationNt',on_delete=models.DO_NOTHING,db_constraint=False , blank=True, null=True
                                        , verbose_name='Situation')
-    libelle = models.CharField(max_length=900, db_column='Libelle_NT', blank=True, null=True
+    libelle = models.TextField(db_column='Libelle_NT', blank=True, null=True
                                , verbose_name='Libelle')
     date_ouverture_nt = models.DateField(db_column='Date_Ouverture_NT', blank=True, null=True
                                          , verbose_name='Ouverture')
-    date_cloture_nt = models.DateField(db_column='Date_Cloture_NT', blank=True, null=True
+    date_cloture_nt = models.DateField(db_column='Date_Cloture_NT',blank=True, null=True
                                        , verbose_name='Cloture')
 
     code_site = models.ForeignKey(Sites, on_delete=models.DO_NOTHING, db_column='Code_site', null=False
@@ -216,7 +216,7 @@ class Marche(SafeDeleteModel):
     nt = models.ForeignKey(NT, on_delete=models.DO_NOTHING, db_column='nt', null=False
                            , verbose_name='Numero Travail',to_field="id")
 
-    libelle = models.CharField(null=False, max_length=500
+    libelle = models.TextField(null=False
                                , verbose_name='Libelle')
     ods_depart = models.DateField(null=False, blank=True
                                   , verbose_name='ODS de démarrage')

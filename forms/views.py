@@ -659,11 +659,14 @@ class NTFieldsApiView(APIView):
             if (flag == 'l'):  # data grid list (react ag-grid)
                 field_info = []
                 for field_name, field_instance in fields.items():
-                    field_info.append({
+                    obj={
                             'field': field_name,
                             'headerName': field_instance.label or field_name,
                             'info': str(field_instance.__class__.__name__),
-                    })
+                    }
+                    if(field_name in ['id']):
+                        obj['hide']=True
+                    field_info.append(obj)
 
             return Response({'fields': field_info,
             'models': model_name, 'pk': NT._meta.pk.name}, status=status.HTTP_200_OK)
@@ -679,7 +682,7 @@ class NTFieldsStateApiView(APIView):
         fields = serializer.get_fields()
         field_info = []
         for field_name, field_instance in fields.items():
-            default_value = ''
+            default_value = None
             if (field_name not in ['id',]):
                 if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
                     default_value = []
