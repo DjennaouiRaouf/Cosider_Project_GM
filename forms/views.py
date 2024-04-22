@@ -1605,10 +1605,10 @@ class AttFieldsStateApiView(APIView):
         if(production):
             for field_name, field_instance in fields.items():
                 if(field_name in ['qte']):
-                    default_value=production.quantite_1
+                    default_value=round(production.quantite_1,2)
                     field_info.append({field_name:default_value})
                 if (field_name in ['montant']):
-                    default_value = production.valeur_1
+                    default_value = round(production.valeur_1,2)
                     field_info.append({field_name: default_value})
                 if (field_name in ['date']):
                     default_value = production.mmaa
