@@ -1515,8 +1515,7 @@ class AttachementsFieldsApiView(APIView):
                 field_info = []
                 for field_name, field_instance in fields.items():
 
-                    if(  field_name in ['qte','montant',
-                                        "date",] ):
+                    if(  field_name in ['qte',"date",] ):
                         obj = {
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),
@@ -1607,22 +1606,22 @@ class AttFieldsStateApiView(APIView):
                 if(field_name in ['qte']):
                     default_value=round(production.quantite_1,2)
                     field_info.append({field_name:default_value})
-                if (field_name in ['montant']):
-                    default_value = round(production.valeur_1,2)
-                    field_info.append({field_name: default_value})
                 if (field_name in ['date']):
                     default_value = production.mmaa
                     field_info.append({field_name: default_value})
-                    state = {}
-                    for d in field_info:
-                        state.update(d)
+                if (field_name in ['dqe']):
+                    default_value = production.code_tache
+                    field_info.append({field_name: default_value})
+                state = {}
+                for d in field_info:
+                    state.update(d)
 
             return Response({'state': state}, status=status.HTTP_200_OK)
 
         else:
             for field_name, field_instance in fields.items():
                 default_value = None
-                if(  field_name in ['qte','montant',"date"] ):
+                if(  field_name in ['qte',"date"] ):
 
                     if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
                         default_value = []
