@@ -46,7 +46,7 @@ def pre_save_dqe(sender, instance, **kwargs):
         instance.id = str(instance.code_tache) + "_" + str(instance.marche.id)
 
     instance.libelle = instance.libelle.lower()
-
+    instance.quantite+=instance.aug_dim
 
 
 """
