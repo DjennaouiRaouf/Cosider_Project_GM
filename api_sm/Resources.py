@@ -136,6 +136,7 @@ class DQEResource(resources.ModelResource):
 
 
 
+
     class Meta:
         model = DQE
         exclude = ('deleted', 'deleted_by_cascade')

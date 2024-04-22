@@ -40,7 +40,7 @@ class UserFieldsStateApiView(APIView):
         fields = serializer.get_fields()
         field_info = []
         for field_name, field_instance in fields.items():
-            default_value = ''
+            default_value = None
             field_info.append({
                 field_name:default_value ,
 
@@ -92,7 +92,7 @@ class DQEFieldsStateApiView(APIView):
 
             for field_name, field_instance in fields.items():
                 if (not field_name in ['prix_q','id','code_site','nt']):
-                    default_value = ''
+                    default_value = None
                     if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
                         default_value = []
                     if str(field_instance.__class__.__name__) == 'BooleanField':
@@ -255,7 +255,7 @@ class MarcheFieldsStateApiView(APIView):
 
             for field_name, field_instance in fields.items():
                 if (field_name not in ['id', 'montant_ht', 'montant_ttc']):
-                    default_value = ''
+                    default_value = None
                     if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                         default_value =[]
                     if str(field_instance.__class__.__name__) == 'BooleanField':
@@ -770,7 +770,7 @@ class FactureFieldsStateApiView(APIView):
         fields = serializer.get_fields()
         field_info = []
         for field_name, field_instance in fields.items():
-            default_value = ''
+            default_value = None
             if (field_name in ['numero_facture','du','au','num_situation']):
                 if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
                     default_value = []
@@ -891,7 +891,7 @@ class EncaissementFieldsStateApiView(APIView):
         fields = serializer.get_fields()
         field_info = []
         for field_name, field_instance in fields.items():
-            default_value = ''
+            default_value = None
             if (field_name not in  ['montant_creance','facture']):
                 if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
                     default_value = []
@@ -1106,7 +1106,7 @@ class AvanceFieldsStateApiView(APIView):
         fields = serializer.get_fields()
         field_info = []
         for field_name, field_instance in fields.items():
-            default_value = ''
+            default_value = None
             if (field_name not in  ['heure','marche','id','taux']):
                 if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
                     default_value= []
@@ -1223,7 +1223,7 @@ class CautionFieldsStateApiView(APIView):
         fields = serializer.get_fields()
         field_info = []
         for field_name, field_instance in fields.items():
-            default_value = ''
+            default_value = None
             if (field_name not in  ['id','est_recupere','marche','taux']):
                 if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
                     default_value = []
@@ -1359,7 +1359,7 @@ class OdsFieldsStateApiView(APIView):
 
 
         for field_name, field_instance in fields.items():
-            default_value = ''
+            default_value = None
             if (field_name not in  ['marche']):
                 if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
                     default_value= []
@@ -1611,7 +1611,7 @@ class AttFieldsStateApiView(APIView):
 
 
         for field_name, field_instance in fields.items():
-            default_value = ''
+            default_value = None
             if(  field_name in ['qte','montant',"date"] ):
 
                 if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
