@@ -1,4 +1,3 @@
-from django.db.models import Sum
 from num2words import num2words
 from rest_framework import serializers
 
@@ -113,15 +112,14 @@ class NTSerializer(serializers.ModelSerializer):
 
 
 class DQESerializer(serializers.ModelSerializer):
-    prix_q = serializers.SerializerMethodField(label="Montant")
+    prix_q = serializers.SerializerMethodField()
 
     def get_prix_q(self, obj):
         return obj.prix_q
 
     class Meta:
         model=DQE
-        fields = [ 'id','code_tache','marche','code_site' ,'nt' ,'libelle','unite','prix_u' ,'quantite','prix_q',
-    'aug_dim','est_tache_composite','est_tache_complementaire', ]
+        fields = '__all__'
 
 
     def get_fields(self, *args, **kwargs):
@@ -137,7 +135,7 @@ class DQESerializer(serializers.ModelSerializer):
 
 class MarcheSerializer(serializers.ModelSerializer):
     code_site=serializers.PrimaryKeyRelatedField(source="nt_code_site",queryset=Sites.objects.all(),write_only=True,label='Code du site')
-    nt=serializers.CharField(source="nt_nt",write_only=True,label='NT')
+    nt=serializers.CharField(source="nt_nt",write_only=True,label='Numero du travail')
     montant_ht = serializers.SerializerMethodField()
     montant_ttc = serializers.SerializerMethodField()
 
@@ -181,41 +179,8 @@ class MarcheSerializer(serializers.ModelSerializer):
         return representation
 
 
-class EtatCreanceSerializer(serializers.ModelSerializer):
-    code_site = serializers.PrimaryKeyRelatedField(source="nt_code_site", queryset=Sites.objects.all(), write_only=True,
-                                                   label='Code du site')
-    nt = serializers.CharField(source="nt_nt", write_only=True, label='NT')
-    gf = serializers.SerializerMethodField(label='Montant Global des factures')
-    ge = serializers.SerializerMethodField(label='Montant Global Encaissé')
-    cr = serializers.SerializerMethodField(label='Creance')
-
-    def get_gf(self, obj):
-        return obj.montant_gf
-    def get_ge(self, obj):
-        return obj.montant_ge
-    def get_cr(self,obj):
-        return obj.montant_creance
-
-    def get_fields(self, *args, **kwargs):
-        fields = super().get_fields(*args, **kwargs)
-        fields.pop('deleted', None)
-        fields.pop('deleted_by_cascade', None)
-        return fields
-
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        representation['cr'] = instance.montant_creance
-        representation['ge'] = instance.montant_ge
-        representation['gf'] = instance.montant_gf
-        representation['code_site'] = instance.nt.code_site.id
-        representation['nt'] = instance.nt.nt
 
 
-        return representation
-
-    class Meta:
-        model = Marche
-        fields = ['id', 'code_site', 'nt', 'gf', 'ge', 'cr']
 
 
 class FactureSerializer(serializers.ModelSerializer):
@@ -226,7 +191,7 @@ class FactureSerializer(serializers.ModelSerializer):
     montant_marche = serializers.CharField(source='marche.ht', read_only=True, label="Montant du Marche")
     client = serializers.CharField(source='marche.nt.code_client.id', read_only=True, label="Client")
     pole = serializers.CharField(source='marche.nt.code_site.id', read_only=True, label="Pole")
-    num_travail=serializers.CharField(source='marche.nt.nt', read_only=True, label="NT")
+    num_travail=serializers.CharField(source='marche.nt.nt', read_only=True, label="Numero du travail")
     lib_nt = serializers.CharField(source='marche.nt.libelle', read_only=True, label="Libelle du travail")
 
     somme=serializers.SerializerMethodField(label="Arretée la présenta facture à la somme de")
@@ -422,8 +387,6 @@ class CautionSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['avance'] = instance.avance.type.libelle
-        representation['type'] = instance.type.libelle
         return representation
 
 class TypeCautionSerializer(serializers.ModelSerializer):
