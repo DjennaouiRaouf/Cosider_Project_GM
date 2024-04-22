@@ -1003,7 +1003,6 @@ class GetDQEStateView(generics.ListAPIView):
         for q in queryset:
             try:
                 attachement=Attachements.objects.filter(dqe=q).latest('date')
-
                 X.append(attachement.dqe.code_tache)
                 Y1.append(attachement.qte_cumule)
                 Y2.append(attachement.dqe.quantite)
