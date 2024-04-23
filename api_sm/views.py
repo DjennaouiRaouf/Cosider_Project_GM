@@ -316,15 +316,18 @@ class GetFacture(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         rg_total = 0
-        creance = 0
+        mgf=0
+        enc = 0
         response_data = super().list(request, *args, **kwargs).data
         for q in queryset:
             rg_total += q.montant_rg
+            mgf+=q.montant_factureTTC
             try:
-                creance+= Encaissement.objects.filter(facture=q).latest('date_encaissement').montant_creance
+                enc+=(Encaissement.objects.filter(facture=q).distinct().aggregate(total=Sum('montant_encaisse'))['total'] or 0)
             except Encaissement.DoesNotExist:
                 pass
 
+        creance=mgf-enc
         return Response({'facture': response_data,
                          'extra': {
 
