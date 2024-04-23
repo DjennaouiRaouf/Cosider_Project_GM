@@ -651,6 +651,31 @@ class GetCautions(generics.ListAPIView):
     filterset_class = CautionFilter
 
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        qr = 0
+        qd = 0
+        response_data = super().list(request, *args, **kwargs).data
+        for q in queryset:
+            if(q.est_recupere == True):
+                qr = qr + q.montant
+
+            if(q.est_recupere == False):
+                qd = qd + q.montant
+
+
+        m=Marche.objects.get(id=self.request.query_params.get('marche', None))
+        return Response({'caut': response_data,
+                         'extra': {
+                             'qr': qr,
+                             'qd': qd,
+
+                         }}, status=status.HTTP_200_OK)
+
+
+
+
+
 class PermissionApiView(APIView):
     def get(self, request, *args, **kwargs):
         '''
