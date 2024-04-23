@@ -199,7 +199,10 @@ class FactureSerializer(serializers.ModelSerializer):
     tva=serializers.CharField(source='marche.tva', read_only=True, label="TVA")
     rabais=serializers.CharField(source='marche.rabais', read_only=True, label="Rabais")
     retenue_garantie = serializers.CharField(source='marche.rg', read_only=True, label="Retenue de Garantie")
-
+    montant_factureHT=serializers.SerializerMethodField(label="Montant en HT")
+    montant_factureTTC=serializers.SerializerMethodField(label="Montant en TTC")
+    ava=serializers.SerializerMethodField(label="Montant AV.A Remb")
+    avf=serializers.SerializerMethodField(label="Montant AV.F Remb")
     montant_precedent=serializers.SerializerMethodField(label="Montant Precedent")
 
     montant_cumule=serializers.SerializerMethodField(label="Montant Cumule")
@@ -221,6 +224,14 @@ class FactureSerializer(serializers.ModelSerializer):
 
     def get_montant_cumule(self,obj):
         return obj.montant_cumule
+    def get_montant_factureHT(self,obj):
+        return obj.montant_factureHT
+    def get_montant_factureTTC(self,obj):
+        return obj.montant_factureTTC
+    def get_ava(self,obj):
+        return obj.montant_ava_remb
+    def get_avf(self,obj):
+        return obj.montant_avf_remb
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)

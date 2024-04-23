@@ -577,6 +577,28 @@ class GetAvance(generics.ListAPIView):
     filterset_class = AvanceFilter
 
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        ava = 0
+        avf = 0
+        response_data = super().list(request, *args, **kwargs).data
+        for q in queryset:
+            if(q.type.id == 1):
+                avf = avf + q.montant
+
+            if(q.type.id == 2):
+                ava = ava + q.montant
+
+        m=Marche.objects.get(id=self.request.query_params.get('marche', None))
+        return Response({'av': response_data,
+                         'extra': {
+                             'ava': ava,
+                             'avf': avf,
+
+                         }}, status=status.HTTP_200_OK)
+
+
+
 
 class LibAV(generics.ListAPIView):
     queryset = TypeAvance.objects.all()
@@ -765,10 +787,15 @@ class GetAttachements(generics.ListAPIView):
         for q in queryset:
             qt = qt + q.qte
             mt = mt + q.montant
-
+        m=Marche.objects.get(id=self.request.query_params.get('marche', None))
         return Response({'att': response_data,
                          'extra': {
-
+                            'marche':m.id,
+                            'nt':m.nt.nt,
+                            'date':self.request.query_params.get('mm', None)+'/'+self.request.query_params.get('aa', None),
+                            'site':m.nt.code_site.libelle,
+                             'objet':m.libelle,
+                             'client':m.nt.code_client.libelle,
                              'qt': qt,
                              'mt': mt,
 

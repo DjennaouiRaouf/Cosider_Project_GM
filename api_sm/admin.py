@@ -405,7 +405,6 @@ class RembAdmin(SafeDeleteAdmin,ImportExportModelAdmin,admin.ModelAdmin):
         return (obj.rst_remb)
     def remb_mois(self, obj):
         return (obj.montant)
-
     def remb_cumule(self, obj):
         return (obj.montant_cumule)
     def get_import_formats(self):
@@ -523,7 +522,7 @@ class AttachementAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,
 @admin.register(Factures)
 class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     list_display =  [field.name for field in Factures._meta.fields if
-                    field.name not in ['deleted', 'deleted_by_cascade','montant']] + ['montant_precedent','montant','montant_cumule']
+                    field.name not in ['deleted', 'deleted_by_cascade','montant']] + ['montant_precedent','montant','montant_cumule','ava','avf','ht','ttc']
 
     list_filter = (SafeDeleteAdminFilter,)
 
@@ -534,8 +533,18 @@ class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,ad
     def montant_cumule(self,obj):
         return obj.montant_cumule
 
-    def montant_global_ht(self,obj):
+    def ava(self,obj):
+        return obj.montant_ava_remb
+
+    def avf(self, obj):
+        return obj.montant_avf_remb
+
+    def ht(self,obj):
         return (obj.montant_factureHT)
+
+    def ttc(self, obj):
+        return (obj.montant_factureTTC)
+
     def get_import_formats(self):
 
         formats = (

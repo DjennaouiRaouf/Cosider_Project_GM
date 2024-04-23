@@ -519,28 +519,44 @@ class Factures(SafeDeleteModel):
                                          verbose_name="Montant Retenue de garantie"
                                          ,editable=False) #retenue de garantie le montant du mois
 
-    montant_avf_remb=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                         verbose_name="Montant d'avance forfaitaire remboursé"
-                                         ,editable=False)
-    montant_ava_remb = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                          verbose_name="Montant d'avance appros remboursé"
-                                          , editable=False)
 
-    montant_factureHT=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                         verbose_name="Montant de la facture HT"
-                                         ,editable=False)
 
-    montant_factureTTC=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                         verbose_name="Montant de la facture TTC"
-                                         ,editable=False)
+
 
     taux_realise=models.DecimalField(max_digits=38,decimal_places=2,validators=[MinValueValidator(0),MinValueValidator(100)], default=0,
                                          verbose_name="Taux Realisé"
                                          ,editable=False)
 
-    is_remb=models.BooleanField(default=False,null=False,editable=False,verbose_name='Remboursement Effectué')
 
     objects = DeletedModelManager()
+
+    @property
+    def montant_ava_remb(self):
+        try:
+            remb=Remboursement.objects.get(facture=self.numero_facture,avance__type=2)
+            if(remb):
+                return remb.montant
+            else:
+                return 0
+        except Remboursement.DoesNotExist:
+            return  0
+    @property
+    def montant_avf_remb(self):
+        try:
+            remb=Remboursement.objects.get(facture=self.numero_facture,avance__type=1)
+            if(remb):
+                return remb.montant
+            else:
+                return 0
+        except Remboursement.DoesNotExist:
+            return 0
+
+    @property
+    def montant_factureHT(self):
+        return round(self.montant - self.montant_rb - self.montant_rg-self.montant_ava_remb-self.montant_avf_remb, 2)
+    @property
+    def montant_factureTTC(self):
+        return round(self.montant_factureHT+(self.montant_factureHT*(self.marche.tva / 100)),2)
 
     @property
     def montant_precedent(self):

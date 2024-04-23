@@ -97,19 +97,14 @@ def pre_save_factures(sender, instance, **kwargs):
         instance.montant = m
         instance.montant_rb = m * (instance.marche.rabais / 100)
         instance.montant_rg = round((m - instance.montant_rb) * (instance.marche.rg / 100), 2)
-        instance.montant_factureHT = round(instance.montant - instance.montant_rb - instance.montant_rg, 2)
-        instance.montant_factureTTC = round(
-        instance.montant_factureHT + (instance.montant_factureHT * instance.marche.tva / 100), 2)
+
         qte_real = Attachements.objects.filter(Q(marche=instance.marche) & Q(date__lte=fin)).aggregate(
                 models.Sum('qte'))["qte__sum"]
         qte_dqe = DQE.objects.filter(Q(marche=instance.marche)).aggregate(
                 models.Sum('quantite'))["quantite__sum"]
         instance.taux_realise = round((qte_real / qte_dqe) * 100, 2)
 
-    if instance.pk:
-        instance.montant_factureHT=round(instance.montant_factureHT-instance.montant_avf_remb-instance.montant_ava_remb,2)
-        instance.montant_factureTTC = round(
-            instance.montant_factureHT + (instance.montant_factureHT * instance.marche.tva / 100), 2)
+
 
 
 
@@ -152,95 +147,17 @@ def pre_save_remboursement(sender, instance, **kwargs):
     else:
         tremb = round(
                 (instance.avance.taux_avance / (instance.avance.fin - instance.facture.taux_realise)) * 100, 2)
-
         instance.montant = instance.facture.montant_factureHT * (tremb / 100)
+
         if (instance.rst_remb < 0):
             instance.montant = instance.avance.montant
         if (instance.rst_remb == 0):
             instance.avance.remboursee = True
             instance.avance.save()
 
-        if instance.avance.type.id == 1:
-            instance.facture.montant_avf_remb = round(instance.montant, 2)
-        if instance.avance.type.id == 2:
-            instance.facture.montant_ava_remb = round(instance.montant, 2)
-        instance.facture.save()
 
 
-'''
-@receiver(pre_save, sender=Remboursement)
-def pre_save_remboursement(sender, instance, **kwargs):
 
-    if not instance.pk:
-        if (instance.avance.remboursee):
-            raise ValidationError('Cette avance est remboursée')
-
-        elif (Decimal(instance.avance.fin) < Decimal(instance.facture.taux_realise)):
-            raise ValidationError('Cette avance peut pas etre emboursé dans cette situation')
-
-        else:
-            remb = Remboursement.objects.filter(
-                Q(facture__num_situation__lt=instance.facture.num_situation) & Q(avance__type=instance.avance.type.id) & Q(avance__num_avance=instance.avance.num_avance)
-            & Q(avance__remboursee=False))
-
-            if (remb):  # courant
-                previous = remb.last()
-                print(previous)
-                tremb=round((instance.avance.taux_avance/(instance.avance.fin-instance.facture.taux_realise))*100,2)
-                mm = (instance.facture.montant - instance.facture.montant_rb - instance.facture.montant_rg-instance.facture.montant_avf_remb-instance.facture.montant_ava_remb) * (
-                        tremb / 100)
-
-                cumule = mm + previous.montant_cumule
-                rar = instance.avance.montant - cumule
-                print()
-                if (rar < 0):
-                    instance.montant = previous.rst_remb
-                    instance.montant_cumule = instance.montant + previous.montant_cumule
-                    instance.rst_remb = instance.avance.montant - instance.montant_cumule
-
-                else:
-                    instance.montant = mm
-                    instance.montant_cumule = cumule
-                    instance.rst_remb = rar
-
-                if instance.avance.type.id == 1:
-                    instance.facture.montant_avf_remb = round(instance.montant, 2)
-
-                if instance.avance.type.id == 2:
-                    instance.facture.montant_ava_remb = round(instance.montant, 2)
-                instance.facture.save()
-
-                if (instance.rst_remb == 0):
-                    instance.avance.remboursee=True
-                    instance.avance.save()
-
-            else:  # debut pas de precedent
-                tremb = round(
-                    (instance.avance.taux_avance / (instance.avance.fin - instance.facture.taux_realise)) * 100, 2)
-                mm = (instance.facture.montant - instance.facture.montant_rb - instance.facture.montant_rg-instance.facture.montant_avf_remb-instance.facture.montant_ava_remb) * (
-                        tremb / 100)
-                cumule = mm
-                rar = instance.avance.montant - cumule
-                if (rar < 0):
-                    instance.montant = instance.avance.montant
-                    instance.montant_cumule = instance.montant
-                    instance.rst_remb = instance.avance.montant - instance.montant_cumule
-                else:
-                    instance.montant = mm
-                    instance.montant_cumule = cumule
-                    instance.rst_remb = rar
-
-                if instance.avance.type.id == 1:
-                    instance.facture.montant_avf_remb = round(instance.montant, 2)
-                if instance.avance.type.id == 2:
-                    instance.facture.montant_ava_remb = round(instance.montant, 2)
-                instance.facture.save()
-                if (instance.rst_remb == 0):
-                    instance.avance.remboursee = True
-                    instance.avance.save()
-
-
-'''
 @receiver(pre_save, sender=ModePaiement)
 def pre_save_mp(sender, instance, **kwargs):
     instance.libelle = instance.libelle.lower()

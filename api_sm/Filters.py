@@ -117,7 +117,7 @@ class DQEFilter(django_filters.FilterSet):
 class FactureFilter(django_filters.FilterSet):
     class Meta:
         model = Factures
-        fields=['marche','numero_facture','paye',"is_remb"]
+        fields=['marche','numero_facture','paye',]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
