@@ -346,4 +346,3 @@ class ECFilter(django_filters.FilterSet):
                 field_instance.label = model_field.verbose_name
             except:
                 pass
-
