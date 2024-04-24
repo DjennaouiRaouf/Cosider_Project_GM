@@ -136,18 +136,19 @@ class DQESerializer(serializers.ModelSerializer):
 class MarcheSerializer(serializers.ModelSerializer):
     code_site=serializers.PrimaryKeyRelatedField(source="nt_code_site",queryset=Sites.objects.all(),write_only=True,label='Code du site')
     nt=serializers.CharField(source="nt_nt",write_only=True,label='NT')
-    montant_ht = serializers.SerializerMethodField()
-    montant_ttc = serializers.SerializerMethodField()
+    montant_ht = serializers.SerializerMethodField(label='Montant en HT')
+    montant_ttc = serializers.SerializerMethodField(label='Montant en TTC')
 
     def get_montant_ht(self, obj):
         return obj.ht
 
     def get_montant_ttc(self, obj):
         return obj.ttc
-    
+
     class Meta:
         model = Marche
-        fields = "__all__"
+        fields = ['id','libelle','code_site','nt','ods_depart','date_signature','delai_paiement_f','revisable','rabais','rg'
+            ,'tva','montant_ht','montant_ttc']
 
 
 
