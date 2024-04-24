@@ -1141,3 +1141,11 @@ class GetAttachements2(generics.ListAPIView):
         else:
             return Response({'message': "La rechercher n'a pas pu aboutir à un résultat"},
                             status=status.HTTP_404_NOT_FOUND)
+
+
+
+class Etat_Creances(generics.ListAPIView):
+    queryset = Marche.objects.all()
+    serializer_class = ECSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ECFilter

@@ -38,6 +38,8 @@ urlpatterns = [
     path('editusr/',EditUserProfile.as_view()),
     path('getatt2/',GetAttachements2.as_view()),
 
+    path('etatcreance/',Etat_Creances.as_view()),
+
     path('getdqe/', GetDQEView.as_view()),
     path('deldqe/',DelDQEByID.as_view()),
     path('deleteddqe/',DeletedDQE.as_view()),

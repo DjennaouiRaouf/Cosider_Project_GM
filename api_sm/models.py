@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.db.models import Q
 from django.dispatch import receiver
 from safedelete import SOFT_DELETE_CASCADE, DELETED_VISIBLE_BY_PK, SOFT_DELETE, HARD_DELETE
 from safedelete.managers import SafeDeleteManager
@@ -176,7 +177,7 @@ class Sites(SafeDeleteModel):
 class NT(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
     id=models.CharField(db_column='id',max_length=500,primary_key=True,verbose_name="id",editable=False)
-    nt = models.CharField(db_column='NT', max_length=20, verbose_name='Numero du travail')
+    nt = models.CharField(db_column='NT', max_length=20, verbose_name='NT')
     code_situation = models.ForeignKey('api_sch.TabSituationNt',on_delete=models.DO_NOTHING,db_constraint=False , blank=True, null=True
                                        , verbose_name='Situation')
     libelle = models.TextField(db_column='Libelle_NT', blank=True, null=True
@@ -199,8 +200,8 @@ class NT(SafeDeleteModel):
         return str(self.id)
 
     class Meta:
-        verbose_name = 'Numero du travail'
-        verbose_name_plural = 'Numero du travail'
+        verbose_name = 'NT'
+        verbose_name_plural = 'NT'
         unique_together = (('code_site', 'nt'),)
         app_label = 'api_sm'
         
@@ -214,7 +215,7 @@ class Marche(SafeDeleteModel):
 
     id=models.CharField(max_length=500,primary_key=True,verbose_name='Code du Contrat')
     nt = models.ForeignKey(NT, on_delete=models.DO_NOTHING, db_column='nt', null=False
-                           , verbose_name='Numero Travail',to_field="id")
+                           , verbose_name='NT',to_field="id")
 
     libelle = models.TextField(null=False
                                , verbose_name='Libelle')
@@ -261,6 +262,26 @@ class Marche(SafeDeleteModel):
         return self.id
 
 
+    @property
+    def montant_global_f(self):
+        factures = Factures.objects.filter(Q(marche=self))
+        sum=0
+        for f in factures:
+            sum+=f.montant_factureTTC
+        return sum
+
+    @property
+    def montant_global_p(self):
+
+        enc = Encaissement.objects.filter(Q(facture__marche=self)).aggregate(
+                models.Sum('montant_encaisse'))[
+                "montant_encaisse__sum"] or 0
+
+        return enc
+
+    @property
+    def montant_global_c(self):
+        return self.montant_global_f-self.montant_global_p
 
 class Meta:
         verbose_name = 'Marchés'
@@ -557,6 +578,9 @@ class Factures(SafeDeleteModel):
     @property
     def montant_factureTTC(self):
         return round(self.montant_factureHT+(self.montant_factureHT*(self.marche.tva / 100)),2)
+
+
+
 
     @property
     def montant_precedent(self):

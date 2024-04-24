@@ -135,7 +135,7 @@ class DQESerializer(serializers.ModelSerializer):
 
 class MarcheSerializer(serializers.ModelSerializer):
     code_site=serializers.PrimaryKeyRelatedField(source="nt_code_site",queryset=Sites.objects.all(),write_only=True,label='Code du site')
-    nt=serializers.CharField(source="nt_nt",write_only=True,label='Numero du travail')
+    nt=serializers.CharField(source="nt_nt",write_only=True,label='NT')
     montant_ht = serializers.SerializerMethodField()
     montant_ttc = serializers.SerializerMethodField()
 
@@ -191,7 +191,7 @@ class FactureSerializer(serializers.ModelSerializer):
     montant_marche = serializers.CharField(source='marche.ht', read_only=True, label="Montant du Marche")
     client = serializers.CharField(source='marche.nt.code_client.id', read_only=True, label="Client")
     pole = serializers.CharField(source='marche.nt.code_site.id', read_only=True, label="Pole")
-    num_travail=serializers.CharField(source='marche.nt.nt', read_only=True, label="Numero du travail")
+    num_travail=serializers.CharField(source='marche.nt.nt', read_only=True, label="NT")
     lib_nt = serializers.CharField(source='marche.nt.libelle', read_only=True, label="Libelle du travail")
 
     somme=serializers.SerializerMethodField(label="Arretée la présenta facture à la somme de")
@@ -498,4 +498,29 @@ class RemboursementSerializer(serializers.ModelSerializer):
 
 
         return fields
+
+
+
+
+class ECSerializer(serializers.ModelSerializer):
+    nt = serializers.PrimaryKeyRelatedField(source="nt.nt",label='NT',read_only=True)
+    client = serializers.PrimaryKeyRelatedField(source="nt.code_client.libelle",label='Client',read_only=True)
+
+    mgf = serializers.SerializerMethodField()
+    mgp = serializers.SerializerMethodField()
+    mgc = serializers.SerializerMethodField()
+
+    def get_mgf(self, obj):
+        return obj.montant_global_f
+
+    def get_mgp(self, obj):
+        return obj.montant_global_p
+
+
+    def get_mgc(self, obj):
+        return obj.montant_global_c
+
+    class Meta:
+        model = Marche
+        fields = ['id','nt','client','mgf','mgp','mgc']
 
