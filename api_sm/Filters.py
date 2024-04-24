@@ -344,8 +344,8 @@ class ECFilter(django_filters.FilterSet):
         elif value is True:
             ids = [obj.id for obj in queryset if (obj.montant_global_f > 0)]
             return queryset.filter(id__in=ids)
-
         return queryset
+
 
     class Meta:
         model = Marche
