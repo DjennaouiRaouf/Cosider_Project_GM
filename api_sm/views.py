@@ -453,6 +453,16 @@ class DelDQEByID(generics.DestroyAPIView,DestroyModelMixin):
 class UpdateDQEApiVew(generics.UpdateAPIView):
     queryset = DQE.objects.all()
     serializer_class = DQESerializer
+    lookup_field = "pk"
+    def get_object(self):
+        pk = self.request.data.get(DQE._meta.pk.name)
+        try:
+            obj = DQE.objects.get(pk=pk)
+        except DQE.DoesNotExist:
+            raise NotFound("Object n'éxiste pas")
+        self.check_object_permissions(self.request, obj)
+
+        return obj
 
 
 
