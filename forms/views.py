@@ -184,8 +184,7 @@ class DQEFieldsApiView(APIView):
                             obj['related'] = str(field_instance.queryset.model.__name__)
                         if(field_name in ['prix_u','prix_q','quantite']):
                             obj['cellRenderer']='InfoRenderer'
-                        if (field_name in ['unite']):
-                            obj['hide']=True
+
                         field_info.append(obj)
 
 

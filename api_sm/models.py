@@ -301,7 +301,7 @@ class DQE(SafeDeleteModel): # le prix final
     code_tache = models.CharField(db_column='Code_Tache',null=False, max_length=30
                                   ,verbose_name="Code de la tache")
     libelle = models.TextField(db_column='Libelle_Tache',verbose_name="Libelle")
-    unite =models.ForeignKey('api_sch.TabUniteDeMesure',on_delete=models.DO_NOTHING,db_constraint=False , null=False, verbose_name='Unité de mesure')
+    unite =models.ForeignKey('api_sch.TabUniteDeMesure',on_delete=models.DO_NOTHING,db_constraint=False , null=False, verbose_name='Unité')
     prix_u = models.DecimalField(
         max_digits=38, decimal_places=2,
         validators=[MinValueValidator(0)], default=0

@@ -74,8 +74,11 @@ def pre_save_attachement(sender, instance, **kwargs):
     if(instance.dqe.marche!=instance.marche):
         raise ValidationError("Erreur")
     if not instance.pk:
+        if(instance.qte>instance.dqe.quantite):
+            raise ValidationError("Erreur")
         instance.prix_u=instance.dqe.prix_u
         instance.montant=instance.qte*instance.prix_u
+
 
 
 
