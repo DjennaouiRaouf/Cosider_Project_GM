@@ -316,6 +316,7 @@ class DQE(SafeDeleteModel): # le prix final
     aug_dim= models.DecimalField(max_digits=38, decimal_places=2, default=0,verbose_name='Augmentation/Diminution')
 
     objects = DeletedModelManager()
+    history = HistoricalRecords()
 
     @property
     def prix_q(self):

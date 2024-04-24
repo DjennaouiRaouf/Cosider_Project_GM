@@ -328,9 +328,18 @@ class GetFacture(generics.ListAPIView):
                 pass
 
         creance=mgf-enc
+        m = Marche.objects.get(id=self.request.query_params.get('marche', None))
         return Response({'facture': response_data,
                          'extra': {
 
+                             'contrat': m.id,
+                             'signature': m.date_signature,
+                             'projet': m.libelle,
+                             'montant_marche':m.ht,
+                             'client': m.nt.code_client.id,
+                             'nt': m.nt.nt,
+                             'lib_nt': m.nt.libelle,
+                             'pole': m.nt.code_site.id,
                              'rg_total': rg_total,
                              'creance': creance,
 
