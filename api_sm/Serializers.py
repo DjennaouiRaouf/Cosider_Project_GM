@@ -119,7 +119,7 @@ class DQESerializer(serializers.ModelSerializer):
 
     class Meta:
         model=DQE
-        fields = '__all__'
+        fields=['id','code_tache','libelle','est_tache_composite','est_tache_complementaire','prix_u','quantite','unite','prix_q']
 
 
     def get_fields(self, *args, **kwargs):
@@ -323,8 +323,7 @@ class DetailFactureSerializer(serializers.ModelSerializer):
 
     class Meta:
             model=DetailFacture
-            fields='__all__'
-
+            fields='__all_'
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
         fields.pop('id', None)

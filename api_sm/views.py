@@ -906,10 +906,9 @@ class UpdateCautionApiView(generics.UpdateAPIView):
 
     def get_object(self):
         pk = self.request.data.get(Cautions._meta.pk.name)
-
         try:
-            obj = Marche.objects.get(pk=pk)
-        except Marche.DoesNotExist:
+            obj = Cautions.objects.get(pk=pk)
+        except Cautions.DoesNotExist:
             raise NotFound("Object n'éxiste pas")
 
         self.check_object_permissions(self.request, obj)
