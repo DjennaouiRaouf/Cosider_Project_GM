@@ -504,7 +504,7 @@ class RemboursementSerializer(serializers.ModelSerializer):
 
 class ECSerializer(serializers.ModelSerializer):
     nt = serializers.PrimaryKeyRelatedField(source="nt.nt",label='NT',read_only=True)
-    client = serializers.PrimaryKeyRelatedField(source="nt.code_client.libelle",label='Client',read_only=True)
+    client = serializers.PrimaryKeyRelatedField(source="nt.code_client",label='Client',read_only=True)
 
     mgf = serializers.SerializerMethodField()
     mgp = serializers.SerializerMethodField()
@@ -524,3 +524,9 @@ class ECSerializer(serializers.ModelSerializer):
         model = Marche
         fields = ['id','nt','client','mgf','mgp','mgc']
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['client'] = instance.nt.code_client.libelle
+
+
+        return representation

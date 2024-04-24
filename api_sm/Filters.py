@@ -322,7 +322,7 @@ class ImageFilter(django_filters.FilterSet):
 
 class ECFilter(django_filters.FilterSet):
     has_creance = django_filters.BooleanFilter(field_name='mgc', label='Avec Creances ? ', method='filter_has_creance', )
-
+    client = django_filters.ModelChoiceFilter(field_name='nt__code_client',queryset=Clients.objects.all(),label='Client')
     def filter_has_creance(self, queryset, name, value):
 
         if value is False:
@@ -336,7 +336,7 @@ class ECFilter(django_filters.FilterSet):
 
     class Meta:
         model = Marche
-        fields=['id','has_creance']
+        fields=['id','has_creance','client']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
