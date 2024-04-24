@@ -321,11 +321,22 @@ class ImageFilter(django_filters.FilterSet):
 
 
 class ECFilter(django_filters.FilterSet):
+    has_creance = django_filters.BooleanFilter(field_name='mgc', label='Avec Creances ? ', method='filter_has_creance', )
 
+    def filter_has_creance(self, queryset, name, value):
+
+        if value is False:
+            ids = [obj.id for obj in queryset if (obj.montant_global_c <= 0) ]
+            return queryset.filter(id__in=ids)
+        elif value is True:
+            ids = [obj.id for obj in queryset if (obj.montant_global_c > 0)]
+            return queryset.filter(id__in=ids)
+
+        return queryset
 
     class Meta:
         model = Marche
-        fields=['id',]
+        fields=['id','has_creance']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
