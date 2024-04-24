@@ -321,7 +321,9 @@ class ImageFilter(django_filters.FilterSet):
 
 
 class ECFilter(django_filters.FilterSet):
+    code_contrat = django_filters.CharFilter(field_name='id', label='Code du contrat')
     has_creance = django_filters.BooleanFilter(field_name='mgc', label='Avec Creances ? ', method='filter_has_creance', )
+    has_invoice = django_filters.BooleanFilter(field_name='mgf', label='Ayant facturé ? ', method='filter_has_invoice', )
     client = django_filters.ModelChoiceFilter(field_name='nt__code_client',queryset=Clients.objects.all(),label='Client')
     def filter_has_creance(self, queryset, name, value):
 
@@ -334,9 +336,20 @@ class ECFilter(django_filters.FilterSet):
 
         return queryset
 
+    def filter_has_invoice(self, queryset, name, value):
+
+        if value is False:
+            ids = [obj.id for obj in queryset if (obj.montant_global_f <= 0)]
+            return queryset.filter(id__in=ids)
+        elif value is True:
+            ids = [obj.id for obj in queryset if (obj.montant_global_f > 0)]
+            return queryset.filter(id__in=ids)
+
+        return queryset
+
     class Meta:
         model = Marche
-        fields=['id','has_creance','client']
+        fields=['code_contrat','has_creance','client','has_invoice']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

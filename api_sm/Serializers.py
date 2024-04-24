@@ -506,9 +506,9 @@ class ECSerializer(serializers.ModelSerializer):
     nt = serializers.PrimaryKeyRelatedField(source="nt.nt",label='NT',read_only=True)
     client = serializers.PrimaryKeyRelatedField(source="nt.code_client",label='Client',read_only=True)
 
-    mgf = serializers.SerializerMethodField()
-    mgp = serializers.SerializerMethodField()
-    mgc = serializers.SerializerMethodField()
+    mgf = serializers.SerializerMethodField(label='M.G.Facturé')
+    mgp = serializers.SerializerMethodField(label='M.G.Payé')
+    mgc = serializers.SerializerMethodField(label='M.G.Créance')
 
     def get_mgf(self, obj):
         return obj.montant_global_f
