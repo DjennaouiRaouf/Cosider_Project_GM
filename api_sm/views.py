@@ -1144,6 +1144,7 @@ class GetAttachements2(generics.ListAPIView):
 
 
 
+
 class Etat_Creances(generics.ListAPIView):
     queryset = Marche.objects.all()
     serializer_class = ECSerializer
