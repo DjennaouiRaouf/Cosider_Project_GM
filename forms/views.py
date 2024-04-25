@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from api_sch.Filters import ProdFilter
 from api_sch.Serializers import ProductionSerializer
 from api_sch.models import TabUniteDeMesure, TabProduction
 from api_sm.Filters import *
@@ -1580,5 +1581,42 @@ class AttFieldsStateApiView(APIView):
                     state.update(d)
             return Response({'state': state}, status=status.HTTP_200_OK)
 
+
+
+
+
+
+class FlashFieldsFilterApiView(APIView):
+    def get(self,request):
+        field_info = []
+
+        for field_name, field_instance  in ProdFilter.base_filters.items():
+
+            if(field_name in ['dqe']):
+
+                obj = {
+                    'name': field_name,
+                    'type': str(field_instance.__class__.__name__),
+                    'label': field_instance.label or field_name,
+
+                }
+                if str(field_instance.__class__.__name__) == 'ModelChoiceFilter':
+                    anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
+                    serialized_data = anySerilizer(field_instance.queryset, many=True).data
+                    filtered_data = []
+                    for item in serialized_data:
+                        filtered_item = {
+                            'value': item['id'],
+                            'label': item['libelle']
+                        }
+                        filtered_data.append(filtered_item)
+
+                    obj['queryset'] = filtered_data
+
+
+
+                field_info.append(obj)
+
+        return Response({'fields': field_info},status=status.HTTP_200_OK)
 
 
