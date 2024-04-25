@@ -253,7 +253,7 @@ class AttachementsFilter(django_filters.FilterSet):
     code_tache = django_filters.CharFilter(field_name='dqe__code_tache', label="Code Tache")
     mm = django_filters.NumberFilter(field_name='date__month', label='Mois')
     aa = django_filters.NumberFilter(field_name='date__year', label='Année')
-
+    dqe=django_filters.ModelChoiceFilter(field_name='dqe',queryset=DQE.objects.all())
     class Meta:
         model = Attachements
         fields=['marche',]

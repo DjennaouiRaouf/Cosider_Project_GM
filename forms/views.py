@@ -1623,6 +1623,7 @@ class FlashFieldsFilterApiView(APIView):
 class AttachementFieldsFilterApiView(APIView):
     def get(self,request):
         field_info = []
+        marche = request.query_params.get('marche', None)
         for field_name, field_instance  in AttachementsFilter.base_filters.items():
             if(field_name not in ['']):
 
@@ -1633,17 +1634,18 @@ class AttachementFieldsFilterApiView(APIView):
 
                 }
                 if str(field_instance.__class__.__name__) == 'ModelChoiceFilter':
-                    anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
-                    serialized_data = anySerilizer(field_instance.queryset, many=True).data
-                    filtered_data = []
-                    for item in serialized_data:
-                        filtered_item = {
-                            'value': item['id'],
-                            'label': item['libelle']
-                        }
-                        filtered_data.append(filtered_item)
+                    if(field_name in ['dqe']):
+                        anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
+                        serialized_data = anySerilizer(field_instance.queryset.filter(marche=marche), many=True).data
+                        filtered_data = []
+                        for item in serialized_data:
+                            filtered_item = {
+                                'value': item['id'],
+                                'label': item['libelle']
+                            }
+                            filtered_data.append(filtered_item)
 
-                    obj['queryset'] = filtered_data
+                        obj['queryset'] = filtered_data
 
 
 
