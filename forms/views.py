@@ -1587,9 +1587,7 @@ class AttFieldsStateApiView(APIView):
 class FlashFieldsFilterApiView(APIView):
     def get(self,request):
         field_info = []
-
         for field_name, field_instance  in ProdFilter.base_filters.items():
-
             if(field_name in ['dqe']):
 
                 obj = {
