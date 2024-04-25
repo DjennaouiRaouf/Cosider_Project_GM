@@ -1584,7 +1584,6 @@ class AttFieldsStateApiView(APIView):
 
 
 
-
 class FlashFieldsFilterApiView(APIView):
     def get(self,request):
         field_info = []
