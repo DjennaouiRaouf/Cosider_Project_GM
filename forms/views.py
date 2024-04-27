@@ -1627,7 +1627,7 @@ class AttachementFieldsFilterApiView(APIView):
         field_info = []
         marche = request.query_params.get('marche', None)
         for field_name, field_instance  in AttachementsFilter.base_filters.items():
-            if(field_name not in ['']):
+            if(field_name  in ['dqe']):
 
                 obj = {
                     'name': field_name,
