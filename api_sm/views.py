@@ -450,7 +450,6 @@ class DelDQEByID(generics.DestroyAPIView):
         return Response({'Message': pk_list},status=status.HTTP_200_OK)
 
 
-
 class DelATT(generics.DestroyAPIView,DestroyModelMixin):
     #permission_classes = [IsAuthenticated,DeleteDQEPermission]
     queryset = Attachements.objects.all()
