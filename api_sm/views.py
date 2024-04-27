@@ -455,7 +455,6 @@ class DelATT(generics.DestroyAPIView,DestroyModelMixin):
     #permission_classes = [IsAuthenticated,DeleteDQEPermission]
     queryset = Attachements.objects.all()
     serializer_class = AttachementsSerializer
-
     def delete(self, request, *args, **kwargs):
         pk_list = request.data.get(Attachements._meta.pk.name)
         if pk_list:
