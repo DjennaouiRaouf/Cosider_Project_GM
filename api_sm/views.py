@@ -435,8 +435,8 @@ class GetFactureRG(generics.ListAPIView):
 
                          }}, status=status.HTTP_200_OK)
 
-class DelDQEByID(generics.DestroyAPIView,DestroyModelMixin):
-    permission_classes = [IsAuthenticated,DeleteDQEPermission]
+class DelDQEByID(generics.DestroyAPIView):
+    #permission_classes = [IsAuthenticated,DeleteDQEPermission]
     queryset = DQE.objects.all()
     serializer_class = DQESerializer
 
@@ -448,6 +448,25 @@ class DelDQEByID(generics.DestroyAPIView,DestroyModelMixin):
             self.perform_destroy(queryset)
 
         return Response({'Message': pk_list},status=status.HTTP_200_OK)
+
+
+
+class DelATT(generics.DestroyAPIView,DestroyModelMixin):
+    #permission_classes = [IsAuthenticated,DeleteDQEPermission]
+    queryset = Attachements.objects.all()
+    serializer_class = AttachementsSerializer
+
+    def delete(self, request, *args, **kwargs):
+        pk_list = request.data.get(Attachements._meta.pk.name)
+        if pk_list:
+            queryset = self.filter_queryset(self.get_queryset())
+            queryset = queryset.filter(pk__in=pk_list)
+            self.perform_destroy(queryset)
+
+        return Response({'Message': pk_list},status=status.HTTP_200_OK)
+
+
+
 
 
 class UpdateDQEApiVew(generics.UpdateAPIView):

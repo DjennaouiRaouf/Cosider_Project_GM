@@ -89,6 +89,7 @@ urlpatterns = [
 
     path('ods/',GetODS.as_view()),
     path('addods/', AddODS.as_view()),
+    path('delatt/',DelATT.as_view()),
 
 
 
