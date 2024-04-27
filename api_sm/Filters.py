@@ -35,6 +35,9 @@ class SitesFilter(django_filters.FilterSet):
 
 
 class NTFilter(django_filters.FilterSet):
+    nt=django_filters.CharFilter(field_name='nt',label='NT')
+    code_site=django_filters.ModelChoiceFilter(field_name="code_site'",queryset=Sites.objects.all(),label='Site')
+    code_client=django_filters.ModelChoiceFilter(field_name='code_client',queryset=Clients.objects.all(),label='Client')
     class Meta:
         model = NT
         fields=['nt','code_site','code_client',]
