@@ -105,9 +105,10 @@ DATABASES = {
         "NAME": "sm",
         "USER":"",
         "PASSWORD":"",
-        "HOST": "DESKTOP-7OLRFHN\MSSQLSERVER1",
-        "PORT":"2448",
-        "OPTIONS": {"driver": "ODBC Driver 13 for SQL Server",
+        "HOST": "DESKTOP-F128EBQ\MSSQLSERVER",
+        "PORT":"1433",
+        "OPTIONS": {"driver": "ODBC Driver 18 for SQL Server",
+                    'extra_params': "Encrypt=no;TrustServerCertificate=yes",
                     'MARS_Connection': 'True',  # Enable Multiple Active Result Sets
                     'host_is_server': 'True',  # Optimize connection settings
         },
@@ -119,9 +120,10 @@ DATABASES = {
         "NAME": "ca_ch",
         "USER": "",
         "PASSWORD": "",
-        "HOST": "DESKTOP-7OLRFHN\MSSQLSERVER1",
-        "PORT": "2448",
-        "OPTIONS": {"driver": "ODBC Driver 13 for SQL Server",
+        "HOST": "DESKTOP-F128EBQ\MSSQLSERVER",
+        "PORT": "1433",
+        "OPTIONS": {"driver": "ODBC Driver 18 for SQL Server",
+                    'extra_params': "Encrypt=no;TrustServerCertificate=yes",
                     'MARS_Connection': 'True',  # Enable Multiple Active Result Sets
                     'host_is_server': 'True',  # Optimize connection settings
                     },
