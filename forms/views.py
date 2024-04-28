@@ -788,31 +788,33 @@ class FactureFieldsStateApiView(APIView):
 
 
 class FactureFieldsFilterApiView(APIView):
-    def get(self,request):
-        filter_fields = list(FactureFilter.base_filters.keys())
-        serializer = FactureSerializer()
-        fields = serializer.get_fields()
+    def get(self, request):
         field_info = []
-        for field_name, field_instance in fields.items():
-            if field_name in filter_fields:
-                if field_name not in ['marche']:
-                    obj = {
-                        'name': field_name,
-                        'type': str(field_instance.__class__.__name__),
+        for field_name, field_instance in FactureFilter.base_filters.items():
+            if (field_name not in ['marche']):
 
-                        'label': field_instance.label or field_name,
-                    }
-                    if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
-                        anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
-                        obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
+                obj = {
+                    'name': field_name,
+                    'type': str(field_instance.__class__.__name__),
+                    'label': field_instance.label or field_name,
 
-                    field_info.append(obj)
+                }
+                if str(field_instance.__class__.__name__) == 'ModelChoiceFilter':
+                    anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
+                    serialized_data = anySerilizer(field_instance.queryset, many=True).data
+                    filtered_data = []
+                    for item in serialized_data:
+                        filtered_item = {
+                            'value': item['id'],
+                             'label': item['libelle']
+                        }
+                        filtered_data.append(filtered_item)
 
-        return Response({'fields': field_info},status=status.HTTP_200_OK)
+                    obj['queryset'] = filtered_data
 
+                field_info.append(obj)
 
-
-
+        return Response({'fields': field_info}, status=status.HTTP_200_OK)
 
 
 class EncaissementFieldsApiView(APIView):
