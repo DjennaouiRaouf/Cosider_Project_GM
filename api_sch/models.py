@@ -71,13 +71,12 @@ class TabBanque(models.Model):
 
 
 class TabFiliale(models.Model):
-    code_filiale = models.CharField(db_column='Code_Filiale', primary_key=True, max_length=5)  
+    id = models.CharField(db_column='Code_Filiale', primary_key=True, max_length=5)
     code_entreprise=models.CharField(max_length=2,null=False, db_column='Code_Entreprise')
-    libelle_filiale = models.CharField(db_column='Libelle_Filiale', max_length=50, blank=True, null=True)  
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', blank=True, null=True)  
-    user_id = models.CharField(db_column='User_ID', max_length=15, blank=True, null=True)  
-    date_modification = models.DateTimeField(db_column='Date_Modification', blank=True, null=True)  
+    libelle = models.CharField(db_column='Libelle_Filiale', max_length=50, blank=True, null=True)
 
+    def __str__(self):
+        return str(self.id)
     class Meta:
         managed = False
         db_table = 'Tab_filiale'
@@ -93,6 +92,9 @@ class TabUniteDeMesure(models.Model):
     user_id = models.CharField(db_column='User_ID', max_length=15, blank=True, null=True)  # Field name made lowercase.
     date_modification = models.DateTimeField(db_column='Date_Modification', blank=True, null=True)  # Field name made lowercase.
 
+
+    def __str__(self):
+        return str(self.libelle)
     class Meta:
         managed = False
         db_table = 'Tab_Unite_de_mesure'
@@ -109,6 +111,8 @@ class TabSituationNt(models.Model):
     user_id = models.CharField(db_column='User_ID', max_length=15, blank=True, null=True)  # Field name made lowercase.
     date_modification = models.DateTimeField(db_column='Date_Modification', blank=True, null=True)  # Field name made lowercase.
 
+    def __str__(self):
+        return str(self.libelle)
     class Meta:
         managed = False
         db_table = 'Tab_Situation_NT'
@@ -122,6 +126,8 @@ class TabDivision(models.Model):
     code_filiale = models.ForeignKey('TabFiliale', models.DO_NOTHING, db_column='Code_Filiale', blank=True, null=True)  # Field name made lowercase.
     libelle = models.CharField(db_column='Libelle_Division', max_length=100, blank=True, null=True)  # Field name made lowercase.
 
+    def __str__(self):
+        return str(self.libelle)
     class Meta:
         managed = False
         db_table = 'Tab_Division'
@@ -131,7 +137,11 @@ class TabCommune(models.Model):
     id = models.CharField(db_column='Code_Commune_Ons', primary_key=True, max_length=10)  # Field name made lowercase.
     libelle = models.CharField(db_column='Libelle_Commune', max_length=50, blank=True, null=True)  # Field name made lowercase.
 
+    def __str__(self):
+        return str(self.libelle)
     class Meta:
         managed = False
         db_table = 'Tab_Commune'
+
+
 

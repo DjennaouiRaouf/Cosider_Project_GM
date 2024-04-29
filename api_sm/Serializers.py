@@ -95,7 +95,7 @@ class SiteSerializer(serializers.ModelSerializer):
 class NTSerializer(serializers.ModelSerializer):
     class Meta:
         model=NT
-        fields ='__all__'
+        fields =['id','code_site','nt','code_client','code_situation_nt','libelle','date_ouverture_nt','date_cloture_nt']
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
         fields.pop('deleted', None)
@@ -104,8 +104,10 @@ class NTSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-
-
+        if instance.code_situation_nt:
+            representation['code_situation_nt'] = instance.code_situation_nt.libelle
+        else:
+            representation['code_situation_nt'] = None
 
         return representation
 

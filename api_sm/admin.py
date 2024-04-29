@@ -67,14 +67,10 @@ class ImagesAdmin(SafeDeleteAdmin,admin.ModelAdmin):
 
 
 @admin.register(Clients)
-class ClientAdmin(DjangoQLSearchMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+class ClientAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_per_page = lp
     resource_class=ClientResource
     list_display = [field.name for field in Clients._meta.fields if field.name not in ['deleted', 'deleted_by_cascade']]
-    list_filter = (
-        SafeDeleteAdminFilter,
-    )
-    search_fields = ('id','libelle','type_client','est_client_cosider','nif','raison_social','adresse')
 
     def get_import_formats(self):
 
@@ -101,13 +97,11 @@ class ClientAdmin(DjangoQLSearchMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportE
 
 
 @admin.register(Sites)
-class SitesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+class SitesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = SiteResource
     list_per_page = lp
-    list_display = ('id','libelle','code_filiale','code_division','code_region',
-        'code_commune_site','date_ouverture_site','date_cloture_site' )
-    list_editable = ()
-    list_filter = (SafeDeleteAdminFilter,)
+    list_display = [field.name for field in Sites._meta.fields]
+
 
     def get_import_formats(self):
 
@@ -137,14 +131,11 @@ class SitesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin
 
 
 @admin.register(NT)
-class NTAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+class NTAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = NTResource
-    list_display = (
-    'nt','code_client_link','code_site_link','libelle','date_ouverture_nt','date_cloture_nt',
-    )
-    change_links = ['code_client','code_site']
-    list_filter = (SafeDeleteAdminFilter,)
-    search_fields = ('nt','code_client__id')
+    list_display = ['id','code_site',]
+
+
     def get_import_formats(self):
         formats = (
             base_formats.XLSX,
@@ -161,7 +152,7 @@ class NTAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExp
             return False
         return super().has_change_permission(request, obj)
 
- 
+
 
 
 

@@ -102,21 +102,6 @@ DATABASES = {
 DATABASES = {
     'default': {
         "ENGINE": "mssql",
-        "NAME": "sm",
-        "USER":"",
-        "PASSWORD":"",
-        "HOST": "DJENNAOUI\MSSQLSERVER",
-        "PORT":"1433",
-        "OPTIONS": {"driver": "ODBC Driver 18 for SQL Server",
-                    'extra_params': "Encrypt=no;TrustServerCertificate=yes",
-                    'MARS_Connection': 'True',  # Enable Multiple Active Result Sets
-                    'host_is_server': 'True',  # Optimize connection settings
-        },
-
-
-    },
-    'ca_ch': {
-        "ENGINE": "mssql",
         "NAME": "ca_ch",
         "USER": "",
         "PASSWORD": "",
@@ -128,12 +113,11 @@ DATABASES = {
                     'host_is_server': 'True',  # Optimize connection settings
                     },
 
-
     },
+
 
 }
 
-DATABASE_ROUTERS = ['api_sm.routers.DatabaseRouter']
 
 AUTH_PASSWORD_VALIDATORS = [
     {

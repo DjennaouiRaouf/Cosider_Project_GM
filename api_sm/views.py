@@ -120,7 +120,7 @@ class GetClientsView(generics.ListAPIView):
 
 
 class AjoutSiteApiView(generics.CreateAPIView):
-    permission_classes = [IsAuthenticated,AddSitePermission]
+    #permission_classes = [IsAuthenticated,AddSitePermission]
 
     queryset = Sites.objects.all()
     serializer_class = SiteSerializer

@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="sm@localhost" uuid="5cf340f5-5973-44cc-86e1-8e800ca35d08">
+    <data-source source="LOCAL" name="CA_CH@localhost" uuid="53aff873-03c8-4447-abef-a2e0d1cb2d84">
       <driver-ref>sqlserver.ms</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc-driver>
-      <jdbc-url>jdbc:sqlserver://localhost\MSSQLSERVER:1433;database=sm</jdbc-url>
+      <jdbc-url>jdbc:sqlserver://localhost\MSSQLSERVER:1433;database=CA_CH</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="SM@localhost" uuid="346755da-7fc9-43ae-a123-9f1fca104b51">
+      <driver-ref>sqlserver.ms</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc-driver>
+      <jdbc-url>jdbc:sqlserver://localhost\MSSQLSERVER:1433;database=SM</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

@@ -218,7 +218,7 @@ class MarcheFieldsFilterApiView(APIView):
                 for item in serialized_data:
                     filtered_item = {
                         'value': item['id'],
-                        'label': item['libelle']
+                        'label': item['libelle']  or item['id']
                     }
                     filtered_data.append(filtered_item)
 
@@ -327,7 +327,7 @@ class MarcheFieldsApiView(APIView):
                             for item in serialized_data:
                                 filtered_item = {
                                     'value': item['id'],
-                                    'label': item['libelle']
+                                    'label': item['libelle'] or item['id']
                                 }
                                 filtered_data.append(filtered_item)
 
@@ -495,7 +495,7 @@ class ClientFieldsApiView(APIView):
 
 class SiteFieldsStateApiView(APIView):
     def get(self, request):
-        serializer = ClientsSerializer()
+        serializer = SiteSerializer()
         fields = serializer.get_fields()
         field_info = []
         for field_name, field_instance in fields.items():
@@ -606,7 +606,7 @@ class NTFieldsFilterApiView(APIView):
                         }
                         filtered_data.append(filtered_item)
 
-                        obj['queryset'] = filtered_data
+                        obj['queryset'] = serialized_data
 
                 field_info.append(obj)
 
@@ -640,7 +640,7 @@ class NTFieldsApiView(APIView):
                             for item in serialized_data:
                                 filtered_item = {
                                     'value': item['id'],
-                                    'label': item['libelle']
+                                    'label': item['libelle'] or item['id']
                                 }
                                 filtered_data.append(filtered_item)
 

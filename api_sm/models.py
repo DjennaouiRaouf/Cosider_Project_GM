@@ -12,6 +12,7 @@ from safedelete.models import SafeDeleteModel
 from simple_history.models import HistoricalRecords
 from simple_history.signals import pre_create_historical_record
 
+from api_sch.models import *
 
 
 class DeletedModelManager(SafeDeleteManager):
@@ -81,68 +82,70 @@ class OptionImpression(SafeDeleteModel):
 
 class Clients(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    id = models.CharField(db_column='Code_Client', primary_key=True, max_length=500, verbose_name='Code du Client')
-    type_client = models.PositiveSmallIntegerField(db_column='Type_Client', blank=True, null=True ,verbose_name='Type de Client')
-    est_client_cosider = models.BooleanField(db_column='Est_Client_Cosider', blank=True, null=False
-                                             ,verbose_name='Est Client Cosider')
-    libelle = models.CharField(db_column='Libelle_Client', max_length=300, blank=True, null=True,
-                                      verbose_name='Libelle')
-
-    adresse = models.CharField(db_column='adresse', max_length=500, blank=True, null=True,
-                                      verbose_name='Adresse')
 
 
-    nif = models.CharField(db_column='NIF', unique=True, max_length=50, blank=True, null=True,verbose_name='NIF')
-    raison_social = models.CharField(db_column='Raison_Social', max_length=50, blank=True, null=True,verbose_name='Raison Social')
-    num_registre_commerce = models.CharField(db_column='Num_Registre_Commerce', max_length=20, blank=True, null=True,
-                                             verbose_name='Numero du registre de commerce')
-
+    id =models.CharField(db_column='Code_Client', primary_key=True,
+                                   max_length=20,verbose_name="Code Client")
+    type_client = models.SmallIntegerField(db_column='Type_Client', blank=True, null=True,verbose_name="Type Client")  
+    est_client_cosider = models.BooleanField(db_column='Est_Client_Cosider', blank=True,
+                                             null=True,verbose_name="Est Client Cosider ?")  
+    libelle = models.CharField(db_column='Libelle_Client', max_length=300, blank=True,
+                                      null=True,verbose_name="Libelle")  
+    nif = models.CharField(db_column='NIF', unique=True, max_length=50, blank=True,
+                           null=True,verbose_name="NIF")  
+    raison_social = models.CharField(db_column='Raison_Social', max_length=50, blank=True,
+                                     null=True,verbose_name="Raison social")  
+    num_registre_commerce = models.CharField(db_column='Num_Registre_Commerce', max_length=20, blank=True,
+                                             null=True,verbose_name="N° Registre Commerce")
+    
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', blank=True, null=True)  
+    user_id = models.CharField(db_column='User_ID', max_length=15, blank=True, null=True)  
+    date_modification = models.DateTimeField(db_column='Date_Modification', blank=True, null=True)
     objects = DeletedModelManager()
+
     def __str__(self):
         return  self.id
 
-
-
     class Meta:
+        managed=False
+        db_table = 'Tab_Client'
         verbose_name = 'Clients'
         verbose_name_plural = 'Clients'
-        app_label = 'api_sm'
-        
+
 
 
 class Sites(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
+
     id = models.CharField(db_column='Code_site', primary_key=True, max_length=500 ,
                                  verbose_name='Code du Site')
-    responsable_site = models.CharField(db_column='Responsable', max_length=500, blank=True, null=True,
-                                 verbose_name='Responsable du Site')
-    libelle = models.CharField(db_column='Libelle_Site', max_length=500, blank=True, null=True,
-                                 verbose_name='Libelle du Site')
-    type_site = models.PositiveSmallIntegerField(db_column='Type_Site', blank=True, null=True,
-                                 verbose_name='Type du Site')
+    code_filiale = models.ForeignKey(TabFiliale, models.DO_NOTHING,
+                                     db_column='Code_Filiale',verbose_name='Code Filiale')
+    code_region = models.CharField(db_column='Code_Region', max_length=1, blank=True,
+                                   null=True,verbose_name='Code Région')
+    libelle = models.CharField(db_column='Libelle_Site', max_length=150, blank=True,
+                                    null=True,verbose_name='Libelle')
+    code_agence = models.ForeignKey(TabAgence, models.DO_NOTHING, db_column='Code_Agence', blank=True,
+                                    null=True,verbose_name='Code Agence')
+    type_site = models.SmallIntegerField(db_column='Type_Site', blank=True, null=True,verbose_name='Type du Site')
+    code_division = models.ForeignKey(TabDivision, models.DO_NOTHING, db_column='Code_Division', blank=True,
+                                      null=True,verbose_name='Code Division')
+    code_commune_site = models.CharField(db_column='Code_Commune_Site', max_length=10, blank=True,
+                                         null=True,verbose_name='Code Commune')
+    jour_cloture_mouv_rh_paie = models.CharField(db_column='Jour_Cloture_Mouv_RH_Paie', max_length=2, blank=True,
+                                                 null=True)  
+    date_ouverture_site = models.DateField(db_column='Date_Ouverture_Site', blank=True,
+                                           null=True,verbose_name='Date Ouverture')
+    date_cloture_site = models.DateField(db_column='Date_Cloture_Site', blank=True,
+                                         null=True,verbose_name='Date Cloture')
 
-    code_filiale = models.CharField(db_column='Code_Filiale', max_length=50,blank=True, null=True,
-                                 verbose_name='Code Filiale')
-
-
-    code_division  = models.ForeignKey('api_sch.TabDivision', on_delete=models.DO_NOTHING, db_constraint=False,
-                                       blank=True, null=True
-                                       , verbose_name='Division')
-
-    code_region = models.CharField(db_column='Code_Region', max_length=20, blank=True, null=True,
-                                 verbose_name='Code région')
-
-    code_commune_site  = models.ForeignKey('api_sch.TabCommune', on_delete=models.DO_NOTHING, db_constraint=False,
-                                       blank=True, null=True
-                                       , verbose_name='Commune')
-
-    date_ouverture_site = models.DateField(db_column='Date_Ouverture_Site', blank=True, null=True,
-                                 verbose_name='Ouverture')
-    date_cloture_site = models.DateField(db_column='Date_Cloture_Site', blank=True, null=True,
-                                 verbose_name='Cloture')
-
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', blank=True, null=True)  
+    user_id = models.CharField(db_column='User_ID', max_length=15, blank=True, null=True)  
+    date_modification = models.DateTimeField(db_column='Date_Modification', blank=True,
+                                             null=True)  
 
     objects = DeletedModelManager()
+
 
     def __str__(self):
         return self.id
@@ -162,49 +165,45 @@ class Sites(SafeDeleteModel):
 
 
     class Meta:
+        managed = False
+        db_table = 'Tab_Site'
         verbose_name = 'Sites'
         verbose_name_plural = 'Sites'
-        app_label = 'api_sm'
+
         
-
-
-
-
 
 
 
 
 class NT(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    id=models.CharField(db_column='id',max_length=500,primary_key=True,verbose_name="id",editable=False)
-    nt = models.CharField(db_column='NT', max_length=20, verbose_name='NT')
-    code_situation = models.ForeignKey('api_sch.TabSituationNt',on_delete=models.DO_NOTHING,db_constraint=False , blank=True, null=True
-                                       , verbose_name='Situation')
-    libelle = models.TextField(db_column='Libelle_NT', blank=True, null=True
-                               , verbose_name='Libelle')
-    date_ouverture_nt = models.DateField(db_column='Date_Ouverture_NT', blank=True, null=True
-                                         , verbose_name='Ouverture')
-    date_cloture_nt = models.DateField(db_column='Date_Cloture_NT',blank=True, null=True
-                                       , verbose_name='Cloture')
-
-    code_site = models.ForeignKey(Sites, on_delete=models.DO_NOTHING, db_column='Code_site', null=False
-                                  , verbose_name='Code du Site')
-    code_client = models.ForeignKey(Clients, on_delete=models.DO_NOTHING, db_column='Code_Client',null=True
-                                    , verbose_name='Code du client')
-
-
-
+    id = models.CharField(primary_key=True, max_length=500,db_column='id',editable=False)
+    code_site = models.ForeignKey(Sites, models.DO_NOTHING, db_column='Code_Site',verbose_name='Site')  # Field name made lowercase.
+    nt = models.CharField(db_column='NT', max_length=20,verbose_name='NT')  # Field name made lowercase.
+    code_client = models.ForeignKey(Clients, models.DO_NOTHING,db_column='code_client',to_field='id',verbose_name='Client')  # Field name made lowercase.
+    code_situation_nt = models.ForeignKey('api_sch.TabSituationNt', models.DO_NOTHING, db_column='Code_Situation_NT', blank=True, null=True
+                                          ,verbose_name='Situation')  # Field name made lowercase.
+    libelle = models.TextField(db_column='Libelle_NT', blank=True, null=True ,verbose_name='Libelle')  # Field name made lowercase.
+    date_ouverture_nt = models.DateField(db_column='Date_Ouverture_NT', blank=True, null=True,verbose_name='Ouverture')  # Field name made lowercase.
+    date_cloture_nt = models.DateField(db_column='Date_Cloture_NT', blank=True, null=True,verbose_name='Cloture')  # Field name made lowercase.
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', blank=True, null=True)  # Field name made lowercase.
+    user_id = models.CharField(db_column='User_ID', max_length=15, blank=True, null=True)  # Field name made lowercase.
+    date_modification = models.DateTimeField(db_column='Date_Modification', blank=True, null=True)  # Field name made lowercase.
     objects = DeletedModelManager()
-
     def __str__(self):
         return str(self.id)
-
     class Meta:
+        managed=False
+        db_table = 'Tab_NT'
         verbose_name = 'NT'
         verbose_name_plural = 'NT'
         unique_together = (('code_site', 'nt'),)
-        app_label = 'api_sm'
-        
+
+
+
+
+
+
 
 
 
@@ -214,9 +213,7 @@ class Marche(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
 
     id=models.CharField(max_length=500,primary_key=True,verbose_name='Code du Contrat')
-    nt = models.ForeignKey(NT, on_delete=models.DO_NOTHING, db_column='nt', null=False
-                           , verbose_name='NT',to_field="id")
-
+    nt=models.ForeignKey(NT, models.DO_NOTHING,db_column='nt',to_field='id')
     libelle = models.TextField(null=False
                                , verbose_name='Libelle')
     ods_depart = models.DateField(null=False, blank=True
