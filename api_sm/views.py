@@ -485,13 +485,13 @@ class UpdateDQEApiVew(generics.UpdateAPIView):
 
 class UpdateNTApiVew(generics.UpdateAPIView):
     queryset = NT.objects.all()
-    serializer_class = DQESerializer
+    serializer_class = NTSerializer
     lookup_field = "id"
     def get_object(self):
         pk = self.request.data.get('id')
         try:
-            obj = NT.objects.get(id=id)
-        except DQE.DoesNotExist:
+            obj = NT.objects.get(id=pk)
+        except NT.DoesNotExist:
             raise NotFound("Object n'éxiste pas")
         self.check_object_permissions(self.request, obj)
 
