@@ -34,6 +34,8 @@ urlpatterns = [
     path('addatt/', AddAttachementApiView.as_view()),
 
     path('recupcaution/',UpdateCautionApiView.as_view()),
+
+    path('updatent/',UpdateNTApiVew.as_view()),
     path('userprofile/',UserProfile.as_view()),
     path('editusr/',EditUserProfile.as_view()),
     path('getatt2/',GetAttachements2.as_view()),
