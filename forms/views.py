@@ -621,6 +621,8 @@ class NTFieldsApiView(APIView):
             fields = serializer.get_fields()
             model_class = serializer.Meta.model
             model_name = model_class.__name__
+
+
             if (flag == 'f'):  # react form
                 field_info = []
 
@@ -658,7 +660,7 @@ class NTFieldsApiView(APIView):
                             'info': str(field_instance.__class__.__name__),
                     }
                     if(field_name in ['id']):
-                        obj['hide']=False
+                        obj['hide']=True
                     field_info.append(obj)
 
             return Response({'fields': field_info,
@@ -674,28 +676,59 @@ class NTFieldsStateApiView(APIView):
         serializer = NTSerializer()
         fields = serializer.get_fields()
         field_info = []
-        for field_name, field_instance in fields.items():
-            default_value = None
-            if (field_name not in ['id',]):
-                if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
-                    default_value = []
-                if str(field_instance.__class__.__name__) == 'BooleanField':
-                    default_value= True
 
-                if str(field_instance.__class__.__name__) in ['PositiveSmallIntegerField','DecimalField','PositiveIntegerField',
-                                                              'IntegerField',]:
-                    default_value = 0
+        id = request.query_params.get("id", None)
+        if id:
+            nt = NT.objects.get(id=id)
+        else:
+            nt = None
+        if (nt == None):
+            for field_name, field_instance in fields.items():
+                default_value = None
+                if (field_name not in ['id',]):
+                    if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
+                        default_value = []
+                    if str(field_instance.__class__.__name__) == 'BooleanField':
+                        default_value= True
 
-                field_info.append({
-                    field_name:default_value ,
+                    if str(field_instance.__class__.__name__) in ['PositiveSmallIntegerField','DecimalField','PositiveIntegerField',
+                                                                  'IntegerField',]:
+                        default_value = 0
 
-                })
+                    field_info.append({
+                        field_name:default_value ,
+
+                    })
 
 
-                state = {}
+                    state = {}
 
-            for d in field_info:
-                state.update(d)
+                for d in field_info:
+                    state.update(d)
+            return Response({'state': state}, status=status.HTTP_200_OK)
+        else:
+            update_nt = NTSerializer(nt).data
+            for field_name, field_instance in fields.items():
+                if (not field_name in ['id']):
+                    default_value = update_nt[field_name]
+
+                    field_info.append({
+                        field_name: default_value,
+
+                    })
+                    state = {}
+
+                    for d in field_info:
+                        state.update(d)
+
+            site = Sites.objects.get(id=state['code_site'])
+            state['code_site'] = [{'value': site.id, 'label': site.libelle or site.id}]
+            situation = TabSituationNt.objects.get(libelle=state['code_situation_nt'])
+            state['code_situation_nt'] = [{'value': situation.id, 'label': situation.libelle or situation.id}]
+            client = Clients.objects.get(id=state['code_client'])
+            state['code_client'] = [{'value': client.id, 'label': client.libelle or client.id}]
+
+            print(state)
         return Response({'state': state}, status=status.HTTP_200_OK)
 
 
