@@ -138,7 +138,7 @@ class AjoutSiteApiView(generics.CreateAPIView):
 
 
 class AjoutMarcheApiView(generics.CreateAPIView):
-    permission_classes = [IsAuthenticated, AddMarchePermission]
+    #permission_classes = [IsAuthenticated, AddMarchePermission]
 
     queryset = Sites.objects.all()
     serializer_class = MarcheSerializer

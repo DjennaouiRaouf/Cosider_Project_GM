@@ -95,12 +95,14 @@ class SiteSerializer(serializers.ModelSerializer):
 class NTSerializer(serializers.ModelSerializer):
     class Meta:
         model=NT
-        fields =['id','code_site','nt','code_client','code_situation_nt','libelle','date_ouverture_nt','date_cloture_nt']
+        fields =['code_site','nt','code_client','code_situation_nt','libelle','date_ouverture_nt','date_cloture_nt']
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
         fields.pop('deleted', None)
         fields.pop('deleted_by_cascade', None)
         return fields
+
+
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)

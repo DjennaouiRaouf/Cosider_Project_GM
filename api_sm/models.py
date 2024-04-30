@@ -99,10 +99,12 @@ class Clients(SafeDeleteModel):
                                      null=True,verbose_name="Raison social")  
     num_registre_commerce = models.CharField(db_column='Num_Registre_Commerce', max_length=20, blank=True,
                                              null=True,verbose_name="N° Registre Commerce")
-    
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', blank=True, null=True)  
-    user_id = models.CharField(db_column='User_ID', max_length=15, blank=True, null=True)  
-    date_modification = models.DateTimeField(db_column='Date_Modification', blank=True, null=True)
+
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)  # Field name made lowercase.
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,
+                               default=get_current_user)  # Field name made lowercase.
+    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)  # Field name made lowercase.
     objects = DeletedModelManager()
 
     def __str__(self):
@@ -141,10 +143,12 @@ class Sites(SafeDeleteModel):
     date_cloture_site = models.DateField(db_column='Date_Cloture_Site', blank=True,
                                          null=True,verbose_name='Date Cloture')
 
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', blank=True, null=True)  
-    user_id = models.CharField(db_column='User_ID', max_length=15, blank=True, null=True)  
-    date_modification = models.DateTimeField(db_column='Date_Modification', blank=True,
-                                             null=True)  
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)  # Field name made lowercase.
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,
+                               default=get_current_user)  # Field name made lowercase.
+    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)  # Field name made lowercase.
+
 
     objects = DeletedModelManager()
 
@@ -187,7 +191,7 @@ class NT(SafeDeleteModel):
     libelle = models.TextField(db_column='Libelle_NT', blank=True, null=True ,verbose_name='Libelle')  # Field name made lowercase.
     date_ouverture_nt = models.DateField(db_column='Date_Ouverture_NT', blank=True, null=True,verbose_name='Ouverture')  # Field name made lowercase.
     date_cloture_nt = models.DateField(db_column='Date_Cloture_NT', blank=True, null=True,verbose_name='Cloture')  # Field name made lowercase.
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', editable=False)  # Field name made lowercase.
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer',default=False ,editable=False)  # Field name made lowercase.
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)  # Field name made lowercase.
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)  # Field name made lowercase.
     objects = DeletedModelManager()
@@ -198,7 +202,7 @@ class NT(SafeDeleteModel):
         db_table = 'Tab_NT'
         verbose_name = 'NT'
         verbose_name_plural = 'NT'
-        unique_together = (('id','code_site', 'nt'),('code_site', 'nt'),)
+        unique_together = (('code_site', 'nt'),)
 
 
 
@@ -236,11 +240,13 @@ class Marche(SafeDeleteModel):
 
 
     date_signature = models.DateField(null=False, verbose_name='Date de signature')
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', editable=False)  # Field name made lowercase.
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)  # Field name made lowercase.
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,
                                default=get_current_user)  # Field name made lowercase.
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)  # Field name made lowercase.
-    objects = DeletedModelManager()
+
+
     objects = DeletedModelManager()
 
 
