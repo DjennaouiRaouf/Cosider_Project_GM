@@ -17,8 +17,6 @@ from .models import *
 # NT
 @receiver(pre_save, sender=NT)
 def pre_save_nt(sender, instance, **kwargs):
-    if not instance.pk:
-        instance.id = instance.code_site.id + "-" + instance.nt
     if (instance.date_cloture_nt and instance.date_ouverture_nt):
         if (instance.date_cloture_nt <= instance.date_ouverture_nt):
             raise ValidationError("Date de cloture doit etre supérieur ou égale à la date d\'ouverture")

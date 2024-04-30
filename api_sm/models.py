@@ -6,6 +6,8 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import Q
 from django.dispatch import receiver
+from django_currentuser.db.models import CurrentUserField
+from django_currentuser.middleware import get_current_user
 from safedelete import SOFT_DELETE_CASCADE, DELETED_VISIBLE_BY_PK, SOFT_DELETE, HARD_DELETE
 from safedelete.managers import SafeDeleteManager
 from safedelete.models import SafeDeleteModel
@@ -177,7 +179,6 @@ class Sites(SafeDeleteModel):
 
 class NT(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    id = models.CharField(primary_key=True, max_length=500,db_column='id',editable=False)
     code_site = models.ForeignKey(Sites, models.DO_NOTHING, db_column='Code_Site',verbose_name='Site')  # Field name made lowercase.
     nt = models.CharField(db_column='NT', max_length=20,verbose_name='NT')  # Field name made lowercase.
     code_client = models.ForeignKey(Clients, models.DO_NOTHING,db_column='code_client',to_field='id',verbose_name='Client')  # Field name made lowercase.
@@ -186,18 +187,18 @@ class NT(SafeDeleteModel):
     libelle = models.TextField(db_column='Libelle_NT', blank=True, null=True ,verbose_name='Libelle')  # Field name made lowercase.
     date_ouverture_nt = models.DateField(db_column='Date_Ouverture_NT', blank=True, null=True,verbose_name='Ouverture')  # Field name made lowercase.
     date_cloture_nt = models.DateField(db_column='Date_Cloture_NT', blank=True, null=True,verbose_name='Cloture')  # Field name made lowercase.
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', blank=True, null=True)  # Field name made lowercase.
-    user_id = models.CharField(db_column='User_ID', max_length=15, blank=True, null=True)  # Field name made lowercase.
-    date_modification = models.DateTimeField(db_column='Date_Modification', blank=True, null=True)  # Field name made lowercase.
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', editable=False)  # Field name made lowercase.
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)  # Field name made lowercase.
+    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)  # Field name made lowercase.
     objects = DeletedModelManager()
     def __str__(self):
-        return str(self.id)
+        return str(self.code_site)+' '+str(self.nt)
     class Meta:
         managed=False
         db_table = 'Tab_NT'
         verbose_name = 'NT'
         verbose_name_plural = 'NT'
-        unique_together = (('code_site', 'nt'),)
+        unique_together = (('id','code_site', 'nt'),('code_site', 'nt'),)
 
 
 
@@ -211,9 +212,8 @@ class NT(SafeDeleteModel):
 
 class Marche(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-
     id=models.CharField(max_length=500,primary_key=True,verbose_name='Code du Contrat')
-    nt=models.ForeignKey(NT, models.DO_NOTHING,db_column='nt',to_field='id')
+    nt=models.ForeignKey(NT, models.DO_NOTHING,db_column='NT',to_field='id')
     libelle = models.TextField(null=False
                                , verbose_name='Libelle')
     ods_depart = models.DateField(null=False, blank=True
@@ -236,9 +236,13 @@ class Marche(SafeDeleteModel):
 
 
     date_signature = models.DateField(null=False, verbose_name='Date de signature')
-   
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', editable=False)  # Field name made lowercase.
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,
+                               default=get_current_user)  # Field name made lowercase.
+    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)  # Field name made lowercase.
     objects = DeletedModelManager()
-    history = HistoricalRecords()
+    objects = DeletedModelManager()
+
 
     @property
     def ht(self):

@@ -133,7 +133,7 @@ class SitesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 @admin.register(NT)
 class NTAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = NTResource
-    list_display = ['id','code_site',]
+    list_display = [field.name for field in NT._meta.fields if field.name not in ['deleted', 'deleted_by_cascade','est_bloquer',]]
 
 
     def get_import_formats(self):
@@ -235,16 +235,12 @@ class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.M
 
 
 @admin.register(Marche)
-class MarcheAdmin(DjangoQLSearchMixin,AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+class MarcheAdmin(DjangoQLSearchMixin,AdminChangeLinksMixin,ImportExportModelAdmin,admin.ModelAdmin):
     save_as = True
     list_per_page = lp
     resource_class = MarcheResource
     list_display = [field.name for field in Marche._meta.fields if field.name not in ['deleted', 'deleted_by_cascade']]+['montant_ht','montant_ttc',]
-    list_filter = (SafeDeleteAdminFilter,
 
-                   )
-    search_fields = ('nt__nt','id')
-    change_links = ('nt',)
 
     def montant_ttc(self, obj):
         return obj.ttc

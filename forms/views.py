@@ -602,11 +602,11 @@ class NTFieldsFilterApiView(APIView):
                     for item in serialized_data:
                         filtered_item = {
                                 'value': item['id'],
-                                'label': item['libelle']
+                                'label': item['libelle'] or item['id']
                         }
                         filtered_data.append(filtered_item)
 
-                        obj['queryset'] = serialized_data
+                        obj['queryset'] = filtered_data
 
                 field_info.append(obj)
 
