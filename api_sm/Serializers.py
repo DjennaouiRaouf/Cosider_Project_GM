@@ -95,7 +95,7 @@ class SiteSerializer(serializers.ModelSerializer):
 class NTSerializer(serializers.ModelSerializer):
     class Meta:
         model=NT
-        fields =['code_site','nt','code_client','code_situation_nt','libelle','date_ouverture_nt','date_cloture_nt']
+        fields =['id','code_site','nt','code_client','code_situation_nt','libelle','date_ouverture_nt','date_cloture_nt']
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
         fields.pop('deleted', None)
@@ -159,7 +159,7 @@ class MarcheSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         code_site = validated_data.pop('nt_code_site')
         num_t = validated_data.pop('nt_nt')
-        print(code_site,num_t)
+
         nt_obj = NT.objects.get(
             code_site_id=code_site,
             nt=num_t

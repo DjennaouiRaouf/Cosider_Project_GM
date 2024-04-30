@@ -658,7 +658,7 @@ class NTFieldsApiView(APIView):
                             'info': str(field_instance.__class__.__name__),
                     }
                     if(field_name in ['id']):
-                        obj['hide']=True
+                        obj['hide']=False
                     field_info.append(obj)
 
             return Response({'fields': field_info,
