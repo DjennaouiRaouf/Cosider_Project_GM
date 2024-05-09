@@ -251,7 +251,7 @@ class Marche(CPkModel):
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
-    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
 
