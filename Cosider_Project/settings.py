@@ -140,11 +140,6 @@ SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
 LANGUAGE_CODE = 'fr'
 
-#TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_TZ = False
 
 
 
