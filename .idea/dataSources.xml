@@ -8,12 +8,5 @@
       <jdbc-url>jdbc:sqlserver://localhost\MSSQLSERVER:1433;database=CA_CH</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="SM@localhost" uuid="346755da-7fc9-43ae-a123-9f1fca104b51">
-      <driver-ref>sqlserver.ms</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc-driver>
-      <jdbc-url>jdbc:sqlserver://localhost\MSSQLSERVER:1433;database=SM</jdbc-url>
-      <working-dir>$ProjectFileDir$</working-dir>
-    </data-source>
   </component>
 </project>

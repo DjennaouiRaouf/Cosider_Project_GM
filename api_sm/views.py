@@ -2,6 +2,7 @@ import json
 
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import check_password
+from django.db import IntegrityError
 from django.db.models import Count, Sum
 from django_filters.rest_framework import DjangoFilterBackend
 from import_export.admin import ImportMixin, ExportMixin
@@ -140,53 +141,56 @@ class AjoutSiteApiView(generics.CreateAPIView):
 class AjoutMarcheApiView(generics.CreateAPIView):
     #permission_classes = [IsAuthenticated, AddMarchePermission]
 
-    queryset = Sites.objects.all()
+    queryset = Marche.objects.all()
     serializer_class = MarcheSerializer
 
     def create(self, request, *args, **kwargs):
+
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        revisable=False
+        try:
+            revisable=serializer.initial_data['revisable']
+            print(revisable)
+        except Exception as e:
+            revisable=False
 
-        self.perform_create(serializer)
-        custom_response = {
-            'status': 'success',
-            'message': 'Marché ajouté',
-            'data': serializer.data,
-        }
+        try:
 
-        return Response(custom_response, status=status.HTTP_201_CREATED)
+            Marche(id=serializer.initial_data['id'], code_site=serializer.initial_data['code_site'], nt=serializer.initial_data['nt'],
+                   libelle=serializer.initial_data['libelle'], ods_depart=serializer.initial_data['ods_depart'],
 
+                   delai_paiement_f=serializer.initial_data['delai_paiement_f'],
+                   rabais=serializer.initial_data['rabais']or 0, tva=serializer.initial_data['tva']or 0, rg=serializer.initial_data['rg'],
+                   date_signature=serializer.initial_data['date_signature']).save(
+                force_insert=True)
+            return Response('Marché ajouté' ,status=status.HTTP_200_OK)
+        except IntegrityError as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+        
 
 
 
 
 class AjoutDQEApiView(generics.CreateAPIView):
     #permission_classes = [IsAuthenticated, AddDQEPermission]
-    queryset = Sites.objects.all()
+    queryset = DQE.objects.all()
     serializer_class = DQESerializer
 
     def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        print(serializer.initial_data)
+
         try:
+            DQE(code_site=serializer.initial_data['pole'],nt=serializer.initial_data['nt'],
+                code_tache=serializer.initial_data['code_tache'],prix_u=serializer.initial_data['prix_u'],
+                est_tache_composite=serializer.initial_data['est_tache_composite'],
+                est_tache_complementaire=serializer.initial_data['est_tache_complementaire'],
+                unite=TabUniteDeMesure.objects.get(id=serializer.initial_data['unite']),libelle=serializer.initial_data['libelle']).save(force_insert=True)
+            return Response('Tache ajoutée', status=status.HTTP_200_OK)
+        except IntegrityError as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
 
-            self.perform_create(serializer)
-            custom_response = {
-                'status': 'success',
-                'message': 'DQE ajouté',
-                'data': serializer.data,
-            }
-
-            return Response(custom_response, status=status.HTTP_201_CREATED)
-        except Exception as e :
-            custom_response = {
-                'status': 'error',
-                'message': str(e),
-                'data': None,
-            }
-
-            return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)
 
 class GetSitesView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated, ViewSitePermission]
@@ -215,7 +219,7 @@ class GetProdParams(APIView):
 
 class GetDQEView(generics.ListAPIView):
     #permission_classes = [permissions.IsAuthenticated,ViewDQEPermission]
-    queryset = DQE.objects.all()
+    queryset = DQE.objects.filter(est_bloquer=False)
     serializer_class = DQESerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = DQEFilter
@@ -223,17 +227,14 @@ class GetDQEView(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        qt = 0
+
         mt = 0
         response_data = super().list(request, *args, **kwargs).data
         for q in queryset:
-            qt = qt + q.quantite
             mt = mt + q.prix_q
 
         return Response({'dqe': response_data,
                              'extra': {
-
-                                 'qt': qt,
                                  'mt': mt,
 
                              }}, status=status.HTTP_200_OK)
@@ -280,27 +281,19 @@ class AjoutNTApiView(generics.CreateAPIView):
     serializer_class = NTSerializer
 
     def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        print(serializer.initial_data)
+
         try:
+            NT(code_site=serializer.initial_data['site'], nt=serializer.initial_data['nt'],
+               code_client=Clients.objects.get(id=serializer.initial_data['code_client']),
+               code_situation_nt=TabSituationNt.objects.get(id=serializer.initial_data['code_situation_nt']),
+               libelle=serializer.initial_data['libelle'],date_ouverture_nt=serializer.initial_data['date_ouverture_nt']).save(force_insert=True)
+            return Response('NT ajoutée', status=status.HTTP_200_OK)
+        except IntegrityError as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
 
-            self.perform_create(serializer)
-            custom_response = {
-                'status': 'success',
-                'message': 'NT ajouté',
-                'data': serializer.data,
-            }
-
-            return Response(custom_response, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            custom_response = {
-                'status': 'error',
-                'message': str(e),
-                'data': None,
-            }
-
-            return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)
 
 class GetDQEbyId(generics.ListAPIView):
     queryset = DQE.objects.all()
@@ -486,11 +479,13 @@ class UpdateDQEApiVew(generics.UpdateAPIView):
 class UpdateNTApiVew(generics.UpdateAPIView):
     queryset = NT.objects.all()
     serializer_class = NTSerializer
-    lookup_field = "id"
+    lookup_field = ['code_site','nt']
     def get_object(self):
-        pk = self.request.data.get('id')
+        cs = self.request.data.get('code_site')
+        nt = self.request.data.get('nt')
+        s = Sites.objects.get(id=cs) # a revoire
         try:
-            obj = NT.objects.get(id=pk)
+            obj = NT.objects.get(code_site=s, nt=nt)
         except NT.DoesNotExist:
             raise NotFound("Object n'éxiste pas")
         self.check_object_permissions(self.request, obj)
@@ -599,11 +594,7 @@ class UpdateMarcheView(generics.UpdateAPIView):
 
 
 
-class DeletedDQE(generics.ListAPIView):
-    queryset = DQE.all_objects.deleted_only()
-    serializer_class = DQESerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_class = DQEFilter
+
 
 
 
@@ -644,7 +635,7 @@ class GetAvance(generics.ListAPIView):
             if(q.type.id == 2):
                 ava = ava + q.montant
 
-        m=Marche.objects.get(id=self.request.query_params.get('marche', None))
+
         return Response({'av': response_data,
                          'extra': {
                              'ava': ava,
@@ -673,29 +664,19 @@ class AddAvanceApiView(generics.CreateAPIView):
     queryset = Avance.objects.all()
     serializer_class = AvanceSerializer
 
-
     def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        cs=request.data.get('pole')
+        nt=request.data.get('nt')
+        m=Marche.objects.get(nt=nt,code_site=cs)
+
         try:
-
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-
-            self.perform_create(serializer)
-            custom_response = {
-                'status': 'success',
-                'message': 'Avance ajoutée',
-                'data': serializer.data,
-            }
-
-            return Response(custom_response, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            custom_response = {
-                'status': 'error',
-                'message': str(e),
-                'data': None,
-            }
-
-            return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)
+            Avance(montant=serializer.initial_data['montant'], marche=m,
+               debut=serializer.initial_data['debut'],fin=serializer.initial_data['fin'],type=TypeAvance.objects.get(id=serializer.initial_data['type']),
+               date=serializer.initial_data['date']).save(force_insert=True)
+            return Response('Avance ajoutée', status=status.HTTP_200_OK)
+        except IntegrityError as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -886,8 +867,9 @@ class contratKeys(APIView):
     #permission_classes = [IsAuthenticated]
     def get(self,request):
         try:
-            keys=Marche.objects.all().values_list('id', flat=True)
-            return Response(keys,status=status.HTTP_200_OK)
+            nt=NT.objects.all().values_list('nt', flat=True)
+            pole=NT.objects.all().values_list('code_site', flat=True)
+            return Response({'nt':nt,'pole':pole},status=status.HTTP_200_OK)
         except Marche.DoesNotExist:
             return Response({'message':'Pas de contrat'},status=status.HTTP_404_NOT_FOUND)
 

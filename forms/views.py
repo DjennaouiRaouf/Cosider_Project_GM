@@ -59,7 +59,7 @@ class DQEFieldsFilterApiView(APIView):
     def get(self,request):
         field_info=[]
         for field_name, field_instance in DQEFilter.base_filters.items():
-            if(field_name not in ['marche']):
+            if(field_name not in ['marche','nt','code_site']):
                 obj = {
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),
@@ -83,7 +83,7 @@ class DQEFieldsStateApiView(APIView):
         if(dqe == None):
 
             for field_name, field_instance in fields.items():
-                if (not field_name in ['prix_q','id','code_site','nt']):
+                if (not field_name in ['prix_q','id','pole','nt']):
                     default_value = None
                     if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
                         default_value = []
@@ -138,9 +138,9 @@ class DQEFieldsApiView(APIView):
                 field_info = []
                 for field_name, field_instance in fields.items():
 
-                    if (field_name not in ['prix_q','id','marche','code_site','nt',]):
+                    if (field_name not in ['prix_q','id','pole','nt']):
 
-                        if( field_name in ['prix_u','quantite','aug_dim',]):
+                        if( field_name in ['prix_u','quantite']):
                             readOnly=False
                         else:
                             readOnly = True
@@ -172,14 +172,14 @@ class DQEFieldsApiView(APIView):
             if(flag=='l'): #data grid list (react ag-grid)
                 field_info = []
                 for field_name, field_instance in fields.items():
-                    if(field_name not in ["marche",'code_site','nt']):
+                    if(field_name not in ['',]):
                         obj = {
                             'field': field_name,
                             'headerName': field_instance.label or field_name,
                             'info': str(field_instance.__class__.__name__),
 
                         }
-                        if( field_name in ['id']):
+                        if( field_name in ['pole','nt']):
                             obj['hide'] = True
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField") and field_name not in ['marche']:
                             obj['related'] = str(field_instance.queryset.model.__name__)
@@ -237,7 +237,7 @@ class MarcheFieldsStateApiView(APIView):
         serializer = MarcheSerializer()
         fields = serializer.get_fields()
         field_info = []
-        marche_pk = request.query_params.get(Marche._meta.pk.name, None)
+        marche_pk = request.query_params.get('id', None)
         if marche_pk:
             marche = Marche.objects.get(pk=marche_pk)
         else:
@@ -252,7 +252,7 @@ class MarcheFieldsStateApiView(APIView):
                     if str(field_instance.__class__.__name__) == 'BooleanField':
                         default_value= False
                     if str(field_instance.__class__.__name__) in ['PositiveSmallIntegerField','DecimalField','PositiveIntegerField',
-                                                                  'IntegerField',]:
+                                                                  'IntegerField','FloatField']:
                         default_value = 0
 
                     field_info.append({
@@ -263,6 +263,8 @@ class MarcheFieldsStateApiView(APIView):
 
                     for d in field_info:
                         state.update(d)
+            return Response({'state': state}, status=status.HTTP_200_OK)
+
         else:
             update_marche=MarcheSerializer(marche).data
             for field_name, field_instance in fields.items():
@@ -278,9 +280,9 @@ class MarcheFieldsStateApiView(APIView):
                     for d in field_info:
                         state.update(d)
 
-        s=Sites.objects.get(id=state['code_site'])
+            s=Sites.objects.get(id=state['code_site'])
 
-        state['code_site']=[{'value':s.id,'label':s.libelle}]
+            state['code_site']=[{'value':s.id,'label':s.libelle}]
 
         return Response({'state': state}, status=status.HTTP_200_OK)
 
@@ -441,7 +443,9 @@ class ClientFieldsStateApiView(APIView):
         fields = serializer.get_fields()
         field_info = []
         for field_name, field_instance in fields.items():
-            default_value = ""
+            default_value = None
+            if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
+                default_value= []
             if str(field_instance.__class__.__name__) == 'BooleanField':
                 default_value= False
             if str(field_instance.__class__.__name__) in ['PositiveSmallIntegerField','DecimalField','PositiveIntegerField',
@@ -499,7 +503,11 @@ class SiteFieldsStateApiView(APIView):
         fields = serializer.get_fields()
         field_info = []
         for field_name, field_instance in fields.items():
-            default_value = ""
+            default_value = None
+            if str(field_instance.__class__.__name__) == 'ChoiceField':
+                default_value= ''
+            if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
+                default_value= False
             if str(field_instance.__class__.__name__) == 'BooleanField':
                 default_value= False
             if str(field_instance.__class__.__name__) in ['PositiveSmallIntegerField','DecimalField','PositiveIntegerField',
@@ -551,6 +559,13 @@ class SiteFieldsApiView(APIView):
                         "required": field_instance.required,
                         'label': field_instance.label or field_name,
                     }
+                    try:
+
+                        if field_instance.choices:
+
+                            obj['choices']= [{'key': key, 'value': value} for key, value in dict(field_instance.choices).items()]
+                    except:
+                        pass
                     if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                         anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
                         serialized_data = anySerilizer(field_instance.queryset, many=True).data
@@ -677,15 +692,18 @@ class NTFieldsStateApiView(APIView):
         fields = serializer.get_fields()
         field_info = []
 
-        id = request.query_params.get("id", None)
-        if id:
-            nt = NT.objects.get(id=id)
+        cs = request.query_params.get("code_site", None)
+        nt = request.query_params.get("nt", None)
+
+
+        if cs and nt:
+            num_t = NT.objects.get(code_site__id=cs,nt=nt)
         else:
-            nt = None
-        if (nt == None):
+            num_t = None
+        if (num_t == None):
             for field_name, field_instance in fields.items():
                 default_value = None
-                if (field_name not in ['id',]):
+                if (field_name not in ['',]):
                     if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
                         default_value = []
                     if str(field_instance.__class__.__name__) == 'BooleanField':
@@ -707,9 +725,11 @@ class NTFieldsStateApiView(APIView):
                     state.update(d)
             return Response({'state': state}, status=status.HTTP_200_OK)
         else:
-            update_nt = NTSerializer(nt).data
+
+            update_nt = NTSerializer(num_t).data
+            print(update_nt)
             for field_name, field_instance in fields.items():
-                if (not field_name in ['id']):
+                if (not field_name in ['']):
                     default_value = update_nt[field_name]
 
                     field_info.append({
@@ -721,8 +741,7 @@ class NTFieldsStateApiView(APIView):
                     for d in field_info:
                         state.update(d)
 
-            site = Sites.objects.get(id=state['code_site'])
-            state['code_site'] = [{'value': site.id, 'label': site.libelle or site.id}]
+
             situation = TabSituationNt.objects.get(libelle=state['code_situation_nt'])
             state['code_situation_nt'] = [{'value': situation.id, 'label': situation.libelle or situation.id}]
             client = Clients.objects.get(id=state['code_client'])
@@ -1111,7 +1130,7 @@ class AvanceFieldsApiView(APIView):
                             'headerName': field_instance.label or field_name,
                             'info': str(field_instance.__class__.__name__),
                         }
-                        if(field_name in ['id']):
+                        if(field_name in ['id','marche']):
                             obj['hide']=True
                         if(field_name in ['taux_avance','montant','debut','fin','remb']):
                             obj['cellRenderer']='InfoRenderer'

@@ -61,6 +61,9 @@ class ClientsSerializer(serializers.ModelSerializer):
         fields = super().get_fields(*args, **kwargs)
         fields.pop('deleted', None)
         fields.pop('deleted_by_cascade', None)
+        fields.pop('est_bloquer', None)
+        fields.pop('user_id', None)
+        fields.pop('date_modification', None)
         return fields
 
 
@@ -74,8 +77,11 @@ class ClientsSerializer(serializers.ModelSerializer):
 class SiteSerializer(serializers.ModelSerializer):
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        fields.pop('deleted', None)
-        fields.pop('deleted_by_cascade', None)
+        fields.pop('est_bloquer', None)
+        fields.pop('user_id', None)
+        fields.pop('date_modification', None)
+        fields.pop('jour_cloture_mouv_rh_paie',None)
+
         return fields
 
 
@@ -93,17 +99,19 @@ class SiteSerializer(serializers.ModelSerializer):
 
 
 class NTSerializer(serializers.ModelSerializer):
+    site=serializers.PrimaryKeyRelatedField(source='code_site',queryset=Sites.objects.all(), label='Pole')
+
+
     class Meta:
         model=NT
-        fields =['id','code_site','nt','code_client','code_situation_nt','libelle','date_ouverture_nt','date_cloture_nt']
+        fields =['site','nt','code_client','code_situation_nt','libelle','date_ouverture_nt','date_cloture_nt']
+
+
+
+
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        fields.pop('deleted', None)
-        fields.pop('deleted_by_cascade', None)
         return fields
-
-
-
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         if instance.code_situation_nt:
@@ -117,14 +125,25 @@ class NTSerializer(serializers.ModelSerializer):
 
 class DQESerializer(serializers.ModelSerializer):
     prix_q = serializers.SerializerMethodField(label="Montant")
+    pole= serializers.PrimaryKeyRelatedField(source='code_site',queryset=Sites.objects.all(), label='Pole')
+
+
 
     def get_prix_q(self, obj):
         return obj.prix_q
 
     class Meta:
         model=DQE
-        fields=['id','code_tache','libelle','est_tache_composite','est_tache_complementaire','prix_u','quantite','unite','prix_q']
+        fields=['pole','nt','code_tache','libelle','est_tache_composite','est_tache_complementaire','prix_u','quantite','unite','prix_q']
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if instance.unite:
+            representation['unite'] = instance.unite.libelle
+        else:
+            representation['unite'] = None
+
+        return representation
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
@@ -136,10 +155,9 @@ class DQESerializer(serializers.ModelSerializer):
 
 
 
-
 class MarcheSerializer(serializers.ModelSerializer):
-    code_site=serializers.PrimaryKeyRelatedField(source="nt_code_site",queryset=Sites.objects.all(),write_only=True,label='Code du site')
-    nt=serializers.CharField(source="nt_nt",write_only=True,label='NT')
+    code_site=serializers.PrimaryKeyRelatedField(queryset=Sites.objects.all(),label='Site')
+    nt=serializers.CharField(label='NT')
     montant_ht = serializers.SerializerMethodField(label='Montant en HT')
     montant_ttc = serializers.SerializerMethodField(label='Montant en TTC')
 
@@ -151,34 +169,21 @@ class MarcheSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Marche
-        fields = ['id','libelle','code_site','nt','ods_depart','date_signature','delai_paiement_f','revisable','rabais','rg'
+        fields = ['id','code_site','nt','libelle','ods_depart','date_signature','delais','delai_paiement_f','revisable','rabais','rg'
             ,'tva','montant_ht','montant_ttc']
 
 
 
-    def create(self, validated_data):
-        code_site = validated_data.pop('nt_code_site')
-        num_t = validated_data.pop('nt_nt')
 
-        nt_obj = NT.objects.get(
-            code_site_id=code_site,
-            nt=num_t
-        )
-
-        marche = Marche.objects.create(nt=nt_obj, **validated_data)
-        return marche
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        fields.pop('deleted', None)
-        fields.pop('deleted_by_cascade', None)
         return fields
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['ht'] = instance.ht
         representation['ttc'] = instance.ttc
-        representation['code_site'] = instance.nt.code_site.id
-        representation['nt'] = instance.nt.nt
+
 
 
         return representation
@@ -271,9 +276,6 @@ class ModePaiementSerializer(serializers.ModelSerializer):
         fields='__all__'
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        fields.pop('deleted', None)
-        fields.pop('deleted_by_cascade', None)
-
 
         return fields
 

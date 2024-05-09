@@ -36,7 +36,7 @@ class SitesFilter(django_filters.FilterSet):
 
 class NTFilter(django_filters.FilterSet):
     nt=django_filters.CharFilter(field_name='nt',label='NT')
-    code_site=django_filters.ModelChoiceFilter(field_name="code_site'",queryset=Sites.objects.all(),label='Site')
+    code_site=django_filters.ModelChoiceFilter(field_name="code_site",queryset=Sites.objects.all(),label='Site')
     code_client=django_filters.ModelChoiceFilter(field_name='code_client',queryset=Clients.objects.all(),label='Client')
     situation=django_filters.ModelChoiceFilter(field_name='code_situation_nt',queryset=TabSituationNt.objects.all(),label='Situation')
     class Meta:
@@ -54,11 +54,11 @@ class NTFilter(django_filters.FilterSet):
 
 
 class MarcheFilter(django_filters.FilterSet):
-    code_site = django_filters.ModelChoiceFilter(field_name='nt__code_site', label='Code du site',
+    code_site = django_filters.ModelChoiceFilter(field_name='code_site', label='Code du site',
                                                  queryset=Sites.objects.all(),)
     code_contrat = django_filters.CharFilter(field_name='id', label='Code du contrat')
     date_signature=django_filters.DateFilter(field_name="date_signature",label='Date de signature')
-    nt = django_filters.CharFilter(field_name='nt__nt', label='Numero du travail')
+    nt = django_filters.CharFilter(field_name='nt', label='Numero du travail')
     rabais=django_filters.NumberFilter(field_name='rabais', label='Rabais')
     tva = django_filters.NumberFilter(field_name='tva', label='TVA')
     rg = django_filters.NumberFilter(field_name='rg', label='Retenue de garantie')
@@ -100,12 +100,13 @@ class MarcheFilter(django_filters.FilterSet):
 
 
 class DQEFilter(django_filters.FilterSet):
-    marche = django_filters.CharFilter(field_name='marche', label="Marche",lookup_expr='exact')
-    code_tache= django_filters.CharFilter(field_name='code_tache',lookup_expr='exact')
-    libelle = django_filters.CharFilter(field_name='libelle', lookup_expr='contains')
+    nt = django_filters.CharFilter(field_name='nt', label='NT')
+    code_site = django_filters.ModelChoiceFilter(field_name="code_site", queryset=Sites.objects.all(), label='Site')
+    code_tache= django_filters.CharFilter(field_name='code_tache', label='Code Tache')
+
     class Meta:
         model = DQE
-        fields=['marche','code_tache','libelle']
+        fields=['code_tache','code_site','nt']
 
 
     def __init__(self, *args, **kwargs):
@@ -182,7 +183,7 @@ class AvanceFilter(django_filters.FilterSet):
 
     class Meta:
         model = Avance
-        fields=['marche','remboursee']
+        fields=['marche__nt','marche__code_site','remboursee']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

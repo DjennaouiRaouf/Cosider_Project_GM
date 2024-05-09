@@ -85,10 +85,7 @@ class ClientAdmin(ImportExportModelAdmin,admin.ModelAdmin):
             base_formats.XLSX,
         )
         return [f for f in formats if f().can_export()]
-    def has_change_permission(self, request, obj=None):
-        if obj and obj.deleted:
-            return False
-        return super().has_change_permission(request, obj)
+  
 
     def has_delete_permission(self, request, obj=None):
         if obj and obj.deleted:
@@ -116,16 +113,8 @@ class SitesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
             base_formats.XLSX,
         )
         return [f for f in formats if f().can_export()]
-    def has_change_permission(self, request, obj=None):
-        if obj and obj.deleted:
-            return False
-        return super().has_change_permission(request, obj)
 
 
-    def has_delete_permission(self, request, obj=None):
-        if obj and obj.deleted:
-            return False
-        return super().has_delete_permission(request, obj)
 
 
 
@@ -133,7 +122,7 @@ class SitesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 @admin.register(NT)
 class NTAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = NTResource
-    list_display = [field.name for field in NT._meta.fields if field.name not in ['deleted', 'deleted_by_cascade','est_bloquer',]]
+    list_display = [field.name for field in NT._meta.fields ]
 
 
     def get_import_formats(self):
@@ -147,10 +136,7 @@ class NTAdmin(ImportExportModelAdmin,admin.ModelAdmin):
             base_formats.XLSX,
         )
         return [f for f in formats if f().can_export()]
-    def has_change_permission(self, request, obj=None):
-        if obj and obj.deleted:
-            return False
-        return super().has_change_permission(request, obj)
+  
 
 
 
@@ -179,21 +165,16 @@ class ODS(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelA
         )
         return [f for f in formats if f().can_export()]
 
-    def has_change_permission(self, request, obj=None):
-        if obj and obj.deleted:
-            return False
-        return super().has_change_permission(request, obj)
+  
 
 @admin.register(DQE)
-class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+class DQEAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     save_as=True
     list_per_page = lp
     resource_class = DQEResource
-    list_display = [field.name for field in DQE._meta.fields if field.name not in ['deleted', 'deleted_by_cascade']]+['prix_q',]
-    list_filter = (SafeDeleteAdminFilter,
+    list_display = [field.name for field in DQE._meta.fields]+['prix_q',]
 
-                   )
-    search_fields = ('marche__id',)
+
 
 
     def prix_q(self,obj):
@@ -219,15 +200,7 @@ class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.M
         return [f for f in formats if f().can_export()]
 
 
-    def has_change_permission(self, request, obj=None):
-        if obj and obj.deleted:
-            return False
-        return super().has_change_permission(request, obj)
-
-    def has_delete_permission(self, request, obj=None):
-        if obj and obj.deleted:
-            return False
-        return super().has_delete_permission(request, obj)
+  
 
 
 
@@ -261,20 +234,16 @@ class MarcheAdmin(DjangoQLSearchMixin,AdminChangeLinksMixin,ImportExportModelAdm
         )
         return [f for f in formats if f().can_export()]
 
-    def has_change_permission(self, request, obj=None):
-        if obj and obj.deleted:
-            return False
-        return super().has_change_permission(request, obj)
+  
 
 
 
 
 
 @admin.register(TypeAvance)
-class  TypeAvanceAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+class  TypeAvanceAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = TypeAvanceResource
     list_display = ("id", "libelle" ,"max")
-    list_filter = (SafeDeleteAdminFilter,)
 
     def max(self,obj):
         return str(obj.taux_max)+'%'
@@ -292,10 +261,7 @@ class  TypeAvanceAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
             base_formats.XLSX,
         )
         return [f for f in formats if f().can_export()]
-    def has_change_permission(self, request, obj=None):
-        if obj and obj.deleted:
-            return False
-        return super().has_change_permission(request, obj)
+  
 
  
 
@@ -323,10 +289,7 @@ class  AvanceAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,adm
             base_formats.XLSX,
         )
         return [f for f in formats if f().can_export()]
-    def has_change_permission(self, request, obj=None):
-        if obj and obj.deleted:
-            return False
-        return super().has_change_permission(request, obj)
+  
 
 
 
@@ -366,10 +329,7 @@ class  TypeCautionAdmin(SafeDeleteAdmin,ImportExportModelAdmin,admin.ModelAdmin)
             base_formats.XLSX,
         )
         return [f for f in formats if f().can_export()]
-    def has_change_permission(self, request, obj=None):
-        if obj and obj.deleted:
-            return False
-        return super().has_change_permission(request, obj)
+  
 
  
 
@@ -497,10 +457,7 @@ class AttachementAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,
             base_formats.XLSX,
         )
         return [f for f in formats if f().can_export()]
-    def has_change_permission(self, request, obj=None):
-        if obj and obj.deleted:
-            return False
-        return super().has_change_permission(request, obj)
+  
 
  
 
@@ -545,10 +502,7 @@ class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,ad
             base_formats.XLSX,
         )
         return [f for f in formats if f().can_export()]
-    def has_change_permission(self, request, obj=None):
-        if obj and obj.deleted:
-            return False
-        return super().has_change_permission(request, obj)
+  
 
  
 
@@ -584,10 +538,7 @@ class DetailFactureAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ExportMixin,admin.Mo
             base_formats.XLSX,
         )
         return [f for f in formats if f().can_export()]
-    def has_change_permission(self, request, obj=None):
-        if obj and obj.deleted:
-            return False
-        return super().has_change_permission(request, obj)
+  
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -615,10 +566,7 @@ class EncaissementAmin(SafeDeleteAdmin,SimpleHistoryAdmin,admin.ModelAdmin):
         return (obj.montant_creance)
 
 
-    def has_change_permission(self, request, obj=None):
-        if obj and obj.deleted:
-            return False
-        return super().has_change_permission(request, obj)
+  
 
 
     def numero_facture(self, obj):

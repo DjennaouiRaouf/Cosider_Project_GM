@@ -1,18 +1,14 @@
 from datetime import datetime
-
+from cpkmodel import CPkModel
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.db import models
 from django.db.models import Q
-from django.dispatch import receiver
-from django_currentuser.db.models import CurrentUserField
+
 from django_currentuser.middleware import get_current_user
 from safedelete import SOFT_DELETE_CASCADE, DELETED_VISIBLE_BY_PK, SOFT_DELETE, HARD_DELETE
 from safedelete.managers import SafeDeleteManager
 from safedelete.models import SafeDeleteModel
-from simple_history.models import HistoricalRecords
-from simple_history.signals import pre_create_historical_record
 
 from api_sch.models import *
 
@@ -21,7 +17,7 @@ class DeletedModelManager(SafeDeleteManager):
     _safedelete_visibility = DELETED_VISIBLE_BY_PK
 
 
-# Create your models here.
+
 class Images(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
     Types = [
@@ -82,8 +78,8 @@ class OptionImpression(SafeDeleteModel):
 
 
 
-class Clients(SafeDeleteModel):
-    _safedelete_policy = SOFT_DELETE_CASCADE
+class Clients(models.Model):
+
 
 
     id =models.CharField(db_column='Code_Client', primary_key=True,
@@ -101,11 +97,11 @@ class Clients(SafeDeleteModel):
                                              null=True,verbose_name="N° Registre Commerce")
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
-                                      editable=False)  # Field name made lowercase.
+                                      editable=False)  
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,
-                               default=get_current_user)  # Field name made lowercase.
-    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)  # Field name made lowercase.
-    objects = DeletedModelManager()
+                               default=get_current_user)  
+    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)  
+
 
     def __str__(self):
         return  self.id
@@ -118,17 +114,23 @@ class Clients(SafeDeleteModel):
 
 
 
-class Sites(SafeDeleteModel):
-    _safedelete_policy = SOFT_DELETE_CASCADE
-
+class Sites(models.Model):
+    RG=(
+        ('',''),
+        ('N','Nord'),
+         ('S','Sud'),
+          ('W','West'),
+           ('E','Est'),
+            ('C','Centre'),
+    )
     id = models.CharField(db_column='Code_site', primary_key=True, max_length=500 ,
                                  verbose_name='Code du Site')
     code_filiale = models.ForeignKey(TabFiliale, models.DO_NOTHING,
                                      db_column='Code_Filiale',verbose_name='Code Filiale')
     code_region = models.CharField(db_column='Code_Region', max_length=1, blank=True,
-                                   null=True,verbose_name='Code Région')
+                                   null=True,verbose_name='Région',choices=RG)
     libelle = models.CharField(db_column='Libelle_Site', max_length=150, blank=True,
-                                    null=True,verbose_name='Libelle')
+                                    null=True,verbose_name='Libellé')
     code_agence = models.ForeignKey(TabAgence, models.DO_NOTHING, db_column='Code_Agence', blank=True,
                                     null=True,verbose_name='Code Agence')
     type_site = models.SmallIntegerField(db_column='Type_Site', blank=True, null=True,verbose_name='Type du Site')
@@ -144,13 +146,13 @@ class Sites(SafeDeleteModel):
                                          null=True,verbose_name='Date Cloture')
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
-                                      editable=False)  # Field name made lowercase.
+                                      editable=False)  
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,
-                               default=get_current_user)  # Field name made lowercase.
-    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)  # Field name made lowercase.
+                               default=get_current_user)  
+    date_modification = models.DateTimeField(db_column='Date_Modification',editable=False, auto_now=True)  
 
 
-    objects = DeletedModelManager()
+  
 
 
     def __str__(self):
@@ -176,27 +178,30 @@ class Sites(SafeDeleteModel):
         verbose_name = 'Sites'
         verbose_name_plural = 'Sites'
 
-        
 
 
 
 
-class NT(SafeDeleteModel):
-    _safedelete_policy = SOFT_DELETE_CASCADE
-    code_site = models.ForeignKey(Sites, models.DO_NOTHING, db_column='Code_Site',verbose_name='Site')  # Field name made lowercase.
-    nt = models.CharField(db_column='NT', max_length=20,verbose_name='NT')  # Field name made lowercase.
-    code_client = models.ForeignKey(Clients, models.DO_NOTHING,db_column='code_client',to_field='id',verbose_name='Client')  # Field name made lowercase.
-    code_situation_nt = models.ForeignKey('api_sch.TabSituationNt', models.DO_NOTHING, db_column='Code_Situation_NT', blank=True, null=True
-                                          ,verbose_name='Situation')  # Field name made lowercase.
-    libelle = models.TextField(db_column='Libelle_NT', blank=True, null=True ,verbose_name='Libelle')  # Field name made lowercase.
-    date_ouverture_nt = models.DateField(db_column='Date_Ouverture_NT', blank=True, null=True,verbose_name='Ouverture')  # Field name made lowercase.
-    date_cloture_nt = models.DateField(db_column='Date_Cloture_NT', blank=True, null=True,verbose_name='Cloture')  # Field name made lowercase.
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer',default=False ,editable=False)  # Field name made lowercase.
-    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)  # Field name made lowercase.
-    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)  # Field name made lowercase.
-    objects = DeletedModelManager()
-    def __str__(self):
-        return str(self.code_site)+' '+str(self.nt)
+
+
+
+class NT(CPkModel):
+    code_site = models.CharField(db_column='Code_site', primary_key=True, max_length=500 ,
+                                 verbose_name='Code du Site')
+    nt = models.CharField(db_column='NT', max_length=20,null=False,primary_key=True,verbose_name='NT')
+    code_client = models.ForeignKey(Clients, models.DO_NOTHING, db_column='Code_Client',verbose_name='Client')
+    code_situation_nt = models.ForeignKey('api_sch.TabSituationNt', models.DO_NOTHING, db_column='Code_Situation_NT', blank=True, null=True,verbose_name='Situation')
+    libelle = models.TextField(db_column='Libelle_NT', blank=True, null=True,verbose_name='libellé')
+    date_ouverture_nt = models.DateField(db_column='Date_Ouverture_NT', blank=True, null=True,verbose_name='Ouverture')
+    date_cloture_nt = models.DateField(db_column='Date_Cloture_NT', blank=True, null=True,verbose_name='Cloture')
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,
+                               default=get_current_user)
+    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
+
+
+
     class Meta:
         managed=False
         db_table = 'Tab_NT'
@@ -214,46 +219,44 @@ class NT(SafeDeleteModel):
 
 
 
-class Marche(SafeDeleteModel):
-    _safedelete_policy = SOFT_DELETE_CASCADE
-    id=models.CharField(max_length=500,primary_key=True,verbose_name='Code du Contrat')
-    nt=models.ForeignKey(NT, models.DO_NOTHING,db_column='NT',to_field='id')
-    libelle = models.TextField(null=False
-                               , verbose_name='Libelle')
+class Marche(CPkModel):
+
+    id=models.CharField(max_length=500,primary_key=True,verbose_name='Contrat N°')
+
+
+    code_site = models.CharField(db_column='Code_site', max_length=10,
+                                 verbose_name='Code du Site')
+    nt = models.CharField(db_column='NT', max_length=20, null=False, verbose_name='NT')
+
+    libelle = models.TextField(null=False,verbose_name='Libellé')
     ods_depart = models.DateField(null=False, blank=True
                                   , verbose_name='ODS de démarrage')
-    delais = models.PositiveIntegerField(default=0, null=False
+    delais = models.IntegerField(default=0, null=True
                                          , verbose_name='Délai des travaux')
     revisable = models.BooleanField(default=True, null=False
                                     , verbose_name='Est-il révisable ?')
-    delai_paiement_f=models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)],
+    delai_paiement_f=models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)],
                                          null=True
                                                  , verbose_name='Délai de paiement')
-    rabais =  models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name='Taux de rabais',
+    rabais =  models.FloatField(default=0,  verbose_name='Taux de rabais',
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    tva = models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name='TVA',
+    tva = models.FloatField(default=0,  verbose_name='TVA',
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    rg = models.DecimalField(default=0, max_digits=38, decimal_places=2,
+    rg = models.FloatField(default=0, 
                              validators=[MinValueValidator(0), MaxValueValidator(100)], null=False
                              , verbose_name='Taux de retenue de garantie')
 
 
 
     date_signature = models.DateField(null=False, verbose_name='Date de signature')
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
-                                      editable=False)  # Field name made lowercase.
-    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,
-                               default=get_current_user)  # Field name made lowercase.
-    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)  # Field name made lowercase.
 
 
-    objects = DeletedModelManager()
 
 
     @property
     def ht(self):
         try:
-            dqes = DQE.objects.filter(marche=self.id)
+            dqes = DQE.objects.filter(code_site=self.code_site,nt=self.nt)
             sum = 0
             for dqe in dqes:
                 sum = sum + dqe.prix_q
@@ -291,26 +294,29 @@ class Marche(SafeDeleteModel):
         return self.montant_global_f-self.montant_global_p
 
 class Meta:
+        managed=False
+        db_table = 'marche'
         verbose_name = 'Marchés'
         verbose_name_plural = 'Marchés'
-        app_label = 'api_sm'
+
         
 
 
 
 
 
-class DQE(SafeDeleteModel): # le prix final
-    _safedelete_policy = SOFT_DELETE_CASCADE
-    id=models.CharField(db_column='id',max_length=500,primary_key=True,verbose_name="id",editable=False)
-    marche = models.ForeignKey(Marche,on_delete=models.DO_NOTHING,  null=False,related_name="marche_dqe",
-                               to_field="id",verbose_name="Code du marché")
+class DQE(CPkModel):
+    code_site = models.CharField(db_column='Code_site',primary_key=True, max_length=10,
+                                 verbose_name='Code du Site')
+    nt = models.CharField(db_column='NT', max_length=20,primary_key=True, null=False, verbose_name='NT')
     code_tache = models.CharField(db_column='Code_Tache',null=False, max_length=30
-                                  ,verbose_name="Code de la tache")
+                                  ,verbose_name="Code Tache",primary_key=True)
+
     libelle = models.TextField(db_column='Libelle_Tache',verbose_name="Libelle")
-    unite =models.ForeignKey('api_sch.TabUniteDeMesure',on_delete=models.DO_NOTHING,db_constraint=False , null=False, verbose_name='Unité')
-    prix_u = models.DecimalField(
-        max_digits=38, decimal_places=2,
+    unite =models.ForeignKey('api_sch.TabUniteDeMesure',on_delete=models.DO_NOTHING, null=False,db_column='Code_Unite_Mesure', verbose_name='Unité')
+    prix_u = models.FloatField(
+        db_column='Prix_Unitaire',
+        
         validators=[MinValueValidator(0)], default=0
         , verbose_name='Prix unitaire'
     )
@@ -318,51 +324,46 @@ class DQE(SafeDeleteModel): # le prix final
                                               null=False,default=False,verbose_name="Tache composée")
     est_tache_complementaire = models.BooleanField(db_column='Est_Tache_Complementaire', blank=True,
                                                    null=False,default=False,verbose_name="Tache complementaire")
-    quantite = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,verbose_name='Quantité')
+    quantite = models.FloatField( validators=[MinValueValidator(0)], default=0,verbose_name='Quantité')
 
-    aug_dim= models.DecimalField(max_digits=38, decimal_places=2, default=0,verbose_name='Augmentation/Diminution')
-
-    objects = DeletedModelManager()
-    history = HistoricalRecords()
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,
+                               default=get_current_user)
+    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
     @property
     def prix_q(self):
-        return round(self.quantite * self.prix_u, 4)
-
-
-    def __str__(self):
-        return (str(self.id))
+        pq= self.prix_u*self.quantite
+        return pq
 
 
 
     class Meta:
+        managed = False
+        db_table = 'Tab_NT_Taches'
         verbose_name = 'DQE'
         verbose_name_plural = 'DQE'
+        unique_together=(('code_site','nt','code_tache'))
         app_label = 'api_sm'
-        permissions = [
-            ("upload_dqe", "Can upload DQE"),
-            ("download_dqe", "Can download DQE"),
 
-        ]
         
 
 
 
 
 
-class Ordre_De_Service(SafeDeleteModel):
-    _safedelete_policy = SOFT_DELETE_CASCADE
+class Ordre_De_Service(models.Model):
     Types = [
         ('Interruption', 'Interruption'),
         ('Reprise', 'Interruption'),
 
     ]
-    marche = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=True, related_name="ods_marche")
+    marche = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=True, related_name="ods_marche",to_field='id')
     date = models.DateField(null=True,blank=True,verbose_name='Date Interruption')
     rep_int=models.CharField(null=False,default='Interruption',max_length=300,choices=Types,verbose_name='Reprise/Interruption')
     motif = models.TextField(null=True, blank=True,verbose_name='Motif')
 
-    objects = DeletedModelManager()
 
 
 
@@ -383,15 +384,9 @@ class Ordre_De_Service(SafeDeleteModel):
 
 
 
-class TypeAvance(SafeDeleteModel):
-    _safedelete_policy = SOFT_DELETE_CASCADE
+class TypeAvance(models.Model):
     libelle = models.CharField(max_length=500, null=False, unique=True)
-    taux_max = models.DecimalField(default=0, max_digits=38, decimal_places=2,
-                                                 validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-
-
-
-    objects = DeletedModelManager()
+    taux_max = models.FloatField(default=0,validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
 
     def __str__(self):
         return self.libelle
@@ -405,21 +400,22 @@ class TypeAvance(SafeDeleteModel):
         
 
 
-class Avance(SafeDeleteModel):
-    _safedelete_policy = SOFT_DELETE_CASCADE
+class Avance(models.Model):
     type = models.ForeignKey(TypeAvance, on_delete=models.DO_NOTHING, null=False, to_field='id',
                              verbose_name="Type d'avance")
     num_avance = models.PositiveIntegerField(default=0, null=False, blank=True, editable=False,
                                                 verbose_name="Numero d'avance")
     marche = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=False, related_name="Avance_Marche",to_field='id')
 
-    taux_avance = models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name="Taux d'avance", editable=False,
+    taux_avance = models.FloatField(default=0,  verbose_name="Taux d'avance", editable=False,
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
 
 
-    montant = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,null=False,verbose_name='Montant d\'avance')
+    montant = models.FloatField( validators=[MinValueValidator(0)], default=0,null=False,verbose_name='Montant d\'avance')
 
-    fin=models.DecimalField(default=80, max_digits=38, decimal_places=2, verbose_name="% Fin",
+    debut = models.FloatField(default=0,  verbose_name="Debut",
+                                      validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
+    fin=models.FloatField(default=80,  verbose_name="Fin",
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
 
 
@@ -434,10 +430,6 @@ class Avance(SafeDeleteModel):
     remboursee = models.BooleanField(default=False, null=False,verbose_name='Est Remboursée')
 
 
-    objects = DeletedModelManager()
-
-    def __str__(self):
-        return str(self.marche)+"-"+self.type.libelle+'-'+str(self.num_avance)
     class Meta:
         verbose_name = 'Avance'
         verbose_name_plural = 'Avances'
@@ -450,15 +442,20 @@ class Avance(SafeDeleteModel):
 
 
 class Attachements(SafeDeleteModel):
-    _safedelete_policy = SOFT_DELETE_CASCADE
-    marche=models.ForeignKey(Marche, on_delete=models.DO_NOTHING,null=False, blank=False)
-    dqe = models.ForeignKey(DQE, on_delete=models.DO_NOTHING)# item + quantité marche + prix unitaire
-    qte = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,verbose_name='Quantité Mois')
-    prix_u = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
+    marche=models.ForeignKey(Marche, on_delete=models.DO_NOTHING,null=False, blank=False,to_field='id')
+    code_tache = models.CharField(db_column='Code_Tache', null=False, max_length=30
+                                  , verbose_name="Code de la tache")
+    qte = models.FloatField( validators=[MinValueValidator(0)], default=0,verbose_name='Quantité Mois')
+    prix_u = models.FloatField( validators=[MinValueValidator(0)], default=0,
                                      editable=False,verbose_name='Prix unitaire')
-    montant= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,verbose_name='Montant du Mois',editable=False)
+    montant= models.FloatField( validators=[MinValueValidator(0)], default=0,verbose_name='Montant du Mois',editable=False)
     date=models.DateField(null=False,verbose_name='Date')
-    objects = DeletedModelManager()
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,
+                               default=get_current_user)
+    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
+
 
     @property
     def qte_cumule(self):
@@ -521,7 +518,7 @@ class Attachements(SafeDeleteModel):
     class Meta:
         verbose_name = 'Attachements'
         verbose_name_plural = 'Attachements'
-        unique_together=(('dqe','date'),)
+        unique_together=(('marche','code_tache','date'),)
         app_label = 'api_sm'
         
 
@@ -535,16 +532,16 @@ class Factures(SafeDeleteModel):
     au = models.DateField(null=False,verbose_name='Au')
     paye = models.BooleanField(default=False, null=False,editable=False)
     date = models.DateField(auto_now=True, editable=False)
-    montant= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
+    montant= models.FloatField( validators=[MinValueValidator(0)], default=0,
                                       verbose_name="Montant du Mois"
                                       ,editable=False)
 
-    montant_rb = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
+    montant_rb = models.FloatField( validators=[MinValueValidator(0)], default=0,
                                        verbose_name="Montant du rabais"
                                        , editable=False) #montant du rabais du mois
 
 
-    montant_rg=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
+    montant_rg=models.FloatField( validators=[MinValueValidator(0)], default=0,
                                          verbose_name="Montant Retenue de garantie"
                                          ,editable=False) #retenue de garantie le montant du mois
 
@@ -552,7 +549,7 @@ class Factures(SafeDeleteModel):
 
 
 
-    taux_realise=models.DecimalField(max_digits=38,decimal_places=2,validators=[MinValueValidator(0),MinValueValidator(100)], default=0,
+    taux_realise=models.FloatField(validators=[MinValueValidator(0),MinValueValidator(100)], default=0,
                                          verbose_name="Taux Realisé"
                                          ,editable=False)
 
@@ -630,7 +627,7 @@ class Remboursement(SafeDeleteModel):
     facture = models.ForeignKey(Factures, on_delete=models.DO_NOTHING, null=True, blank=True, to_field="numero_facture")
     avance=models.ForeignKey(Avance, on_delete=models.DO_NOTHING, null=True, blank=True)
 
-    montant =models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
+    montant =models.FloatField( validators=[MinValueValidator(0)], default=0,
                                          verbose_name="Montant Mois"
                                          ,editable=False)
 
@@ -699,7 +696,7 @@ class Encaissement(SafeDeleteModel):
     facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,null=True,blank=True,verbose_name="Facture")
     date_encaissement=models.DateField(null=False,verbose_name="Date d'encaissement")
     mode_paiement=models.ForeignKey(ModePaiement,on_delete=models.DO_NOTHING,null=False,verbose_name="Mode de paiement")
-    montant_encaisse=models.DecimalField(max_digits=38, decimal_places=2, blank=True,verbose_name="Montant encaissé",
+    montant_encaisse=models.FloatField( blank=True,verbose_name="Montant encaissé",
                                      validators=[MinValueValidator(0)], default=0)
     agence = models.ForeignKey('api_sch.TabAgence',on_delete=models.DO_NOTHING,db_constraint=False , null=True, verbose_name='Agence')
 
@@ -739,11 +736,11 @@ class TypeCaution(SafeDeleteModel):
     libelle = models.CharField(max_length=500,null=True,blank=True)
     type_avance = models.ForeignKey(TypeAvance, on_delete=models.DO_NOTHING, null=True,blank=True, to_field='id',
                              verbose_name="Type d'avance")
-    taux_exact= models.DecimalField(max_digits=38, decimal_places=2,
+    taux_exact= models.FloatField(
                                    validators=[MinValueValidator(0), MaxValueValidator(100)], null=True,blank=True)
-    taux_min = models.DecimalField(max_digits=38, decimal_places=2,
+    taux_min = models.FloatField(
                                validators=[MinValueValidator(0), MaxValueValidator(100)], null=True,blank=True)
-    taux_max = models.DecimalField( max_digits=38, decimal_places=2,
+    taux_max = models.FloatField( 
                                    validators=[MinValueValidator(0), MaxValueValidator(100)], null=True,blank=True)
 
     objects = DeletedModelManager()
@@ -764,15 +761,15 @@ class TypeCaution(SafeDeleteModel):
 
 class Cautions(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    marche = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=False, related_name="Caution_Marche")
+    marche = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=True, related_name="Caution_Marche",to_field='id')
     type = models.ForeignKey(TypeCaution, on_delete=models.DO_NOTHING, null=False)
     avance = models.ForeignKey(Avance, on_delete=models.DO_NOTHING, null=True, blank=True)
     date_soumission = models.DateField(null=False,verbose_name="Date dépot")
-    taux = models.DecimalField(default=0,max_digits=38, decimal_places=2,
+    taux = models.FloatField(default=0,
                                      validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
     agence = models.ForeignKey('api_sch.TabAgence', on_delete=models.CASCADE, db_constraint=False)
-    montant = models.DecimalField(
-        max_digits=38, decimal_places=2,
+    montant = models.FloatField(
+        
         validators=[MinValueValidator(0)], default=0,
         editable=False
     )

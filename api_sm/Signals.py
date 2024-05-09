@@ -43,7 +43,7 @@ def pre_save_dqe(sender, instance, **kwargs):
         instance.id = str(instance.code_tache) + "_" + str(instance.marche.id)
 
     instance.libelle = instance.libelle.lower()
-    instance.quantite=instance.quantite+instance.aug_dim
+
 
 
 """
@@ -188,37 +188,15 @@ def pre_save_detail_facture(sender, instance, **kwargs):
 @receiver(pre_save, sender=Avance)
 def pre_save_avance(sender, instance, **kwargs):
     if not instance.pk:
-        instance.taux_avance = round((instance.montant / instance.marche.ttc)*100, 2)
-        print(instance.taux_avance)
-        if (instance.type.id == 1 and instance.taux_avance > instance.type.taux_max):
-            raise ValidationError(
-                f'L\'avance de type {instance.type.libelle} ne doit pas dépassé le taux   {instance.type.taux_max}%')
-
-        if (instance.type.id != 1 and instance.taux_avance > instance.type.taux_max):
-            raise ValidationError(
-                f'Vous avez une avance de type Avance {instance.type.libelle} la somme des taux ne doit pas dépasser {instance.type.taux_max}%')
-
-
+        try:
+            instance.taux_avance = round((float(instance.montant) / float(instance.marche.ttc))*100)
+        except Exception as e :
+            instance.taux_avance = 0
         instance.num_avance = Avance.objects.filter(marche=instance.marche).count()
 
 
 
 
-
-@receiver(post_save, sender=Avance)
-def post_save_avance(sender, instance, created, **kwargs):
-    if(created):
-        if (not instance.deleted):
-            sum = Avance.objects.filter(marche=instance.marche, type=instance.type).aggregate(models.Sum('taux_avance'))[
-                "taux_avance__sum"]
-
-            if (instance.type.id != 1 and sum > instance.type.taux_max):
-                raise ValidationError(
-                    f'Vous avez plusieurs avances de type Avance {instance.type.libelle} la somme des taux ne doit pas dépasser {instance.type.taux_max}%')
-
-            if (instance.type.id == 1 and (instance.taux_avance  >  instance.type.taux_max or sum > instance.type.taux_max)):
-                raise ValidationError(
-                    f'L\'avance de type {instance.type.libelle} doit etre égale  {instance.type.taux_max}%')
 
 
 
@@ -228,28 +206,6 @@ def post_save_avance(sender, instance, created, **kwargs):
 def pre_save_type_caution(sender, instance, **kwargs):
     if (instance.type_avance):
         instance.libelle = instance.type_avance.libelle
-    if (not instance.type_avance and not instance.libelle):
-        raise ValidationError(
-            f'Libelle de la caution est obligatoire')
-    if (not instance.taux_exact and not instance.taux_min and not instance.taux_max):
-        raise ValidationError(
-            f'Le taux de la caution doit etre soit une valeur exact ou intervale')
-
-    if ((instance.taux_exact and instance.taux_min) or (instance.taux_exact and instance.taux_max)):
-        raise ValidationError(
-            f'Le taux de la caution doit etre soit une valeur exact ou intervale')
-
-    if (instance.taux_min and not instance.taux_max):
-        raise ValidationError(
-            f'Le taux  MAX de la caution est obligatoir')
-
-    if (not instance.taux_min and instance.taux_max):
-        instance.taux_min = 0
-
-    if (instance.taux_min and instance.taux_max):
-        if (instance.taux_min >= instance.taux_max):
-            raise ValidationError(
-                f'Le taux  MIN de la caution  doit etre supérieur au taux MAX')
 
 
 @receiver(pre_save, sender=Cautions)
