@@ -96,11 +96,11 @@ class Clients(models.Model):
     num_registre_commerce = models.CharField(db_column='Num_Registre_Commerce', max_length=20, blank=True,
                                              null=True,verbose_name="N° Registre Commerce")
 
+
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
-                                      editable=False)  
-    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,
-                               default=get_current_user)  
-    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)  
+                                      editable=False)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,)
+    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
 
     def __str__(self):
@@ -145,14 +145,12 @@ class Sites(models.Model):
     date_cloture_site = models.DateField(db_column='Date_Cloture_Site', blank=True,
                                          null=True,verbose_name='Date Cloture')
 
+
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
-                                      editable=False)  
-    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,
-                               default=get_current_user)  
-    date_modification = models.DateTimeField(db_column='Date_Modification',editable=False, auto_now=True)  
+                                      editable=False)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,)
+    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
-
-  
 
 
     def __str__(self):
@@ -194,12 +192,11 @@ class NT(CPkModel):
     libelle = models.TextField(db_column='Libelle_NT', blank=True, null=True,verbose_name='libellé')
     date_ouverture_nt = models.DateField(db_column='Date_Ouverture_NT', blank=True, null=True,verbose_name='Ouverture')
     date_cloture_nt = models.DateField(db_column='Date_Cloture_NT', blank=True, null=True,verbose_name='Cloture')
+
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
-    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,
-                               default=get_current_user)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
-
 
 
     class Meta:
@@ -252,6 +249,13 @@ class Marche(CPkModel):
 
 
 
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,)
+    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
+
+
+
 
     @property
     def ht(self):
@@ -293,13 +297,13 @@ class Marche(CPkModel):
     def montant_global_c(self):
         return self.montant_global_f-self.montant_global_p
 
-class Meta:
-        managed=False
-        db_table = 'marche'
-        verbose_name = 'Marchés'
-        verbose_name_plural = 'Marchés'
+    class Meta:
 
-        
+            db_table = 'Marche'
+            verbose_name = 'Marchés'
+            verbose_name_plural = 'Marchés'
+
+
 
 
 
@@ -328,8 +332,7 @@ class DQE(CPkModel):
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
-    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,
-                               default=get_current_user)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
     @property
@@ -388,6 +391,13 @@ class TypeAvance(models.Model):
     libelle = models.CharField(max_length=500, null=False, unique=True)
     taux_max = models.FloatField(default=0,validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
 
+
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,)
+    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
+
+
     def __str__(self):
         return self.libelle
 
@@ -396,6 +406,7 @@ class TypeAvance(models.Model):
     class Meta:
         verbose_name = 'Type Avance'
         verbose_name_plural = 'Type Avance'
+        db_table = 'TypeAvance'
         app_label = 'api_sm'
         
 
@@ -419,6 +430,11 @@ class Avance(models.Model):
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
 
 
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,)
+    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
+
 
 
 
@@ -433,8 +449,7 @@ class Avance(models.Model):
     class Meta:
         verbose_name = 'Avance'
         verbose_name_plural = 'Avances'
-
-        app_label = 'api_sm'
+        db_table='Avances'
         
 
 
@@ -442,7 +457,7 @@ class Avance(models.Model):
 
 
 class Attachements(SafeDeleteModel):
-    marche=models.ForeignKey(Marche, on_delete=models.DO_NOTHING,null=False, blank=False,to_field='id')
+    marche=models.ForeignKey(Marche,db_column='Num_Marche', on_delete=models.DO_NOTHING,null=False, blank=False,to_field='id')
     code_tache = models.CharField(db_column='Code_Tache', null=False, max_length=30
                                   , verbose_name="Code de la tache")
     qte = models.FloatField( validators=[MinValueValidator(0)], default=0,verbose_name='Quantité Mois')
@@ -450,10 +465,10 @@ class Attachements(SafeDeleteModel):
                                      editable=False,verbose_name='Prix unitaire')
     montant= models.FloatField( validators=[MinValueValidator(0)], default=0,verbose_name='Montant du Mois',editable=False)
     date=models.DateField(null=False,verbose_name='Date')
+
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
-    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,
-                               default=get_current_user)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
 
@@ -516,6 +531,7 @@ class Attachements(SafeDeleteModel):
 
 
     class Meta:
+        db_table = 'Attachements'
         verbose_name = 'Attachements'
         verbose_name_plural = 'Attachements'
         unique_together=(('marche','code_tache','date'),)
@@ -523,38 +539,37 @@ class Attachements(SafeDeleteModel):
         
 
 
-class Factures(SafeDeleteModel):
-    _safedelete_policy = SOFT_DELETE_CASCADE
-    numero_facture=models.CharField(max_length=800,primary_key=True,verbose_name='Numero de facture')
-    num_situation=models.IntegerField(null=False,verbose_name='Numero de situation')
-    marche=models.ForeignKey(Marche,on_delete=models.DO_NOTHING,null=False,verbose_name='Marche',to_field="id")
+class Factures(models.Model):
+    numero_facture=models.CharField(max_length=800,db_column='Num_facture',primary_key=True,verbose_name='Numero de facture')
+    num_situation=models.IntegerField(null=False,db_column='Num_Situation',verbose_name='Numero de situation')
+    marche=models.ForeignKey(Marche,db_column='Num_Marche',on_delete=models.DO_NOTHING,null=False,verbose_name='Marche',to_field="id")
     du = models.DateField(null=False,verbose_name='Du')
     au = models.DateField(null=False,verbose_name='Au')
-    paye = models.BooleanField(default=False, null=False,editable=False)
+    paye = models.BooleanField(default=False,db_column='Paye', null=False,editable=False)
     date = models.DateField(auto_now=True, editable=False)
-    montant= models.FloatField( validators=[MinValueValidator(0)], default=0,
+    montant= models.FloatField( db_column='Montant_Mois',validators=[MinValueValidator(0)], default=0,
                                       verbose_name="Montant du Mois"
                                       ,editable=False)
 
-    montant_rb = models.FloatField( validators=[MinValueValidator(0)], default=0,
+    montant_rb = models.FloatField( db_column='Montant_RB',validators=[MinValueValidator(0)], default=0,
                                        verbose_name="Montant du rabais"
                                        , editable=False) #montant du rabais du mois
 
 
-    montant_rg=models.FloatField( validators=[MinValueValidator(0)], default=0,
+    montant_rg=models.FloatField( db_column='Montant_RG',validators=[MinValueValidator(0)], default=0,
                                          verbose_name="Montant Retenue de garantie"
                                          ,editable=False) #retenue de garantie le montant du mois
 
 
 
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,)
+    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
 
-    taux_realise=models.FloatField(validators=[MinValueValidator(0),MinValueValidator(100)], default=0,
-                                         verbose_name="Taux Realisé"
-                                         ,editable=False)
 
 
-    objects = DeletedModelManager()
 
     @property
     def montant_ava_remb(self):
@@ -618,18 +633,24 @@ class Factures(SafeDeleteModel):
 
 
     class Meta:
+        db_table='Factures'
         verbose_name = 'Factures'
         verbose_name_plural = 'Factures'
         app_label = 'api_sm'
         
-class Remboursement(SafeDeleteModel):
-    _safedelete_policy = SOFT_DELETE_CASCADE
-    facture = models.ForeignKey(Factures, on_delete=models.DO_NOTHING, null=True, blank=True, to_field="numero_facture")
-    avance=models.ForeignKey(Avance, on_delete=models.DO_NOTHING, null=True, blank=True)
+class Remboursement(models.Model):
+    facture = models.ForeignKey(Factures,db_column='Num_Facture', on_delete=models.DO_NOTHING, null=True, blank=True, to_field="numero_facture")
+    avance=models.ForeignKey(Avance,db_column='Avance', on_delete=models.DO_NOTHING, null=True, blank=True)
 
-    montant =models.FloatField( validators=[MinValueValidator(0)], default=0,
+    montant =models.FloatField( db_column='Montant',validators=[MinValueValidator(0)], default=0,
                                          verbose_name="Montant Mois"
                                          ,editable=False)
+
+
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,)
+    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
     @property
     def montant_cumule(self):
@@ -651,11 +672,12 @@ class Remboursement(SafeDeleteModel):
 
 
 
-    objects = DeletedModelManager()
+
 
 
 
     class Meta:
+        db_table='Rembourcement'
         verbose_name = 'Remboursement'
         verbose_name_plural = 'Remboursements'
         app_label = 'api_sm'
@@ -663,26 +685,37 @@ class Remboursement(SafeDeleteModel):
 
 
 
-class DetailFacture(SafeDeleteModel):
-    _safedelete_policy = SOFT_DELETE_CASCADE
+class DetailFacture(models.Model):
     facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,null=True,blank=True,to_field="numero_facture")
     detail=models.ForeignKey(Attachements,on_delete=models.DO_NOTHING)
-    objects = DeletedModelManager()
+    coef_rev=models.FloatField(db_column='Coef_Rev', blank=True,verbose_name="Coéf Révi",
+                                     validators=[MinValueValidator(1)], default=1)
+
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,)
+    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
+
 
     class Meta:
+        db_table='Detail_Facture'
         verbose_name = 'Datails Facture'
         verbose_name_plural = 'Details Facture'
         app_label = 'api_sm'
         
 
 
-class ModePaiement(SafeDeleteModel):
-    _safedelete_policy = SOFT_DELETE_CASCADE
+class ModePaiement(models.Model):
     libelle=models.CharField(max_length=500,null=False,unique=True)
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False, )
+    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
     def __str__(self):
         return  self.libelle
     class Meta:
+        db_table='Mode_Paiement'
         verbose_name = 'Mode de Paiement'
         verbose_name_plural = 'Mode de Paiement'
         app_label = 'api_sm'
@@ -690,8 +723,8 @@ class ModePaiement(SafeDeleteModel):
 
 
 
-class Encaissement(SafeDeleteModel):
-    _safedelete_policy = SOFT_DELETE_CASCADE
+class Encaissement(models.Model):
+
 
     facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,null=True,blank=True,verbose_name="Facture")
     date_encaissement=models.DateField(null=False,verbose_name="Date d'encaissement")
@@ -702,7 +735,10 @@ class Encaissement(SafeDeleteModel):
 
     numero_piece = models.CharField(max_length=300,null=False,verbose_name="Numero de piéce")
 
-    objects = DeletedModelManager()
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False, )
+    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
     @property
     def montant_creance(self):
@@ -724,6 +760,7 @@ class Encaissement(SafeDeleteModel):
 
 
     class Meta:
+        db_table="Encaissements"
         verbose_name = 'Encaissement'
         verbose_name_plural = 'Encaissement'
         unique_together=(("facture","date_encaissement"),)
@@ -731,8 +768,8 @@ class Encaissement(SafeDeleteModel):
 
 
 
-class TypeCaution(SafeDeleteModel):
-    _safedelete_policy = SOFT_DELETE_CASCADE
+class TypeCaution(models.Model):
+
     libelle = models.CharField(max_length=500,null=True,blank=True)
     type_avance = models.ForeignKey(TypeAvance, on_delete=models.DO_NOTHING, null=True,blank=True, to_field='id',
                              verbose_name="Type d'avance")
@@ -743,7 +780,10 @@ class TypeCaution(SafeDeleteModel):
     taux_max = models.FloatField( 
                                    validators=[MinValueValidator(0), MaxValueValidator(100)], null=True,blank=True)
 
-    objects = DeletedModelManager()
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False, )
+    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
     def __str__(self):
         return self.libelle
@@ -754,31 +794,34 @@ class TypeCaution(SafeDeleteModel):
 
 
     class Meta:
+        db_table='Type_Caution'
         verbose_name = 'Type_Caution'
         verbose_name_plural = 'Type_Caution'
         app_label = 'api_sm'
 
 
-class Cautions(SafeDeleteModel):
-    _safedelete_policy = SOFT_DELETE_CASCADE
-    marche = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=True, related_name="Caution_Marche",to_field='id')
-    type = models.ForeignKey(TypeCaution, on_delete=models.DO_NOTHING, null=False)
-    avance = models.ForeignKey(Avance, on_delete=models.DO_NOTHING, null=True, blank=True)
+class Cautions(models.Model):
+
+    marche = models.ForeignKey(Marche,db_column='Num_Marche', on_delete=models.DO_NOTHING, null=True, related_name="Caution_Marche",to_field='id')
+    type = models.ForeignKey(TypeCaution,db_column='Type_Caution', on_delete=models.DO_NOTHING, null=False)
+    avance = models.ForeignKey(Avance,db_column='Avance', on_delete=models.DO_NOTHING, null=True, blank=True)
     date_soumission = models.DateField(null=False,verbose_name="Date dépot")
     taux = models.FloatField(default=0,
                                      validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    agence = models.ForeignKey('api_sch.TabAgence', on_delete=models.CASCADE, db_constraint=False)
+    agence = models.ForeignKey('api_sch.TabAgence',db_column='Agence', on_delete=models.CASCADE, db_constraint=False)
     montant = models.FloatField(
         
         validators=[MinValueValidator(0)], default=0,
         editable=False
     )
-    est_recupere = models.BooleanField(default=False, null=False,verbose_name='Est Recuperée')
-
-    objects = DeletedModelManager()
-
+    est_recupere = models.BooleanField(default=False,db_column='Est_Recupere', null=False,verbose_name='Est Recuperée')
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False, )
+    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
     class Meta:
+        db_table='Cautions'
         verbose_name = 'Caution'
         verbose_name_plural = 'Caution'
         app_label = 'api_sm'

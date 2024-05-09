@@ -3,7 +3,7 @@ import json
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import check_password
 from django.db import IntegrityError
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, Min, Max
 from django_filters.rest_framework import DjangoFilterBackend
 from import_export.admin import ImportMixin, ExportMixin
 from import_export.results import RowResult
@@ -340,7 +340,7 @@ class GetFacture(generics.ListAPIView):
 
 
 class DeletedFacture(generics.ListAPIView):
-    queryset = Factures.all_objects.deleted_only()
+    queryset = Factures.objects.filter(est_bloquer=True)
     serializer_class = FactureSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = FactureFilter
@@ -874,6 +874,43 @@ class contratKeys(APIView):
             return Response({'message':'Pas de contrat'},status=status.HTTP_404_NOT_FOUND)
 
 
+
+class FlashMonths(APIView):
+    #permission_classes = [IsAuthenticated]
+    def get(self,request):
+        try:
+            result = TabProduction.objects.aggregate(
+                min_date=Min('mmaa'),
+                max_date=Max('mmaa')
+            )
+
+            min_date = result['min_date']
+            max_date = result['max_date']
+
+            return Response({'min_date':min_date,'max_date':max_date},status=status.HTTP_200_OK)
+        except Marche.DoesNotExist:
+            return Response({'message':'Pas de Production'},status=status.HTTP_404_NOT_FOUND)
+
+
+class AttMonths(APIView):
+    #permission_classes = [IsAuthenticated]
+    def get(self,request):
+        try:
+            result = Attachements.objects.aggregate(
+                min_date=Min('mmaa'),
+                max_date=Max('mmaa')
+            )
+
+            min_date = result['min_date']
+            max_date = result['max_date']
+
+            return Response({'min_date':min_date,'max_date':max_date},status=status.HTTP_200_OK)
+        except Marche.DoesNotExist:
+            return Response({'message':'Pas de Production'},status=status.HTTP_404_NOT_FOUND)
+
+
+
+
 class CInvoice(APIView):
     #permission_classes = [IsAuthenticated]
     def get(self,request):
@@ -1123,7 +1160,7 @@ class DelEnc(generics.DestroyAPIView,DestroyModelMixin):
 
 
 class DeletedEncaissement(generics.ListAPIView):
-    queryset = Encaissement.all_objects.deleted_only()
+    queryset = Encaissement.objects.filter(est_bloquer=True)
     serializer_class = EncaissementSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = EncaissementFilter
