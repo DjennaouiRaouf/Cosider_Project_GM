@@ -815,7 +815,7 @@ class GetAttachements(generics.ListAPIView):
         qt = 0
         mt = 0
         response_data = super().list(request, *args, **kwargs).data
-        m=Marche.objects.get(nt=self.request.query_params.get('nt', None),code=self.request.query_params.get('code_site',None))
+        m=Marche.objects.get(nt=self.request.query_params.get('nt', None),code_site=self.request.query_params.get('code_site',None))
         for q in queryset:
             mt = mt + q.montant
         try:
