@@ -255,14 +255,13 @@ class TypeCautionFilter(django_filters.FilterSet):
 
 
 class AttachementsFilter(django_filters.FilterSet):
-    marche = django_filters.CharFilter(field_name='dqe__marche', label="Marche")
-    code_tache = django_filters.CharFilter(field_name='dqe__code_tache', label="Code Tache")
+    code_tache = django_filters.CharFilter(field_name='code_tache', label="Code Tache")
+    code_site = django_filters.CharFilter(field_name='code_site', label="Code Pole")
     mm = django_filters.NumberFilter(field_name='date__month', label='Mois')
     aa = django_filters.NumberFilter(field_name='date__year', label='Année')
-    dqe=django_filters.ModelChoiceFilter(field_name='dqe',queryset=DQE.objects.all())
     class Meta:
         model = Attachements
-        fields=['marche',]
+        fields=['nt','code_tache','code_site',]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

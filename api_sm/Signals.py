@@ -68,13 +68,9 @@ def pre_create_historical_record_callback(sender, **kwargs):
 
 @receiver(pre_save, sender=Attachements)
 def pre_save_attachement(sender, instance, **kwargs):
-    if(instance.dqe.marche!=instance.marche):
-        raise ValidationError("Erreur")
-    if not instance.pk:
-        if(instance.qte>instance.dqe.quantite):
-            raise ValidationError("Erreur")
-        instance.prix_u=instance.dqe.prix_u
-        instance.montant=instance.qte*instance.prix_u
+    dqe=DQE.objects.get(nt=instance.nt,code_site=instance.code_site,code_tache=instance.code_tache)
+    instance.prix_u=dqe.prix_u
+    instance.montant=float(instance.qte)*float(instance.prix_u)
 
 
 

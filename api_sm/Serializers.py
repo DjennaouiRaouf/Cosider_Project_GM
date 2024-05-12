@@ -414,9 +414,8 @@ class Ordre_De_ServiceSerializer(serializers.ModelSerializer):
 
 
 class AttachementsSerializer(serializers.ModelSerializer):
-    code_tache = serializers.CharField(source='dqe.code_tache', read_only=True, label="Code Tache")
-    libelle_tache = serializers.CharField(source='dqe.libelle', read_only=True, label="Designation")
-    unite = serializers.CharField(source='dqe.unite.libelle', read_only=True, label="Unite")
+    libelle_tache = serializers.CharField(read_only=True, label="Designation")
+    unite = serializers.CharField(read_only=True, label="Unite")
     montant_precedent = serializers.SerializerMethodField()
     montant_cumule = serializers.SerializerMethodField()
     qte_precedente = serializers.SerializerMethodField()

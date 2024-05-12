@@ -401,7 +401,7 @@ class Attachements(models.Model):
     @property
     def qte_cumule(self):
         try:
-            ct=DQE.objects.get(nt=self.marche.nt,code_site=self.marche.code_site)
+            ct=DQE.objects.get(nt=self.marche.nt,code_site=self.marche.code_site,code_tache=self.code_tache)
             previous_cumule = Attachements.objects.filter(code_tache=ct.code_tache,date__lt=self.date)
             sum = self.qte
             if (previous_cumule):
@@ -415,7 +415,7 @@ class Attachements(models.Model):
     @property
     def qte_precedente(self):
         try:
-            ct = DQE.objects.get(nt=self.marche.nt, code_site=self.marche.code_site)
+            ct = DQE.objects.get(nt=self.marche.nt, code_site=self.marche.code_site,code_tache=self.code_tache)
             previous_cumule = Attachements.objects.filter(code_tache=ct.code_tache, date__lt=self.date)
             sum = 0
             if (previous_cumule):
@@ -429,7 +429,7 @@ class Attachements(models.Model):
     @property
     def montant_precedent(self):
         try:
-            ct = DQE.objects.get(nt=self.marche.nt, code_site=self.marche.code_site)
+            ct = DQE.objects.get(nt=self.marche.nt, code_site=self.marche.code_site,code_tache=self.code_tache)
             previous_cumule = Attachements.objects.filter(code_tache=ct.code_tache, date__lt=self.date)
             sum = 0
             if (previous_cumule):
@@ -444,7 +444,7 @@ class Attachements(models.Model):
     @property
     def montant_cumule(self):
         try:
-            ct = DQE.objects.get(nt=self.marche.nt, code_site=self.marche.code_site)
+            ct = DQE.objects.get(nt=self.marche.nt, code_site=self.marche.code_site,code_tache=self.code_tache)
             previous_cumule = Attachements.objects.filter(code_tache=ct.code_tache,date__lt=self.date)
             sum = self.montant
             if (previous_cumule):
@@ -456,11 +456,10 @@ class Attachements(models.Model):
         except Attachements.DoesNotExist:
             return self.montant
 
-    def __str__(self):
-        return  str(self.id)+"-"+self.dqe.code_tache
 
 
     class Meta:
+        managed=False
         db_table = 'Attachements'
         verbose_name = 'Attachements'
         verbose_name_plural = 'Attachements'

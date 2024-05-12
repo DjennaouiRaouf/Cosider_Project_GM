@@ -791,27 +791,17 @@ class AddAttachementApiView(generics.CreateAPIView):
     serializer_class = AttachementsSerializer
 
     def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        print(serializer.initial_data)
+        marche=Marche.objects.get(code_site=serializer.initial_data['code_site'],nt=serializer.initial_data['nt'])
         try:
+            Attachements(code_site=serializer.initial_data['code_site'], nt=serializer.initial_data['nt'],
+               code_tache=serializer.initial_data['code_tache'],date=serializer.initial_data['date'],
+              qte=serializer.initial_data['qte'],marche=marche).save(force_insert=True)
+            return Response('Attachement ajouté', status=status.HTTP_200_OK)
+        except IntegrityError as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-
-            self.perform_create(serializer)
-            custom_response = {
-                'status': 'success',
-                'message': 'Attachement ajouté',
-                'data': serializer.data,
-            }
-
-            return Response(custom_response, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            custom_response = {
-                'status': 'error',
-                'message': str(e),
-                'data': None,
-            }
-
-            return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)
 
 
 class GetAttachements(generics.ListAPIView):
@@ -819,14 +809,14 @@ class GetAttachements(generics.ListAPIView):
     serializer_class = AttachementsSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = AttachementsFilter
-
+'''
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         qt = 0
         mt = 0
         response_data = super().list(request, *args, **kwargs).data
         for q in queryset:
-            qt = qt + q.qte
+            qt = 0
             mt = mt + q.montant
         m=Marche.objects.get(id=self.request.query_params.get('marche', None))
         return Response({'att': response_data,
@@ -841,6 +831,7 @@ class GetAttachements(generics.ListAPIView):
                              'mt': mt,
 
                          }}, status=status.HTTP_200_OK)
+'''
 
 
 class contratKeys(APIView):
@@ -870,7 +861,7 @@ class FlashMonths(APIView):
             max_date = result['max_date']
 
             return Response({'min_date':min_date,'max_date':max_date},status=status.HTTP_200_OK)
-        except Marche.DoesNotExist:
+        except TabProduction.DoesNotExist:
             return Response({'message':'Pas de Production'},status=status.HTTP_404_NOT_FOUND)
 
 
@@ -878,18 +869,19 @@ class AttMonths(APIView):
     #permission_classes = [IsAuthenticated]
     def get(self,request):
         try:
-            result = Attachements.objects.aggregate(
-                min_date=Min('mmaa'),
-                max_date=Max('mmaa')
+            cs=request.query_params.get('code_site', None)
+            nt=request.query_params.get('nt', None)
+            result = Attachements.objects.filter(nt=nt,code_site=cs).aggregate(
+                min_date=Min('date'),
+                max_date=Max('date')
             )
 
             min_date = result['min_date']
             max_date = result['max_date']
 
             return Response({'min_date':min_date,'max_date':max_date},status=status.HTTP_200_OK)
-        except Marche.DoesNotExist:
+        except Attachements.DoesNotExist:
             return Response({'message':'Pas de Production'},status=status.HTTP_404_NOT_FOUND)
-
 
 
 

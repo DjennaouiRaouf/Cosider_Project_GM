@@ -328,10 +328,16 @@ class MarcheFieldsApiView(APIView):
                             serialized_data = anySerilizer(field_instance.queryset, many=True).data
                             filtered_data = []
                             for item in serialized_data:
-                                filtered_item = {
-                                    'value': item['id'],
-                                    'label': item['libelle'] or item['id']
-                                }
+                                if (field_name in ['code_site']):
+                                    filtered_item = {
+                                        'value': item['id'],
+                                        'label': item['id']
+                                    }
+                                else:
+                                    filtered_item = {
+                                        'value': item['id'],
+                                        'label': item['libelle'] or item['id']
+                                    }
                                 filtered_data.append(filtered_item)
 
                             obj['queryset'] = filtered_data
@@ -1473,6 +1479,8 @@ class FlashFieldsApiView(APIView):
                     if (field_name == 'code_tache'):
                         obj['checkboxSelection'] = True
                         obj['headerCheckboxSelection'] = True
+
+
 
                     if (str(field_name).startswith('valeur') or str(field_name).startswith('quantite')):
                         obj['cellRenderer'] = 'InfoRenderer'
