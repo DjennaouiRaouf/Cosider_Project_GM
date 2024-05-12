@@ -397,6 +397,9 @@ class Attachements(models.Model):
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
+    def delete(self, *args, **kwargs):
+        self.est_bloquer=True
+        super().save(force_update=True,*args, **kwargs)
 
     @property
     def qte_cumule(self):

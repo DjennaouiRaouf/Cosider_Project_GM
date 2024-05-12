@@ -443,16 +443,17 @@ class DelDQEByID(generics.DestroyAPIView):
         return Response({'Message': pk_list},status=status.HTTP_200_OK)
 
 
-class DelATT(generics.DestroyAPIView,DestroyModelMixin):
+class DelATT(generics.DestroyAPIView):
     #permission_classes = [IsAuthenticated,DeleteDQEPermission]
-    queryset = Attachements.objects.all()
+    queryset = Attachements.objects.filter(est_bloquer=False)
     serializer_class = AttachementsSerializer
     def delete(self, request, *args, **kwargs):
         pk_list = request.data.get(Attachements._meta.pk.name)
         if pk_list:
             queryset = self.filter_queryset(self.get_queryset())
             queryset = queryset.filter(pk__in=pk_list)
-            self.perform_destroy(queryset)
+            for obj in queryset:
+                obj.delete()
 
         return Response({'Message': pk_list},status=status.HTTP_200_OK)
 
@@ -805,7 +806,7 @@ class AddAttachementApiView(generics.CreateAPIView):
 
 
 class GetAttachements(generics.ListAPIView):
-    queryset = Attachements.objects.all()
+    queryset = Attachements.objects.filter(est_bloquer=False)
     serializer_class = AttachementsSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = AttachementsFilter
