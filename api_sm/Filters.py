@@ -117,13 +117,15 @@ class DQEFilter(django_filters.FilterSet):
 
 
 class FactureFilter(django_filters.FilterSet):
-    marche=django_filters.CharFilter(field_name='marche')
+    code_site=django_filters.CharFilter(field_name='marche__code_site')
+    nt = django_filters.CharFilter(field_name='marche__nt')
+
     numero_facture=django_filters.CharFilter(field_name='numero_facture',label='N° Facture')
     num_situation=django_filters.NumberFilter(field_name='num_situation',label='N° Situation')
     paye=django_filters.BooleanFilter(field_name='paye',label='Est Payée')
     class Meta:
         model = Factures
-        fields=['marche','numero_facture','num_situation','paye',]
+        fields=['code_site','nt','numero_facture','num_situation','paye',]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

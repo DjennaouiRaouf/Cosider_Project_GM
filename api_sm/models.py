@@ -36,7 +36,7 @@ class Clients(models.Model):
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
-    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
 
@@ -85,7 +85,7 @@ class Sites(models.Model):
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
-    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
 
@@ -130,7 +130,7 @@ class NT(CPkModel):
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
-    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
     class Meta:
         managed=False
@@ -255,8 +255,14 @@ class DQE(CPkModel):
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
-    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
+
+
+    def delete(self, *args, **kwargs):
+        self.est_bloquer=True
+        super().save(force_update=True,*args, **kwargs)
+
 
     @property
     def prix_q(self):
@@ -317,7 +323,7 @@ class TypeAvance(models.Model):
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
-    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
 
@@ -355,7 +361,7 @@ class Avance(models.Model):
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
-    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
 
@@ -394,7 +400,7 @@ class Attachements(models.Model):
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
-    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
     def delete(self, *args, **kwargs):
@@ -496,7 +502,7 @@ class Factures(models.Model):
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
-    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
 
@@ -581,7 +587,7 @@ class Remboursement(models.Model):
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
-    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
     @property
@@ -625,7 +631,7 @@ class DetailFacture(models.Model):
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
-    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
 

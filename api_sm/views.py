@@ -173,7 +173,7 @@ class AjoutMarcheApiView(generics.CreateAPIView):
 
 class AjoutDQEApiView(generics.CreateAPIView):
     #permission_classes = [IsAuthenticated, AddDQEPermission]
-    queryset = DQE.objects.all()
+    queryset = DQE.objects.filter(est_bloquer=False)
     serializer_class = DQESerializer
 
     def create(self, request, *args, **kwargs):
@@ -296,16 +296,16 @@ class AjoutNTApiView(generics.CreateAPIView):
 
 
 class GetDQEbyId(generics.ListAPIView):
-    queryset = DQE.objects.all()
+    queryset = DQE.objects.filter(est_bloquer=False)
     serializer_class = DQESerializer
     lookup_field = 'marche'
 
 class GetFacture(generics.ListAPIView):
-    queryset = Factures.objects.all().order_by('num_situation')
+    queryset = Factures.objects.filter(est_bloquer=False).order_by('num_situation')
     serializer_class = FactureSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = FactureFilter
-
+'''
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         rg_total = 0
@@ -321,6 +321,7 @@ class GetFacture(generics.ListAPIView):
                 pass
 
         creance=mgf-enc
+        
         m = Marche.objects.get(id=self.request.query_params.get('marche', None))
         return Response({'facture': response_data,
                          'extra': {
@@ -338,6 +339,7 @@ class GetFacture(generics.ListAPIView):
 
                          }}, status=status.HTTP_200_OK)
 
+'''
 
 class DeletedFacture(generics.ListAPIView):
     queryset = Factures.objects.filter(est_bloquer=True)
@@ -400,7 +402,7 @@ class getDetFacture(generics.ListAPIView):
 
 
 class GetFactureRG(generics.ListAPIView):
-    queryset = Factures.objects.all()
+    queryset = DQE.objects.filter(est_bloquer=False)
     serializer_class = FactureSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = FactureFilter
@@ -430,7 +432,7 @@ class GetFactureRG(generics.ListAPIView):
 
 class DelDQEByID(generics.DestroyAPIView):
     #permission_classes = [IsAuthenticated,DeleteDQEPermission]
-    queryset = DQE.objects.all()
+    queryset = DQE.objects.filter(est_bloquer=False)
     serializer_class = DQESerializer
 
     def delete(self, request, *args, **kwargs):
@@ -462,7 +464,7 @@ class DelATT(generics.DestroyAPIView):
 
 
 class UpdateDQEApiVew(generics.UpdateAPIView):
-    queryset = DQE.objects.all()
+    queryset = DQE.objects.filter(est_bloquer=False)
     serializer_class = DQESerializer
     lookup_field = "pk"
     def get_object(self):
@@ -497,7 +499,7 @@ class UpdateNTApiVew(generics.UpdateAPIView):
 
 
 class AddFactureApiView(generics.CreateAPIView):
-    queryset = Factures.objects.all()
+    queryset = DQE.objects.filter(est_bloquer=False)
     serializer_class = FactureSerializer
 
     def create(self, request, *args, **kwargs):
@@ -788,22 +790,20 @@ class AddODS(generics.CreateAPIView):
 
 
 class AddAttachementApiView(generics.CreateAPIView):
-    queryset = Attachements.objects.all()
+    queryset = Attachements.objects.filter(est_bloquer=False)
     serializer_class = AttachementsSerializer
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        print(serializer.initial_data)
-        marche=Marche.objects.get(code_site=serializer.initial_data['code_site'],nt=serializer.initial_data['nt'])
-        try:
-            Attachements(code_site=serializer.initial_data['code_site'], nt=serializer.initial_data['nt'],
-               code_tache=serializer.initial_data['code_tache'],date=serializer.initial_data['date'],
-              qte=serializer.initial_data['qte'],marche=marche).save(force_insert=True)
-            return Response('Attachement ajouté', status=status.HTTP_200_OK)
-        except IntegrityError as e:
-            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
-
-
+        for i in serializer.initial_data:
+            marche=Marche.objects.get(code_site=i['code_site'],nt=i['nt'])
+            try:
+                Attachements(code_site=i['code_site'], nt=i['nt'],
+                   code_tache=i['code_tache'],date=i['mmaa'],
+                  qte=i['quantite_1'],marche=marche).save(force_insert=True)
+            except IntegrityError as e:
+                pass
+        return Response('Attachement ajouté', status=status.HTTP_200_OK)
 
 class GetAttachements(generics.ListAPIView):
     queryset = Attachements.objects.filter(est_bloquer=False)
@@ -901,7 +901,7 @@ class CInvoice(APIView):
 
 
 class GetECF(generics.ListAPIView):
-    queryset = Factures.objects.all()
+    queryset = DQE.objects.filter(est_bloquer=False)
     serializer_class = FactureSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = FactureFilter
@@ -948,7 +948,7 @@ class UpdateCautionApiView(generics.UpdateAPIView):
 
 
 class DeleteInvoiceApiView(generics.DestroyAPIView):
-    queryset = Factures.objects.all()
+    queryset = DQE.objects.filter(est_bloquer=False)
     serializer_class = FactureSerializer
     def delete(self, request, *args, **kwargs):
         pk = request.data.get(Factures._meta.pk.name)
@@ -1052,7 +1052,7 @@ class EditUserProfile(APIView):
 
 class WorkState(generics.ListAPIView):
     #permission_classes = [IsAuthenticated]
-    queryset = Attachements.objects.all()
+    queryset = Attachements.objects.filter(est_bloquer=False)
     serializer_class = AttachementsSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = WorkStateFilter
@@ -1090,7 +1090,7 @@ class WorkState(generics.ListAPIView):
 
 class GetDQEStateView(generics.ListAPIView):
     #permission_classes = [permissions.IsAuthenticated,ViewDQEPermission]
-    queryset = DQE.objects.all()
+    queryset = DQE.objects.filter(est_bloquer=False)
     serializer_class = DQESerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = DQEFilter
@@ -1146,7 +1146,7 @@ class DeletedEncaissement(generics.ListAPIView):
 
 
 class GetAttachements2(generics.ListAPIView):
-    queryset = Attachements.objects.all()
+    queryset = Attachements.objects.filter(est_bloquer=False)
     serializer_class = AttachementsSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = AttachementsFilter
