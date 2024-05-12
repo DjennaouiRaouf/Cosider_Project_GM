@@ -809,16 +809,19 @@ class GetAttachements(generics.ListAPIView):
     serializer_class = AttachementsSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = AttachementsFilter
-'''
+
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         qt = 0
         mt = 0
         response_data = super().list(request, *args, **kwargs).data
+        m=Marche.objects.get(nt=self.request.query_params.get('nt', None),code=self.request.query_params.get('code_site',None))
         for q in queryset:
-            qt = 0
             mt = mt + q.montant
-        m=Marche.objects.get(id=self.request.query_params.get('marche', None))
+        try:
+            qt = float(m.ht) / float(mt)
+        except Exception as e:
+            qt=0
         return Response({'att': response_data,
                          'extra': {
                             'marche':m.id,
@@ -831,7 +834,6 @@ class GetAttachements(generics.ListAPIView):
                              'mt': mt,
 
                          }}, status=status.HTTP_200_OK)
-'''
 
 
 class contratKeys(APIView):
