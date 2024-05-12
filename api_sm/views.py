@@ -822,14 +822,16 @@ class GetAttachements(generics.ListAPIView):
             qt = float(m.ht) / float(mt)
         except Exception as e:
             qt=0
+
+        nt=NT.objects.get(nt=self.request.query_params.get('nt', None),code_site=self.request.query_params.get('code_site',None))
         return Response({'att': response_data,
                          'extra': {
                             'marche':m.id,
-                            'nt':m.nt.nt,
+                            'nt':m.nt,
                             'date':self.request.query_params.get('mm', None)+'/'+self.request.query_params.get('aa', None),
-                            'site':m.nt.code_site.libelle,
+                            'site':m.code_site,
                              'objet':m.libelle,
-                             'client':m.nt.code_client.libelle,
+                             'client':nt.code_client.libelle,
                              'qt': qt,
                              'mt': mt,
 

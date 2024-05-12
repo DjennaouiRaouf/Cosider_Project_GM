@@ -1529,7 +1529,6 @@ class AttachementsFieldsApiView(APIView):
                             "required": field_instance.required,
                             'label': field_instance.label or field_name,
                         }
-
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                             anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
                             obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
@@ -1566,7 +1565,7 @@ class AttachementsFieldsApiView(APIView):
                             obj['checkboxSelection']= True
                             obj['headerCheckboxSelection']= True
 
-                        if(field_name in ['id','dqe']):
+                        if(field_name in ['id','code_site','nt']):
                             obj['hide'] = True
                         if(field_name in ['prix_u']):
                             obj['cellRenderer'] = 'InfoRenderer'

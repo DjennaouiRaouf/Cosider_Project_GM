@@ -414,12 +414,12 @@ class Ordre_De_ServiceSerializer(serializers.ModelSerializer):
 
 
 class AttachementsSerializer(serializers.ModelSerializer):
-    libelle_tache = serializers.CharField(read_only=True, label="Designation")
+    libelle = serializers.CharField(read_only=True, label="Designation")
     unite = serializers.CharField(read_only=True, label="Unite")
-    montant_precedent = serializers.SerializerMethodField()
-    montant_cumule = serializers.SerializerMethodField()
-    qte_precedente = serializers.SerializerMethodField()
-    qte_cumule = serializers.SerializerMethodField()
+    montant_precedent = serializers.SerializerMethodField(label="Montant Precedent")
+    montant_cumule = serializers.SerializerMethodField(label="Montant Cumule")
+    qte_precedente = serializers.SerializerMethodField(label="Qte Precedente")
+    qte_cumule = serializers.SerializerMethodField(label="Qte Cumulée")
 
     def get_montant_precedent(self, obj):
         return 0
@@ -436,14 +436,20 @@ class AttachementsSerializer(serializers.ModelSerializer):
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-       
-
         return fields
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        dqe=DQE.objects.get(nt=instance.nt,code_site=instance.code_site,code_tache=instance.code_tache)
+        representation['libelle'] = dqe.libelle
+        representation['unite'] = dqe.unite.libelle
+
+        return representation
 
 
     class Meta:
         model = Attachements
-        fields ='__all__'
+        fields =['id','code_site','nt','code_tache','libelle','unite','qte_precedente','qte','qte_cumule','montant_precedent','montant','montant_cumule']
 
 
 
