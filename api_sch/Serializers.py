@@ -9,8 +9,6 @@ class ProductionSerializer(serializers.ModelSerializer):
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        fields.pop('deleted', None)
-        fields.pop('user_id', None)
         fields.pop('date_modification', None)
         fields.pop('est_cloturer', None)
         fields.pop('prevu_realiser', None)
@@ -26,6 +24,7 @@ class ProductionSerializer(serializers.ModelSerializer):
         representation['quantite_2'] = round(instance.quantite_2,2)
         representation['valeur_3'] = round(instance.valeur_3,2)
         representation['quantite_3'] = round(instance.quantite_3,2)
+        representation['code_unite_mesure'] = TabUniteDeMesure.objects.get(id=instance.code_unite_mesure).libelle
 
         return representation
 

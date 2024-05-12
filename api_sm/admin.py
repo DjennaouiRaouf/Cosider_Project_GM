@@ -41,28 +41,6 @@ admin.site.register(User, UserAdmin)
 
 
 
-@admin.register(OptionImpression)
-class OptionImpressionAdmin(SafeDeleteAdmin,admin.ModelAdmin):
-    list_per_page = lp
-    list_display = [field.name for field in OptionImpression._meta.fields if field.name not in ['deleted', 'deleted_by_cascade']]
-
-
-@admin.register(TimeLine)
-class TimeLineAdmin(SafeDeleteAdmin,admin.ModelAdmin):
-    list_per_page = lp
-    list_display = ('key', 'year','title','description')
-
-
-@admin.register(Images)
-class ImagesAdmin(SafeDeleteAdmin,admin.ModelAdmin):
-    list_per_page = lp
-    list_display = ('key','src','type')
-    list_filter = ()
-
-    def delete_queryset(self, request, queryset):
-        for obj in queryset:
-            obj.est_bloquer = not obj.est_bloquer
-            obj.save()
 
 
 

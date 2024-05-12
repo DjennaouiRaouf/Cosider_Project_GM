@@ -39,28 +39,10 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
-class ICSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Images
-        fields = '__all__'
-
-class OptionImpressionSerializer(serializers.ModelSerializer):
-    def get_fields(self, *args, **kwargs):
-        fields = super().get_fields(*args, **kwargs)
-        fields.pop('deleted', None)
-        fields.pop('deleted_by_cascade', None)
-        return fields
-
-    class Meta:
-        model = OptionImpression
-        fields = '__all__'
-
 class ClientsSerializer(serializers.ModelSerializer):
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        fields.pop('deleted', None)
-        fields.pop('deleted_by_cascade', None)
+       
         fields.pop('est_bloquer', None)
         fields.pop('user_id', None)
         fields.pop('date_modification', None)
@@ -147,8 +129,7 @@ class DQESerializer(serializers.ModelSerializer):
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        fields.pop('deleted', None)
-        fields.pop('deleted_by_cascade', None)
+       
 
         return fields
 
@@ -156,7 +137,7 @@ class DQESerializer(serializers.ModelSerializer):
 
 
 class MarcheSerializer(serializers.ModelSerializer):
-    code_site=serializers.PrimaryKeyRelatedField(queryset=Sites.objects.all(),label='Site')
+    code_site=serializers.PrimaryKeyRelatedField(queryset=Sites.objects.all().distinct(),label='Site')
     nt=serializers.CharField(label='NT')
     montant_ht = serializers.SerializerMethodField(label='Montant en HT')
     montant_ttc = serializers.SerializerMethodField(label='Montant en TTC')
@@ -245,8 +226,7 @@ class FactureSerializer(serializers.ModelSerializer):
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        fields.pop('deleted', None)
-        fields.pop('deleted_by_cascade', None)
+       
 
         return fields
 
@@ -258,16 +238,6 @@ class FactureSerializer(serializers.ModelSerializer):
 
 
 
-class TimeLineSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TimeLine
-        fields = '__all__'
-    def get_fields(self, *args, **kwargs):
-        fields = super().get_fields(*args, **kwargs)
-        fields.pop('deleted', None)
-        fields.pop('deleted_by_cascade', None)
-
-        return fields
 
 
 class ModePaiementSerializer(serializers.ModelSerializer):
@@ -294,8 +264,7 @@ class EncaissementSerializer(serializers.ModelSerializer):
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        fields.pop('deleted', None)
-        fields.pop('deleted_by_cascade', None)
+       
 
 
         return fields
@@ -333,8 +302,7 @@ class DetailFactureSerializer(serializers.ModelSerializer):
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
         fields.pop('id', None)
-        fields.pop('deleted', None)
-        fields.pop('deleted_by_cascade', None)
+       
 
 
         return fields
@@ -355,8 +323,7 @@ class AvanceSerializer(serializers.ModelSerializer):
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        fields.pop('deleted', None)
-        fields.pop('deleted_by_cascade', None)
+       
         return fields
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -372,8 +339,7 @@ class TypeAvanceSerializer(serializers.ModelSerializer):
         fields='__all__'
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        fields.pop('deleted', None)
-        fields.pop('deleted_by_cascade', None)
+       
 
 
         return fields
@@ -397,8 +363,7 @@ class CautionSerializer(serializers.ModelSerializer):
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        fields.pop('deleted', None)
-        fields.pop('deleted_by_cascade', None)
+       
         return fields
 
 
@@ -412,8 +377,7 @@ class TypeCautionSerializer(serializers.ModelSerializer):
         fields='__all__'
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        fields.pop('deleted', None)
-        fields.pop('deleted_by_cascade', None)
+       
 
 
         return fields
@@ -434,8 +398,7 @@ class Ordre_De_ServiceSerializer(serializers.ModelSerializer):
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
         fields.pop('id', None)
-        fields.pop('deleted', None)
-        fields.pop('deleted_by_cascade', None)
+       
 
 
         return fields
@@ -474,8 +437,7 @@ class AttachementsSerializer(serializers.ModelSerializer):
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        fields.pop('deleted', None)
-        fields.pop('deleted_by_cascade', None)
+       
 
         return fields
 
@@ -498,8 +460,7 @@ class RemboursementSerializer(serializers.ModelSerializer):
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        fields.pop('deleted', None)
-        fields.pop('deleted_by_cascade', None)
+       
         fields.pop('id', None)
 
 

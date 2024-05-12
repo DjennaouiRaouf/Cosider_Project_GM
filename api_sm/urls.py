@@ -7,7 +7,6 @@ urlpatterns = [
     path('login/', LoginView.as_view()),
     path('logout/', LogoutView.as_view()),
     path('whoami/', WhoamiView.as_view()),
-    path('ic_images/', GetICImages.as_view()),
 
 
 
@@ -21,8 +20,6 @@ urlpatterns = [
     path('workstate/', WorkState.as_view()),
     path('dqestate/',GetDQEStateView.as_view()),
     path('importdqe/',ImportDQEAPIView.as_view()),
-    path('optionimpression/',OptionImpressionApiView.as_view()),
-
 
     path('getclients/', GetClientsView.as_view()),
 
@@ -63,7 +60,6 @@ urlpatterns = [
 
     path('getlibmp/',LibMP.as_view()),
 
-    path('timeline/',GetTimeLine.as_view()),
 
     path('delfacture/',DeletedFacture.as_view()),
     path('flashm/',FlashMonths.as_view()),

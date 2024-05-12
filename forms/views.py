@@ -300,6 +300,7 @@ class MarcheFieldsApiView(APIView):
 
                 field_info = []
                 for field_name, field_instance in fields.items():
+
                     if(field_name not in ['montant_ht','montant_ttc']):
 
                         if (field_name in ['id','nt','code_site',"libelle"]):
@@ -754,7 +755,7 @@ class NTFieldsStateApiView(APIView):
 class FactureFieldsApiView(APIView):
     def get(self, request):
         flag = request.query_params.get('flag', None)
-        if flag == 'l' or flag == 'f' or flag == 'p': 
+        if flag == 'l' or flag == 'f' or flag == 'p':
             serializer = FactureSerializer()
             fields = serializer.get_fields()
 
@@ -770,7 +771,7 @@ class FactureFieldsApiView(APIView):
                             'type': str(field_instance.__class__.__name__),
                             "required": field_instance.required,
                             'label': field_instance.label or field_name,
-                            
+
                         }
 
 
@@ -1460,14 +1461,19 @@ class FlashFieldsApiView(APIView):
             for field_name, field_instance in fields.items():
                 if(field_name not in ['nt','code_site','code_groupeactivite',
                     'recepteur','code_produit','type_prestation'
-                    ,'code_type_production','id_production','code_filiale','code_activite'
-                    ,'prevu_realiser','est_cloturer','user_id','date_modification']):
+                    ,'code_type_production','code_filiale','code_activite'
+                    ,'prevu_realiser','id_production','est_cloturer','user_id','date_modification']):
 
                     obj={
                                 'field': field_name,
                                 'headerName': field_instance.label or field_name,
                                 'info': str(field_instance.__class__.__name__),
                         }
+
+                    if (field_name == 'code_tache'):
+                        obj['checkboxSelection'] = True
+                        obj['headerCheckboxSelection'] = True
+
                     if (str(field_name).startswith('valeur') or str(field_name).startswith('quantite')):
                         obj['cellRenderer'] = 'InfoRenderer'
 

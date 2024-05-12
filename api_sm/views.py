@@ -554,26 +554,6 @@ class AddEncaissement(generics.CreateAPIView):
 
 
 
-class OptionImpressionApiView(generics.ListAPIView):
-    queryset = OptionImpression.objects.all()
-    serializer_class = OptionImpressionSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_class = OpImpFilter
-
-class GetICImages(generics.ListAPIView):
-    permission_classes = []
-    queryset = Images.objects.all()
-    serializer_class = ICSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_class = ImageFilter
-
-
-class GetTimeLine(generics.ListAPIView):
-    permission_classes = []
-    queryset = TimeLine.objects.all()
-    serializer_class = TimeLineSerializer
-
-
 
 
 class UpdateMarcheView(generics.UpdateAPIView):
@@ -867,8 +847,8 @@ class contratKeys(APIView):
     #permission_classes = [IsAuthenticated]
     def get(self,request):
         try:
-            nt=NT.objects.all().values_list('nt', flat=True)
-            pole=NT.objects.all().values_list('code_site', flat=True)
+            nt=NT.objects.all().values_list('nt', flat=True).distinct()
+            pole=NT.objects.all().values_list('code_site', flat=True).distinct()
             return Response({'nt':nt,'pole':pole},status=status.HTTP_200_OK)
         except Marche.DoesNotExist:
             return Response({'message':'Pas de contrat'},status=status.HTTP_404_NOT_FOUND)
@@ -879,7 +859,9 @@ class FlashMonths(APIView):
     #permission_classes = [IsAuthenticated]
     def get(self,request):
         try:
-            result = TabProduction.objects.aggregate(
+            cs=request.query_params.get('code_site', None)
+            nt=request.query_params.get('nt', None)
+            result = TabProduction.objects.filter(nt=nt,code_site=cs).aggregate(
                 min_date=Min('mmaa'),
                 max_date=Max('mmaa')
             )

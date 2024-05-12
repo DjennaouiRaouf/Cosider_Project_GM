@@ -59,9 +59,6 @@ class MarcheFilter(django_filters.FilterSet):
     code_contrat = django_filters.CharFilter(field_name='id', label='Code du contrat')
     date_signature=django_filters.DateFilter(field_name="date_signature",label='Date de signature')
     nt = django_filters.CharFilter(field_name='nt', label='Numero du travail')
-    rabais=django_filters.NumberFilter(field_name='rabais', label='Rabais')
-    tva = django_filters.NumberFilter(field_name='tva', label='TVA')
-    rg = django_filters.NumberFilter(field_name='rg', label='Retenue de garantie')
     client=django_filters.BooleanFilter(field_name='nt__code_client__est_client_cosider', label='Cosider client')
     has_rg = django_filters.BooleanFilter(field_name='rg', label='Avec retenue de garantie ?',method='filter_has_rg',)
     has_tva = django_filters.BooleanFilter(field_name='tva', label='Avec TVA ?',method='filter_has_tva',)
@@ -293,39 +290,6 @@ class WorkStateFilter(django_filters.FilterSet):
                 field_instance.label = model_field.verbose_name
             except:
                 pass
-
-
-class OpImpFilter(django_filters.FilterSet):
-
-    class Meta:
-        model = OptionImpression
-        fields=['type']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field_name, field_instance in self.base_filters.items():
-            try:
-                model_field = self.Meta.model._meta.get_field(field_name)
-                field_instance.label = model_field.verbose_name
-            except:
-                pass
-
-
-class ImageFilter(django_filters.FilterSet):
-
-    class Meta:
-        model = Images
-        fields=['type']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field_name, field_instance in self.base_filters.items():
-            try:
-                model_field = self.Meta.model._meta.get_field(field_name)
-                field_instance.label = model_field.verbose_name
-            except:
-                pass
-
 
 
 

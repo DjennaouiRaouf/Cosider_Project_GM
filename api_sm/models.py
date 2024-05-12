@@ -6,68 +6,8 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Q
 
 from django_currentuser.middleware import get_current_user
-from safedelete import SOFT_DELETE_CASCADE, DELETED_VISIBLE_BY_PK, SOFT_DELETE, HARD_DELETE
-from safedelete.managers import SafeDeleteManager
-from safedelete.models import SafeDeleteModel
-
 from api_sch.models import *
 
-
-class DeletedModelManager(SafeDeleteManager):
-    _safedelete_visibility = DELETED_VISIBLE_BY_PK
-
-
-
-class Images(SafeDeleteModel):
-    _safedelete_policy = SOFT_DELETE_CASCADE
-    Types = [
-        ('H', 'Home'),
-        ('L', 'Login'),
-
-    ]
-    key = models.BigAutoField(primary_key=True)
-    src = models.ImageField(upload_to="Images/Images", null=False, blank=True, default='default.png')
-    type=models.CharField(max_length=100,null=False,blank=True,choices=Types)
-    objects = DeletedModelManager()
-    class Meta:
-        verbose_name = 'Images'
-        verbose_name_plural = 'Images'
-        app_label = 'api_sm'
-
-
-class TimeLine(SafeDeleteModel):
-    _safedelete_policy = SOFT_DELETE_CASCADE
-
-    key = models.BigAutoField(primary_key=True)
-    year = models.PositiveIntegerField(default=datetime.now().year,null=False,blank=True)
-    title = models.CharField(max_length=100, null=False, blank=True)
-    description=models.TextField(max_length=300,null=False, blank=True,)
-    objects = DeletedModelManager()
-
-    class Meta:
-        verbose_name = 'TimeLine'
-        verbose_name_plural = 'TimeLine'
-        app_label = 'api_sm'
-
-
-class OptionImpression(SafeDeleteModel):
-    Types = [
-        ('H', 'Header'),
-        ('F', 'Footer'),
-        ('L', 'Logo'),
-
-    ]
-    _safedelete_policy = SOFT_DELETE_CASCADE
-    key = models.BigAutoField(primary_key=True)
-    src = models.ImageField(upload_to="Images/Impression", null=False, blank=True)
-    type=models.CharField( max_length=20,
-        choices=Types, unique=True,null=False)
-    objects = DeletedModelManager()
-    class Meta:
-        verbose_name = 'Option d\'Impression'
-        verbose_name_plural = 'Option d\'Impression'
-        app_label = 'api_sm'
-        
 
 
 
@@ -79,9 +19,6 @@ class OptionImpression(SafeDeleteModel):
 
 
 class Clients(models.Model):
-
-
-
     id =models.CharField(db_column='Code_Client', primary_key=True,
                                    max_length=20,verbose_name="Code Client")
     type_client = models.SmallIntegerField(db_column='Type_Client', blank=True, null=True,verbose_name="Type Client")  
@@ -168,8 +105,6 @@ class Sites(models.Model):
         if( self.date_ouverture_site and self.date_cloture_site == None ):
             super(Sites, self).save(*args, **kwargs)
 
-
-
     class Meta:
         managed = False
         db_table = 'Tab_Site'
@@ -197,8 +132,6 @@ class NT(CPkModel):
                                       editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
-
-
     class Meta:
         managed=False
         db_table = 'Tab_NT'
@@ -219,8 +152,6 @@ class NT(CPkModel):
 class Marche(CPkModel):
 
     id=models.CharField(max_length=500,primary_key=True,verbose_name='Contrat N°')
-
-
     code_site = models.CharField(db_column='Code_site', max_length=10,
                                  verbose_name='Code du Site')
     nt = models.CharField(db_column='NT', max_length=20, null=False, verbose_name='NT')
@@ -243,19 +174,12 @@ class Marche(CPkModel):
                              validators=[MinValueValidator(0), MaxValueValidator(100)], null=False
                              , verbose_name='Taux de retenue de garantie')
 
-
-
     date_signature = models.DateField(null=False, verbose_name='Date de signature')
-
-
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
-
-
-
 
     @property
     def ht(self):
@@ -315,7 +239,6 @@ class DQE(CPkModel):
     nt = models.CharField(db_column='NT', max_length=20,primary_key=True, null=False, verbose_name='NT')
     code_tache = models.CharField(db_column='Code_Tache',null=False, max_length=30
                                   ,verbose_name="Code Tache",primary_key=True)
-
     libelle = models.TextField(db_column='Libelle_Tache',verbose_name="Libelle")
     unite =models.ForeignKey('api_sch.TabUniteDeMesure',on_delete=models.DO_NOTHING, null=False,db_column='Code_Unite_Mesure', verbose_name='Unité')
     prix_u = models.FloatField(
@@ -456,10 +379,13 @@ class Avance(models.Model):
 
 
 
-class Attachements(SafeDeleteModel):
+class Attachements(models.Model):
     marche=models.ForeignKey(Marche,db_column='Num_Marche', on_delete=models.DO_NOTHING,null=False, blank=False,to_field='id')
+    code_site = models.CharField(db_column='Code_site', max_length=10,
+                                 verbose_name='Code du Site')
+    nt = models.CharField(db_column='NT', max_length=20, null=False, verbose_name='NT')
     code_tache = models.CharField(db_column='Code_Tache', null=False, max_length=30
-                                  , verbose_name="Code de la tache")
+                                  , verbose_name="Code Tache")
     qte = models.FloatField( validators=[MinValueValidator(0)], default=0,verbose_name='Quantité Mois')
     prix_u = models.FloatField( validators=[MinValueValidator(0)], default=0,
                                      editable=False,verbose_name='Prix unitaire')
@@ -475,7 +401,8 @@ class Attachements(SafeDeleteModel):
     @property
     def qte_cumule(self):
         try:
-            previous_cumule = Attachements.objects.filter(dqe=self.dqe,date__lt=self.date)
+            ct=DQE.objects.get(nt=self.marche.nt,code_site=self.marche.code_site)
+            previous_cumule = Attachements.objects.filter(code_tache=ct.code_tache,date__lt=self.date)
             sum = self.qte
             if (previous_cumule):
                 for pc in previous_cumule:
@@ -488,7 +415,8 @@ class Attachements(SafeDeleteModel):
     @property
     def qte_precedente(self):
         try:
-            previous_cumule = Attachements.objects.filter(dqe=self.dqe, date__lt=self.date)
+            ct = DQE.objects.get(nt=self.marche.nt, code_site=self.marche.code_site)
+            previous_cumule = Attachements.objects.filter(code_tache=ct.code_tache, date__lt=self.date)
             sum = 0
             if (previous_cumule):
                 for pc in previous_cumule:
@@ -501,7 +429,8 @@ class Attachements(SafeDeleteModel):
     @property
     def montant_precedent(self):
         try:
-            previous_cumule = Attachements.objects.filter(dqe=self.dqe, date__lt=self.date)
+            ct = DQE.objects.get(nt=self.marche.nt, code_site=self.marche.code_site)
+            previous_cumule = Attachements.objects.filter(code_tache=ct.code_tache, date__lt=self.date)
             sum = 0
             if (previous_cumule):
                 for pc in previous_cumule:
@@ -515,7 +444,8 @@ class Attachements(SafeDeleteModel):
     @property
     def montant_cumule(self):
         try:
-            previous_cumule = Attachements.objects.filter(dqe=self.dqe,date__lt=self.date)
+            ct = DQE.objects.get(nt=self.marche.nt, code_site=self.marche.code_site)
+            previous_cumule = Attachements.objects.filter(code_tache=ct.code_tache,date__lt=self.date)
             sum = self.montant
             if (previous_cumule):
                 for pc in previous_cumule:
