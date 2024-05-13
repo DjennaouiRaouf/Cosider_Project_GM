@@ -216,10 +216,16 @@ class MarcheFieldsFilterApiView(APIView):
                 serialized_data = anySerilizer(field_instance.queryset, many=True).data
                 filtered_data = []
                 for item in serialized_data:
-                    filtered_item = {
-                        'value': item['id'],
-                        'label': item['libelle']  or item['id']
-                    }
+                    if(field_name in ['code_site']):
+                        filtered_item = {
+                            'value': item['id'],
+                            'label': item['id']
+                        }
+                    else:
+                        filtered_item = {
+                            'value': item['id'],
+                            'label': item['libelle'] or item['id']
+                        }
                     filtered_data.append(filtered_item)
 
                 obj['queryset'] = filtered_data
@@ -249,6 +255,7 @@ class MarcheFieldsStateApiView(APIView):
                     default_value = None
                     if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                         default_value =[]
+
                     if str(field_instance.__class__.__name__) == 'BooleanField':
                         default_value= False
                     if str(field_instance.__class__.__name__) in ['PositiveSmallIntegerField','DecimalField','PositiveIntegerField',
@@ -649,7 +656,7 @@ class NTFieldsApiView(APIView):
                 field_info = []
 
                 for field_name, field_instance in fields.items():
-                    if (field_name not in ['id']):
+                    if (field_name not in ['']):
                         obj = {
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),
@@ -657,15 +664,28 @@ class NTFieldsApiView(APIView):
                             'label': field_instance.label or field_name,
 
                         }
+
+                        if( field_name in ['site','nt']):
+                            readOnly=True
+                        else:
+                            readOnly = False
+
+                        obj['readOnly']=readOnly
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                             anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
                             serialized_data = anySerilizer(field_instance.queryset, many=True).data
                             filtered_data = []
                             for item in serialized_data:
-                                filtered_item = {
-                                    'value': item['id'],
-                                    'label': item['libelle'] or item['id']
-                                }
+                                if(field_name in ['site',]):
+                                    filtered_item = {
+                                        'value': item['id'],
+                                        'label': item['id']
+                                    }
+                                else:
+                                    filtered_item = {
+                                        'value': item['id'],
+                                        'label': item['libelle'] or item['id']
+                                    }
                                 filtered_data.append(filtered_item)
 
                             obj['queryset'] = filtered_data
@@ -704,20 +724,21 @@ class NTFieldsStateApiView(APIView):
 
 
         if cs and nt:
-            num_t = NT.objects.get(code_site__id=cs,nt=nt)
+            num_t = NT.objects.get(code_site=Sites.objects.get(id=cs),nt=nt)
         else:
             num_t = None
         if (num_t == None):
             for field_name, field_instance in fields.items():
                 default_value = None
                 if (field_name not in ['',]):
+                    default_value=None
                     if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
                         default_value = []
                     if str(field_instance.__class__.__name__) == 'BooleanField':
                         default_value= True
 
                     if str(field_instance.__class__.__name__) in ['PositiveSmallIntegerField','DecimalField','PositiveIntegerField',
-                                                                  'IntegerField',]:
+                                                                  'IntegerField','FloatField']:
                         default_value = 0
 
                     field_info.append({
@@ -734,7 +755,7 @@ class NTFieldsStateApiView(APIView):
         else:
 
             update_nt = NTSerializer(num_t).data
-            print(update_nt)
+
             for field_name, field_instance in fields.items():
                 if (not field_name in ['']):
                     default_value = update_nt[field_name]
@@ -748,13 +769,14 @@ class NTFieldsStateApiView(APIView):
                     for d in field_info:
                         state.update(d)
 
+            site = Sites.objects.get(id=state['site'])
+            state['site'] = [{'value': site.id, 'label': site.id}]
 
             situation = TabSituationNt.objects.get(libelle=state['code_situation_nt'])
             state['code_situation_nt'] = [{'value': situation.id, 'label': situation.libelle or situation.id}]
-            client = Clients.objects.get(id=state['code_client'])
-            state['code_client'] = [{'value': client.id, 'label': client.libelle or client.id}]
+            client = Clients.objects.get(id=state['client'])
+            state['client'] = [{'value': client.id, 'label': client.libelle or client.id}]
 
-            print(state)
         return Response({'state': state}, status=status.HTTP_200_OK)
 
 

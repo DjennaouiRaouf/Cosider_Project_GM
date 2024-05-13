@@ -60,7 +60,7 @@ class Sites(models.Model):
            ('E','Est'),
             ('C','Centre'),
     )
-    id = models.CharField(db_column='Code_site', primary_key=True, max_length=500 ,
+    id = models.CharField(db_column='Code_site', primary_key=True, max_length=10 ,
                                  verbose_name='Code du Site')
     code_filiale = models.ForeignKey(TabFiliale, models.DO_NOTHING,
                                      db_column='Code_Filiale',verbose_name='Code Filiale')
@@ -119,11 +119,11 @@ class Sites(models.Model):
 
 
 class NT(CPkModel):
-    code_site = models.CharField(db_column='Code_site', primary_key=True, max_length=500 ,
+    code_site = models.CharField(db_column='Code_site', primary_key=True, max_length=10 ,
                                  verbose_name='Code du Site')
     nt = models.CharField(db_column='NT', max_length=20,null=False,primary_key=True,verbose_name='NT')
-    code_client = models.ForeignKey(Clients, models.DO_NOTHING, db_column='Code_Client',verbose_name='Client')
-    code_situation_nt = models.ForeignKey('api_sch.TabSituationNt', models.DO_NOTHING, db_column='Code_Situation_NT', blank=True, null=True,verbose_name='Situation')
+    code_client = models.CharField(db_column='Code_Client',verbose_name='Client',max_length=20)
+    code_situation_nt = models.ForeignKey('api_sch.TabSituationNt', models.DO_NOTHING, db_column='Code_Situation_NT', blank=True, null=True,verbose_name='Situation',to_field='id')
     libelle = models.TextField(db_column='Libelle_NT', blank=True, null=True,verbose_name='libellé')
     date_ouverture_nt = models.DateField(db_column='Date_Ouverture_NT', blank=True, null=True,verbose_name='Ouverture')
     date_cloture_nt = models.DateField(db_column='Date_Cloture_NT', blank=True, null=True,verbose_name='Cloture')

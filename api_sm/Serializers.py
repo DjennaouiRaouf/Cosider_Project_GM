@@ -82,11 +82,12 @@ class SiteSerializer(serializers.ModelSerializer):
 
 class NTSerializer(serializers.ModelSerializer):
     site=serializers.PrimaryKeyRelatedField(source='code_site',queryset=Sites.objects.all(), label='Pole')
+    client=serializers.PrimaryKeyRelatedField(source='code_client',queryset=Clients.objects.all(), label='Client')
 
 
     class Meta:
         model=NT
-        fields =['site','nt','code_client','code_situation_nt','libelle','date_ouverture_nt','date_cloture_nt']
+        fields =['site','nt','client','code_situation_nt','libelle','date_ouverture_nt','date_cloture_nt']
 
 
 

@@ -286,7 +286,7 @@ class AjoutNTApiView(generics.CreateAPIView):
 
         try:
             NT(code_site=serializer.initial_data['site'], nt=serializer.initial_data['nt'],
-               code_client=Clients.objects.get(id=serializer.initial_data['code_client']),
+               code_client=Clients.objects.get(id=serializer.initial_data['client']),
                code_situation_nt=TabSituationNt.objects.get(id=serializer.initial_data['code_situation_nt']),
                libelle=serializer.initial_data['libelle'],date_ouverture_nt=serializer.initial_data['date_ouverture_nt']).save(force_insert=True)
             return Response('NT ajoutée', status=status.HTTP_200_OK)
@@ -482,20 +482,37 @@ class UpdateDQEApiVew(generics.UpdateAPIView):
 class UpdateNTApiVew(generics.UpdateAPIView):
     queryset = NT.objects.all()
     serializer_class = NTSerializer
-    lookup_field = ['code_site','nt']
+    lookup_url_kwarg = ['code_site','nt']
     def get_object(self):
-        cs = self.request.data.get('code_site')
-        nt = self.request.data.get('nt')
-        s = Sites.objects.get(id=cs) # a revoire
         try:
-            obj = NT.objects.get(code_site=s, nt=nt)
+            cs = self.request.data.get('site')
+            nt = self.request.data.get('nt')
+            obj = NT.objects.get(code_site=Sites.objects.get(id=cs), nt=nt)
         except NT.DoesNotExist:
             raise NotFound("Object n'éxiste pas")
-        self.check_object_permissions(self.request, obj)
 
+        self.check_object_permissions(self.request, obj)
         return obj
 
 
+    def update(self, request, *args, **kwargs):
+
+        try:
+            instance = self.get_object()
+            serializer = self.get_serializer(instance, data=request.data)
+
+            print(serializer.initial_data['nt'])
+            #instance.code_site = Sites.objects.get(id=serializer.initial_data['site'])
+            instance.nt = serializer.initial_data['nt']
+            instance.code_client =serializer.initial_data['client']
+            #instance.code_situation_nt = TabSituationNt.objects.get(id=serializer.initial_data['code_situation_nt']),
+            instance.libelle = serializer.initial_data['libelle']
+            instance.date_ouverture_nt = serializer.initial_data['date_ouverture_nt']
+            instance.date_cloture_nt = serializer.initial_data['date_cloture_nt']
+            instance.save(force_update=True)
+        except IntegrityError as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+        return Response('NT mis à jour avec succès', status=status.HTTP_200_OK)
 
 
 class AddFactureApiView(generics.CreateAPIView):
@@ -560,14 +577,13 @@ class AddEncaissement(generics.CreateAPIView):
 
 
 class UpdateMarcheView(generics.UpdateAPIView):
-    queryset = Marche.objects.all()
+    queryset = Marche.objects.filter(est_bloquer=False)
     serializer_class = MarcheSerializer
-    lookup_field = "pk"
+    lookup_field = "id"
     def get_object(self):
-        pk = self.request.data.get(Marche._meta.pk.name)
-
+        id = self.request.data.get('id')
         try:
-            obj = Marche.objects.get(pk=pk)
+            obj = Marche.objects.get(id=id)
         except Marche.DoesNotExist:
             raise NotFound("Object n'éxiste pas")
 
@@ -575,12 +591,24 @@ class UpdateMarcheView(generics.UpdateAPIView):
 
         return obj
 
+    def update(self, request, *args, **kwargs):
 
+        try:
+            instance = self.get_object()
+            serializer = self.get_serializer(instance, data=request.data)
 
+            instance.ods_depart = serializer.initial_data['ods_depart']
+            instance.delai_paiement_f = serializer.initial_data['delai_paiement_f']
+            instance.rabais = serializer.initial_data['rabais']
+            instance.tva = serializer.initial_data['tva']
+            instance.rg = serializer.initial_data['rg']
+            instance.date_signature = serializer.initial_data['date_signature']
 
+            instance.save(force_update=True)
+        except IntegrityError as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
-
-
+        return Response('Contrat mis à jour avec succès', status=status.HTTP_200_OK)
 
 
 class LibMP(generics.ListAPIView):

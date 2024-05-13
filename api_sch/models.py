@@ -112,7 +112,7 @@ class TabSituationNt(models.Model):
     date_modification = models.DateTimeField(db_column='Date_Modification', blank=True, null=True)  # Field name made lowercase.
 
     def __str__(self):
-        return str(self.libelle)
+        return str(self.id)
     class Meta:
         managed = False
         db_table = 'Tab_Situation_NT'
