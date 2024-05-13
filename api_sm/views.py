@@ -1,5 +1,6 @@
 import json
 
+import openpyxl
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import check_password
 from django.db import IntegrityError
@@ -184,7 +185,7 @@ class AjoutDQEApiView(generics.CreateAPIView):
             DQE(code_site=serializer.initial_data['pole'],nt=serializer.initial_data['nt'],
                 code_tache=serializer.initial_data['code_tache'],prix_u=serializer.initial_data['prix_u'],
                 est_tache_composite=serializer.initial_data['est_tache_composite'],
-                est_tache_complementaire=serializer.initial_data['est_tache_complementaire'],
+                est_tache_complementaire=serializer.initial_data['est_tache_complementaire'],quantite=serializer.initial_data['quantite'],
                 unite=TabUniteDeMesure.objects.get(id=serializer.initial_data['unite']),libelle=serializer.initial_data['libelle']).save(force_insert=True)
             return Response('Tache ajoutée', status=status.HTTP_200_OK)
         except IntegrityError as e:
@@ -240,31 +241,45 @@ class GetDQEView(generics.ListAPIView):
                              }}, status=status.HTTP_200_OK)
 
 
-class ImportDQEAPIView(ImportMixin,  APIView):
-    permission_classes = [IsAuthenticated, UploadDQEPermission]
-    parser_classes = (MultiPartParser, FormParser,)
-
+class ImportDQEAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request, *args, **kwargs):
-        resource = DQEResource()
-        dataset = Dataset()
-        dqe = request.FILES['file']
-        marche=request.data.get('id')
+        dqe_file = request.FILES['file']
+        nt=request.data.get('nt')
+        cs = request.data.get('cs')
         try:
-            Marche.objects.get(id=marche)
-            imported_data = dataset.load(dqe.read())
-            filtered_rows = [row for row in imported_data.dict if row['marche'] == marche]
-            filtered_dataset = Dataset()
-            filtered_dataset.headers = imported_data.headers
-            filtered_dataset.extend([row.values() for row in filtered_rows])
-            result = resource.import_data(filtered_dataset, dry_run=True)
-            if not result.has_errors():
-                resource.import_data(filtered_dataset, dry_run=False)
-                return Response({'message': 'Fichier importé'}, status=200)
-            else:
-                return Response({'message': 'Impossible d\'importer le fichier '}, status=400)
+            workbook = openpyxl.load_workbook(dqe_file)
+            sheet = workbook.active
+            newRows=0
+            updatedRows=0
+            for row in sheet.iter_rows(min_row=2,values_only=True):
+                try:
+                    DQE(
+                        code_site=row[0], nt=row[1],
+                        code_tache=row[2], prix_u=row[6],
+                        est_tache_composite=row[4],
+                        est_tache_complementaire=row[5],
+                        unite=TabUniteDeMesure.objects.get(libelle=row[8]),
+                        libelle=row[3],quantite=row[7],user_id=request.user.username
+                    ).save(force_insert=True)
+                    newRows += 1
+                except IntegrityError as e:
+                    DQE(
+                        code_site=row[0], nt=row[1],
+                        code_tache=row[2], prix_u=row[6],
+                        est_tache_composite=row[4],
+                        est_tache_complementaire=row[5],
+                        unite=TabUniteDeMesure.objects.get(libelle=row[8]),
+                        libelle=row[3], quantite=row[7], user_id=request.user.username
+                    ).save(force_update=True)
+                    updatedRows += 1
 
-        except Marche.DoesNotExist:
-            return Response({'message': 'Impossible d\'importer le fichier le marché n\'éxiste pas '}, status=400)
+            return Response(f'Creation de {newRows} ligne(s) \n Mise à jour de {updatedRows} ligne(s) ', status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
+
 
 
 class GetNTView(generics.ListAPIView):
@@ -695,7 +710,6 @@ class GetCautions(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = CautionFilter
 
-
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         qr = 0
@@ -709,13 +723,13 @@ class GetCautions(generics.ListAPIView):
                 qd = qd + q.montant
 
 
-        m=Marche.objects.get(id=self.request.query_params.get('marche', None))
         return Response({'caut': response_data,
                          'extra': {
                              'qr': qr,
                              'qd': qd,
 
                          }}, status=status.HTTP_200_OK)
+
 
 
 
@@ -745,30 +759,22 @@ class PermissionApiView(APIView):
 
 
 class AddCautions(generics.CreateAPIView):
-    queryset = Cautions.objects.all()
+    queryset = Cautions.objects.filter(est_bloquer=False)
     serializer_class = CautionSerializer
 
-
     def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        print(serializer.initial_data)
+        nt=request.query_params.get('marche__nt', None)
+        cs=request.query_params.get('marche__code_site', None)
+        print(nt,cs)
+
         try:
+            x=1
 
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-
-            self.perform_create(serializer)
-            custom_response = {
-                'status': 'success',
-                'message': 'Caution ajoutée',
-                'data': serializer.data,
-            }
-
-            return Response(custom_response, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            custom_response = {
-                'status': 'error',
-                'message': str(e),
-                'data': None,
-            }
+            return Response('Tache ajoutée', status=status.HTTP_200_OK)
+        except IntegrityError as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
             return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)
 

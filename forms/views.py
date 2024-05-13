@@ -126,7 +126,7 @@ class DQEFieldsStateApiView(APIView):
 
             unite=TabUniteDeMesure.objects.get(libelle=state['unite'])
             state['unite']=[{'value':unite.id,'label':unite.libelle}]
-            print(state)
+
         return Response({'state': state}, status=status.HTTP_200_OK)
 
 class DQEFieldsApiView(APIView):

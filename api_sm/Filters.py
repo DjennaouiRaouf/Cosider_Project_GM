@@ -197,7 +197,7 @@ class CautionFilter(django_filters.FilterSet):
 
     class Meta:
         model = Cautions
-        fields=['marche',]
+        fields=['marche__nt','marche__code_site']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
