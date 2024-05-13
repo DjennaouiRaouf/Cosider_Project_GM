@@ -75,9 +75,13 @@ class DQEFieldsStateApiView(APIView):
         serializer = DQESerializer()
         fields = serializer.get_fields()
         field_info = []
-        dqe_pk = request.query_params.get(DQE._meta.pk.name, None)
-        if dqe_pk:
-            dqe = DQE.objects.get(pk=dqe_pk)
+        nt = request.query_params.get('nt', None)
+        cs = request.query_params.get('cs', None)
+        ct = request.query_params.get('ct', None)
+
+        if nt and cs and ct:
+            dqe = DQE.objects.get(nt=nt,code_tache=ct,code_site=cs)
+            print(dqe.libelle)
         else:
             dqe = None
         if(dqe == None):
@@ -120,7 +124,7 @@ class DQEFieldsStateApiView(APIView):
                     for d in field_info:
                         state.update(d)
 
-            unite=TabUniteDeMesure.objects.get(id=state['unite'])
+            unite=TabUniteDeMesure.objects.get(libelle=state['unite'])
             state['unite']=[{'value':unite.id,'label':unite.libelle}]
             print(state)
         return Response({'state': state}, status=status.HTTP_200_OK)
