@@ -59,7 +59,6 @@ class MarcheFilter(django_filters.FilterSet):
     code_contrat = django_filters.CharFilter(field_name='id', label='Contrat N°')
     date_signature=django_filters.DateFilter(field_name="date_signature",label='Date de signature')
     nt = django_filters.CharFilter(field_name='nt', label='NT')
-    client=django_filters.BooleanFilter(field_name='nt__code_client__est_client_cosider', label='Autre Client')
     has_rg = django_filters.BooleanFilter(field_name='rg', label='Avec retenue de garantie ?',method='filter_has_rg',)
     has_tva = django_filters.BooleanFilter(field_name='tva', label='Avec TVA ?',method='filter_has_tva',)
     has_rabais = django_filters.BooleanFilter(field_name='rabais', label='Avec Rabais ? ',method='filter_has_rabais',)
@@ -84,7 +83,7 @@ class MarcheFilter(django_filters.FilterSet):
         return queryset
     class Meta:
         model = Marche
-        fields=['code_contrat','date_signature','code_site','client','nt','has_rg','has_tva',]
+        fields=['code_contrat','date_signature','code_site','nt','has_rg','has_tva',]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

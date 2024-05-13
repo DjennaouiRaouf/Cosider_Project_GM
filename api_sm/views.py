@@ -501,16 +501,14 @@ class UpdateNTApiVew(generics.UpdateAPIView):
             instance = self.get_object()
             serializer = self.get_serializer(instance, data=request.data)
 
-            print(serializer.initial_data['nt'])
-            #instance.code_site = Sites.objects.get(id=serializer.initial_data['site'])
-            instance.nt = serializer.initial_data['nt']
             instance.code_client =serializer.initial_data['client']
-            #instance.code_situation_nt = TabSituationNt.objects.get(id=serializer.initial_data['code_situation_nt']),
+            instance.code_situation_nt = TabSituationNt.objects.get(id=serializer.initial_data['code_situation_nt'])
             instance.libelle = serializer.initial_data['libelle']
             instance.date_ouverture_nt = serializer.initial_data['date_ouverture_nt']
             instance.date_cloture_nt = serializer.initial_data['date_cloture_nt']
             instance.save(force_update=True)
         except IntegrityError as e:
+            print(e)
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
         return Response('NT mis à jour avec succès', status=status.HTTP_200_OK)
 
