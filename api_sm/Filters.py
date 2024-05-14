@@ -116,8 +116,8 @@ class DQEFilter(django_filters.FilterSet):
 
 
 class FactureFilter(django_filters.FilterSet):
-    code_site=django_filters.CharFilter(field_name='marche__code_site')
-    nt = django_filters.CharFilter(field_name='marche__nt')
+    code_site=django_filters.CharFilter(field_name='marche__code_site',label='Pole')
+    nt = django_filters.CharFilter(field_name='marche__nt' ,label='NT')
 
     numero_facture=django_filters.CharFilter(field_name='numero_facture',label='N° Facture')
     num_situation=django_filters.NumberFilter(field_name='num_situation',label='N° Situation')
