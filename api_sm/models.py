@@ -506,7 +506,7 @@ class Factures(models.Model):
     @property
     def montant_precedent(self):
         try:
-            previous_cumule = Factures.objects.filter(marche=self.marche, date__lt=self.date)
+            previous_cumule = Factures.objects.filter(marche=self.marche, num_situation__lt=self.num_situation)
             sum = 0
             if (previous_cumule):
                 for pc in previous_cumule:
@@ -518,7 +518,7 @@ class Factures(models.Model):
     @property
     def montant_cumule(self):
         try:
-            previous_cumule = Factures.objects.filter(marche=self.marche, date__lt=self.date,)
+            previous_cumule = Factures.objects.filter(marche=self.marche, num_situation__lt=self.num_situation)
             sum = self.montant
             if (previous_cumule):
                 for pc in previous_cumule:
