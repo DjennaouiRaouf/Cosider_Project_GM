@@ -1,3 +1,5 @@
+from django.db.models import IntegerField
+from django.db.models.functions import Cast
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -806,6 +808,11 @@ class FactureFieldsApiView(APIView):
 
                         }
 
+                        if (field_name == 'numero_facture'):
+                            num_last_facture = Factures.objects.annotate(
+                                numero_facture_int=Cast('numero_facture', IntegerField())
+                            ).filter(est_bloquer=False).last().numero_facture
+                            obj['count'] = num_last_facture
 
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                             anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
@@ -884,6 +891,8 @@ class FactureFieldsFilterApiView(APIView):
                     'label': field_instance.label or field_name,
 
                 }
+
+
                 if str(field_instance.__class__.__name__) == 'ModelChoiceFilter':
                     anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
                     serialized_data = anySerilizer(field_instance.queryset, many=True).data
