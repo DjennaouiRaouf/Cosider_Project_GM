@@ -121,11 +121,12 @@ def pre_save_encaissement(sender, instance, **kwargs):
 @receiver(pre_save, sender=Remboursement)
 def pre_save_remboursement(sender, instance, **kwargs):
     tr=round(instance.facture.montant_cumule/instance.facture.marche.ht,2)
-    print(tr)
+
     if (instance.avance.remboursee):
             raise ValidationError('Cette avance est remboursée')
     elif (instance.avance.debut>=tr):
-        raise ValidationError('Vous ne pouvez pas rembourser cette avance')
+        print(tr)
+        print(instance.avance.debut)
     else:
         tremb = round(
                 (float(instance.avance.taux_avance) / (float(instance.avance.fin) - float(instance.avance.debut) )) * 100, 2)
@@ -150,7 +151,7 @@ def post_save_facture(sender, instance, created, **kwargs):
     if created:
         debut = instance.du
         fin = instance.au
-        details = Attachements.objects.filter(marche=instance.marche, date__lte=fin, date__gte=debut)
+        details = Attachements.objects.filter(marche=instance.marche, date__lte=fin, date__gte=debut,est_bloque=False)
         for d in details:
             DetailFacture(
                 facture=instance,

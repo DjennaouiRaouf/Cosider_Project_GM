@@ -527,24 +527,25 @@ class UpdateNTApiVew(generics.UpdateAPIView):
 class AddFactureApiView(generics.CreateAPIView):
     queryset = Factures.objects.filter(est_bloquer=False)
     serializer_class = FactureSerializer
-
-
-
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         m = Marche.objects.get(nt=self.request.query_params.get('marche__nt', None),
                                code_site=self.request.query_params.get('marche__code_site', None))
-
-        print(serializer.initial_data)
-
         try:
+            num_f=serializer.initial_data['numero_facture']
+            num_s=serializer.initial_data['num_situation']
             Factures(
                 marche=m,
                 du=serializer.initial_data['du'],
                 au = serializer.initial_data['au'],
-                numero_facture=serializer.initial_data['numero_facture'],
-                num_situation=serializer.initial_data['num_situation'],
+                numero_facture=num_f,
+                num_situation=num_f,
             ).save(force_insert=True)
+
+            facture=Factures.objects.get(numero_facture=num_f,num_situation=num_s)
+            avance=Avance.objects.get(marche=facture.marche)
+            Remboursement(facture=facture,avance=avance).save(force_insert=True)
+
             return Response('Facture ajoutée', status=status.HTTP_200_OK)
         except IntegrityError as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
@@ -931,38 +932,6 @@ class DeleteInvoiceApiView(generics.DestroyAPIView):
 
         return Response({'Message': pk}, status=status.HTTP_200_OK)
 
-
-class AddRemb(generics.CreateAPIView):
-    queryset = Remboursement.objects.all()
-    serializer_class = RemboursementSerializer
-    def create(self, request, *args, **kwargs):
-        try:
-            factures = [int(pk) for pk in request.data[0][Factures._meta.pk.name]]
-            factures.sort(reverse=False)
-            avances = [int(pk) for pk in request.data[1]]
-            avances.sort(reverse=False)
-            if(avances and factures):
-                for f in factures :
-                    for a in avances :
-                        facture=Factures.objects.get(numero_facture=f)
-                        avance=Avance.objects.get(id=a)
-                        Remboursement(facture=facture, avance=avance).save()
-
-            custom_response = {
-                'status': 'success',
-                'message': 'Remboursement effectué',
-            }
-
-            return Response( status=status.HTTP_201_CREATED)
-        except Exception as e:
-            print(e)
-            custom_response = {
-                'status': 'error',
-                'message': str(e),
-            }
-
-
-        return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserProfile(APIView):

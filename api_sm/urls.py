@@ -62,7 +62,6 @@ urlpatterns = [
     path('flashm/',FlashMonths.as_view()),
     path('attm/',AttMonths.as_view()),
     path('detail/',getDetailFacture.as_view()),
-    path('remb/',AddRemb.as_view()),
     path('det/',getDetFacture.as_view()),
 
     path("getlibav/",LibAV.as_view()),
