@@ -511,16 +511,14 @@ class Factures(models.Model):
             if (previous_cumule):
                 for pc in previous_cumule:
                     sum += pc.montant
-                return sum
-            else:
-                return 0
+            return sum
         except Factures.DoesNotExist:
             return 0
 
     @property
     def montant_cumule(self):
         try:
-            previous_cumule = Factures.objects.filter(marche=self.marche, date__lt=self.date)
+            previous_cumule = Factures.objects.filter(marche=self.marche, date__lt=self.date,)
             sum = self.montant
             if (previous_cumule):
                 for pc in previous_cumule:

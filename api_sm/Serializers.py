@@ -176,35 +176,19 @@ class MarcheSerializer(serializers.ModelSerializer):
 
 
 class FactureSerializer(serializers.ModelSerializer):
-    num_situation = serializers.IntegerField(label='Numero de la situation')
-    projet=serializers.CharField(source='marche.libelle',read_only=True,label="Projet")
-    code_contrat=serializers.CharField(source='marche.id',read_only=True,label="Contrat N°")
-    signature=serializers.CharField(source='marche.date_signature',read_only=True,label="Signature")
-    montant_marche = serializers.CharField(source='marche.ht', read_only=True, label="Montant du Marche")
-    client = serializers.CharField(source='marche.nt.code_client.id', read_only=True, label="Client")
-    pole = serializers.CharField(source='marche.nt.code_site.id', read_only=True, label="Pole")
-    num_travail=serializers.CharField(source='marche.nt.nt', read_only=True, label="NT")
-    lib_nt = serializers.CharField(source='marche.nt.libelle', read_only=True, label="Libelle du travail")
-
     somme=serializers.SerializerMethodField(label="Arretée la présenta facture à la somme de")
-
-    tva=serializers.CharField(source='marche.tva', read_only=True, label="TVA")
-    rabais=serializers.CharField(source='marche.rabais', read_only=True, label="Rabais")
-    retenue_garantie = serializers.CharField(source='marche.rg', read_only=True, label="Retenue de Garantie")
-    montant_factureHT=serializers.SerializerMethodField(label="Montant en HT")
-    montant_factureTTC=serializers.SerializerMethodField(label="Montant en TTC")
     ava=serializers.SerializerMethodField(label="Montant AV.A Remb")
     avf=serializers.SerializerMethodField(label="Montant AV.F Remb")
     montant_precedent=serializers.SerializerMethodField(label="Montant Precedent")
-
     montant_cumule=serializers.SerializerMethodField(label="Montant Cumule")
 
-
+    montant_factureHT = serializers.SerializerMethodField(label="Montant en HT")
+    montant_factureTTC = serializers.SerializerMethodField(label="Montant en TTC")
 
     class Meta:
         model=Factures
-        fields="__all__"
-
+        fields=['marche','numero_facture','num_situation','date','du', 'au','montant_precedent'
+            ,'montant','montant_cumule','montant_rb','montant_rg','ava','avf','montant_factureHT','montant_factureTTC','somme','paye']
 
 
 

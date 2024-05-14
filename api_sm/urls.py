@@ -7,9 +7,6 @@ urlpatterns = [
     path('login/', LoginView.as_view()),
     path('logout/', LogoutView.as_view()),
     path('whoami/', WhoamiView.as_view()),
-
-
-
     path('adddqe/',AjoutDQEApiView.as_view()),
     path('addclient/',AjoutClientApiView.as_view()),
     path('addmarche/', AjoutMarcheApiView.as_view()),
@@ -76,7 +73,7 @@ urlpatterns = [
     path('addavance/',AddAvanceApiView.as_view()),
 
     path('contractkeys/', contratKeys.as_view()),
-    path('permission/',PermissionApiView.as_view()),
+
 
     path('prodparams/',GetProdParams.as_view()),
 

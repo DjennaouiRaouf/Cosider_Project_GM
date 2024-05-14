@@ -316,7 +316,6 @@ class GetFacture(generics.ListAPIView):
     serializer_class = FactureSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = FactureFilter
-'''
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         rg_total = 0
@@ -332,8 +331,9 @@ class GetFacture(generics.ListAPIView):
                 pass
 
         creance=mgf-enc
-        
-        m = Marche.objects.get(id=self.request.query_params.get('marche', None))
+
+        m = Marche.objects.get(nt=self.request.query_params.get('marche__nt', None),code_site=self.request.query_params.get('marche__code_site', None))
+        n=NT.objects.get(nt=self.request.query_params.get('marche__nt', None),code_site=self.request.query_params.get('marche__code_site', None))
         return Response({'facture': response_data,
                          'extra': {
 
@@ -341,16 +341,16 @@ class GetFacture(generics.ListAPIView):
                              'signature': m.date_signature,
                              'projet': m.libelle,
                              'montant_marche':m.ht,
-                             'client': m.nt.code_client.id,
-                             'nt': m.nt.nt,
-                             'lib_nt': m.nt.libelle,
-                             'pole': m.nt.code_site.id,
+                             'client': n.code_client,
+                             'nt': n.nt,
+                             'lib_nt': n.libelle,
+                             'pole': n.code_site,
                              'rg_total': rg_total,
                              'creance': creance,
 
                          }}, status=status.HTTP_200_OK)
 
-'''
+
 
 class DeletedFacture(generics.ListAPIView):
     queryset = Factures.objects.filter(est_bloquer=True)
@@ -525,32 +525,31 @@ class UpdateNTApiVew(generics.UpdateAPIView):
 
 
 class AddFactureApiView(generics.CreateAPIView):
-    queryset = DQE.objects.filter(est_bloquer=False)
+    queryset = Factures.objects.filter(est_bloquer=False)
     serializer_class = FactureSerializer
 
+
+
     def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        m = Marche.objects.get(nt=self.request.query_params.get('marche__nt', None),
+                               code_site=self.request.query_params.get('marche__code_site', None))
+
+        print(serializer.initial_data)
+
         try:
+            Factures(
+                marche=m,
+                du=serializer.initial_data['du'],
+                au = serializer.initial_data['au'],
+                numero_facture=serializer.initial_data['numero_facture'],
+                num_situation=serializer.initial_data['num_situation'],
+            ).save(force_insert=True)
+            return Response('Facture ajoutée', status=status.HTTP_200_OK)
+        except IntegrityError as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            self.perform_create(serializer)
-
-            custom_response = {
-                    'status': 'success',
-                    'message': 'Facture ajoutée',
-                    'data': serializer.data,
-            }
-
-            return Response(custom_response, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            custom_response = {
-                'status': 'error',
-                'message': str(e),
-                'data': None,
-            }
-
-            return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AddEncaissement(generics.CreateAPIView):
@@ -728,30 +727,6 @@ class GetCautions(generics.ListAPIView):
 
 
 
-
-
-
-class PermissionApiView(APIView):
-    def get(self, request, *args, **kwargs):
-        '''
-        user_permissions = self.request.user.get_all_permissions()
-        return Response({"permissions": user_permissions})
-        '''
-        app_name = 'api_sm'
-        app_permissions = self.get_app_permissions(request.user, app_name)
-        role = '|'.join(list(app_permissions))
-        return Response({"role":role},status=status.HTTP_200_OK)
-
-    def get_app_permissions(self, user, app_name):
-        # Get all permissions for the specified app
-        all_permissions = user.get_all_permissions()
-        app_permissions = set()
-
-        for permission in all_permissions:
-            if permission.split('.')[0] == app_name:
-                app_permissions.add(permission)
-
-        return app_permissions
 
 
 class AddCautions(generics.CreateAPIView):

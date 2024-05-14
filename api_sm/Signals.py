@@ -160,10 +160,6 @@ def post_save_facture(sender, instance, created, **kwargs):
 
 
 
-@receiver(pre_save, sender=DetailFacture)
-def pre_save_detail_facture(sender, instance, **kwargs):
-    if (instance.detail.dqe.marche != instance.facture.marche):
-        raise ValidationError("Cette attachement ne fais pas partie du marche")
 
 
 @receiver(pre_save, sender=Avance)
