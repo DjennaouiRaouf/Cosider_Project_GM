@@ -1215,15 +1215,17 @@ class AvanceFieldsStateApiView(APIView):
 class CautionFieldsApiView(APIView):
     def get(self, request):
         flag = request.query_params.get('flag', None)
-        marche = request.query_params.get('marche', None)
-
         if flag == 'l' or flag == 'f' :
             serializer = CautionSerializer()
             fields = serializer.get_fields()
 
             model_class = serializer.Meta.model
             model_name = model_class.__name__
+
             if (flag == 'f'):  # react form
+                marche = Marche.objects.get(nt=request.query_params.get('nt', None),
+                                            code_site=request.query_params.get('cs', None))
+
                 field_info = []
                 for field_name, field_instance in fields.items():
 
@@ -1247,7 +1249,7 @@ class CautionFieldsApiView(APIView):
                                 for item in serialized_data:
                                     filtered_item = {
                                         'value': item['id'],
-                                        'label': item['type']
+                                        'label': f'{item["type"]} N° {item["num_avance"]} '
                                     }
                                     filtered_data.append(filtered_item)
 
@@ -1274,7 +1276,7 @@ class CautionFieldsApiView(APIView):
             if (flag == 'l'):  # data grid list (react ag-grid)
                 field_info = []
                 for field_name, field_instance in fields.items():
-                    if (field_name not in ['heure','marche']):
+                    if (field_name not in ['marche']):
                         obj={
                             'field': field_name,
                             'headerName': field_instance.label or field_name,
@@ -1283,7 +1285,8 @@ class CautionFieldsApiView(APIView):
                         }
                         if(str(field_instance.__class__.__name__) != 'BooleanField' ):
                             obj['cellRenderer']='InfoRenderer'
-
+                        if(field_name in ['id']):
+                            obj['hide']=True
                         field_info.append(obj)
 
 

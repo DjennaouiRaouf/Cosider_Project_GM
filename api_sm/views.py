@@ -767,17 +767,26 @@ class AddCautions(generics.CreateAPIView):
         print(serializer.initial_data)
         nt=request.query_params.get('marche__nt', None)
         cs=request.query_params.get('marche__code_site', None)
-        print(nt,cs)
-
+        marche=Marche.objects.get(nt=nt,code_site=cs)
+        print(marche.id)
+        avance=None
         try:
-            x=1
-
-            return Response('Tache ajoutée', status=status.HTTP_200_OK)
+            id_avance=serializer.initial_data['avance'] or 0
+            avance=Avance.objects.get(id=id_avance)
+        except Avance.DoesNotExist:
+            avance=None
+        try:
+            Cautions(
+                date_soumission=serializer.initial_data['date_soumission'],
+                marche=marche,
+                avance=avance,
+                type=TypeCaution.objects.get(id=serializer.initial_data['type']),
+                agence=TabAgence.objects.get(id=serializer.initial_data['agence']),
+                montant=serializer.initial_data['montant']
+            ).save(force_insert=True)
+            return Response('Caution ajoutée', status=status.HTTP_200_OK)
         except IntegrityError as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
-
-            return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)
-
 
 class GetODS(generics.ListAPIView):
     #permission_classes = [IsAuthenticated,ViewODSPermission]

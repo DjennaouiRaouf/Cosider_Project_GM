@@ -320,7 +320,7 @@ class DetailFactureSerializer(serializers.ModelSerializer):
 class AvanceSerializer(serializers.ModelSerializer):
     class Meta:
             model=Avance
-            fields='__all__'
+            fields=['id','type','num_avance','montant','taux_avance','debut','fin','date','marche']
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
@@ -359,7 +359,7 @@ class CautionSerializer(serializers.ModelSerializer):
 
     class Meta:
             model=Cautions
-            fields='__all__'
+            fields=['id','type','avance','montant','agence','date_soumission','marche','est_recupere']
 
 
     def get_fields(self, *args, **kwargs):
@@ -372,6 +372,11 @@ class CautionSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
+        representation['type']=instance.type.libelle
+        if (instance.avance):
+            representation['avance']=instance.avance.type.libelle
+        else:
+            representation['avance'] = None
         return representation
 
 class TypeCautionSerializer(serializers.ModelSerializer):

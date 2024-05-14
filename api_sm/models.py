@@ -647,7 +647,7 @@ class ModePaiement(models.Model):
     libelle=models.CharField(max_length=500,null=False,unique=True)
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
-    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False, )
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
     def __str__(self):
@@ -675,7 +675,7 @@ class Encaissement(models.Model):
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
-    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False, )
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
     @property
@@ -720,7 +720,7 @@ class TypeCaution(models.Model):
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
-    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False, )
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
     def __str__(self):
@@ -741,21 +741,18 @@ class TypeCaution(models.Model):
 class Cautions(models.Model):
 
     marche = models.ForeignKey(Marche,db_column='Num_Marche', on_delete=models.DO_NOTHING, null=True, related_name="Caution_Marche",to_field='id')
-    type = models.ForeignKey(TypeCaution,db_column='Type_Caution', on_delete=models.DO_NOTHING, null=False)
-    avance = models.ForeignKey(Avance,db_column='Avance', on_delete=models.DO_NOTHING, null=True, blank=True)
+    type = models.ForeignKey(TypeCaution,db_column='Type_Caution', on_delete=models.DO_NOTHING, null=False,verbose_name="Libelle",to_field='')
+    avance = models.ForeignKey(Avance,db_column='Avance', on_delete=models.DO_NOTHING, null=True, blank=True,verbose_name='Avance')
     date_soumission = models.DateField(null=False,verbose_name="Date dépot")
-    taux = models.FloatField(default=0,
-                                     validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    agence = models.ForeignKey('api_sch.TabAgence',db_column='Agence', on_delete=models.CASCADE, db_constraint=False)
+    agence = models.ForeignKey('api_sch.TabAgence',db_column='Agence', on_delete=models.CASCADE,verbose_name="Agence")
     montant = models.FloatField(
-        
+        verbose_name="Montant",
         validators=[MinValueValidator(0)], default=0,
-        editable=False
     )
     est_recupere = models.BooleanField(default=False,db_column='Est_Recupere', null=False,verbose_name='Est Recuperée')
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
-    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False, )
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
     class Meta:
@@ -767,21 +764,3 @@ class Cautions(models.Model):
 
 
 
-'''
-CREATE VIEW Tab_Banque AS
-SELECT * FROM CA_CH.dbo.Tab_Banque;
-
-CREATE VIEW Tab_Agence AS
-SELECT * FROM CA_CH.dbo.Tab_Agence;
-
-CREATE VIEW Tab_Unite_de_Mesure AS
-SELECT * FROM CA_CH.dbo.Tab_Unite_de_Mesure
-;
-
-CREATE VIEW Tab_Situation_NT AS
-SELECT * FROM CA_CH.dbo.Tab_Situation_NT
-;
-
-
-
-'''

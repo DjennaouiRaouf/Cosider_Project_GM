@@ -83,23 +83,16 @@ def pre_save_factures(sender, instance, **kwargs):
     else:
         debut = instance.du
         fin = instance.au
-        if( not Attachements.objects.filter(dqe__marche=instance.marche, date__lte=fin, date__gte=debut)):
+        if( not Attachements.objects.filter(marche=instance.marche, date__lte=fin, date__gte=debut)):
             raise ValidationError('Facturation impossible les attachements ne sont pas disponible ')
         m=0
-        attachements=Attachements.objects.filter(dqe__marche=instance.marche, date__lte=fin, date__gte=debut)
+        attachements=Attachements.objects.filter(marche=instance.marche, date__lte=fin, date__gte=debut)
         for attachement in attachements:
             m+=attachement.montant
 
         instance.montant = m
         instance.montant_rb = m * (instance.marche.rabais / 100)
         instance.montant_rg = round((m - instance.montant_rb) * (instance.marche.rg / 100), 2)
-
-        qte_real = Attachements.objects.filter(Q(marche=instance.marche) & Q(date__lte=fin)).aggregate(
-                models.Sum('qte'))["qte__sum"]
-        qte_dqe = DQE.objects.filter(Q(marche=instance.marche)).aggregate(
-                models.Sum('quantite'))["quantite__sum"]
-        instance.taux_realise = round((qte_real / qte_dqe) * 100, 2)
-
 
 
 
@@ -118,31 +111,23 @@ def pre_save_encaissement(sender, instance, **kwargs):
         if(not sum):
             sum=0
         sum=sum+instance.montant_encaisse
-        montant_creance=instance.facture.montant_factureTTC-sum
         if(instance.montant_creance == 0):
             instance.facture.paye=True
             instance.facture.save()
         if(instance.montant_creance < 0):
             raise ValidationError('Le paiement de la facture est terminer')
 
-@receiver(post_softdelete, sender=Encaissement)
-def update_on_softdelete(sender, instance, **kwargs):
-    try:
-        encaissements=Encaissement.objects.filter(Q(id__gt=instance.id))
-        if(encaissements):
-            encaissements.update(montant_creance=F('montant_creance') + instance.montant_encaisse)
-
-    except Encaissement.DoesNotExist:
-        pass
-
 
 @receiver(pre_save, sender=Remboursement)
 def pre_save_remboursement(sender, instance, **kwargs):
+    deb_remb=round(instance.facture.montant_cumule/instance.facture.marche.ht,2)
     if (instance.avance.remboursee):
             raise ValidationError('Cette avance est remboursée')
+    elif (instance.avance.debut>=deb_remb):
+        raise ValidationError('Vous ne pouvez pas rembourser cette avance')
     else:
         tremb = round(
-                (instance.avance.taux_avance / (instance.avance.fin - instance.facture.taux_realise)) * 100, 2)
+                (float(instance.avance.taux_avance) / (float(instance.avance.fin) - float(instance.avance.debut) )) * 100, 2)
         instance.montant = instance.facture.montant_factureHT * (tremb / 100)
 
         if (instance.rst_remb < 0):
@@ -203,38 +188,6 @@ def pre_save_type_caution(sender, instance, **kwargs):
     if (instance.type_avance):
         instance.libelle = instance.type_avance.libelle
 
-
-@receiver(pre_save, sender=Cautions)
-def pre_save_caution(sender, instance, **kwargs):
-    if (instance.avance):
-        if (instance.avance.marche != instance.marche):
-            raise ValidationError(
-                f'Le Marché {instance.marche} ne posséde pas cette avance  de type {instance.avance.type}')
-        else:
-            if (instance.avance.type != instance.type.type_avance):
-                raise ValidationError(
-                    f'Cette avance est de type {instance.avance.type} n\'est pas compatible avec la caution de type {instance.type.type_avance} ')
-
-    exact = instance.type.taux_exact
-    max = instance.type.taux_max
-    min = instance.type.taux_min
-    if (exact != None):
-        if (instance.taux != exact):
-            raise ValidationError(
-                f'le taux de la caution du marché  {instance.taux} doit etre égale à {exact}')
-
-        if (min != None and max != None):
-            if (not min <= instance.taux <= max):
-                raise ValidationError(
-                    f'le taux de la caution du marché  {instance.taux}  doit etre comprise entre [{min},{max}]')
-
-    montant = 0
-    if (instance.avance):
-        montant = instance.avance.montant
-    else:
-        montant = instance.marche.ttc
-
-    instance.montant = round(montant * instance.taux / 100, 2)
 
 
 
