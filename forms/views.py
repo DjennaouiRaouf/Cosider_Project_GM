@@ -1485,7 +1485,7 @@ class AttachementsFieldsApiView(APIView):
 
 
             return Response({'fields': field_info,"fields2":field_info2,
-            'models': model_name, 'pk': Ordre_De_Service._meta.pk.name}, status=status.HTTP_200_OK)
+            'models': model_name}, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 

@@ -83,10 +83,10 @@ def pre_save_factures(sender, instance, **kwargs):
     else:
         debut = instance.du
         fin = instance.au
-        if( not Attachements.objects.filter(marche=instance.marche, date__lte=fin, date__gte=debut)):
+        if( not Attachements.objects.filter(marche=instance.marche, date__lte=fin, date__gte=debut,est_bloquer=False)):
             raise ValidationError('Facturation impossible les attachements ne sont pas disponible ')
         m=0
-        attachements=Attachements.objects.filter(marche=instance.marche, date__lte=fin, date__gte=debut)
+        attachements=Attachements.objects.filter(marche=instance.marche, date__lte=fin, date__gte=debut,est_bloquer=False)
         for attachement in attachements:
             m+=attachement.montant
 
@@ -102,7 +102,7 @@ def pre_save_encaissement(sender, instance, **kwargs):
     if not instance.pk:
         try:
 
-            sum = Encaissement.objects.filter(facture=instance.facture, date_encaissement__lt=instance.date_encaissement).aggregate(models.Sum('montant_encaisse'))[
+            sum = Encaissement.objects.filter(facture=instance.facture, date_encaissement__lt=instance.date_encaissement,est_bloquer=False).aggregate(models.Sum('montant_encaisse'))[
                         "montant_encaisse__sum"]
 
         except Encaissement.DoesNotExist:

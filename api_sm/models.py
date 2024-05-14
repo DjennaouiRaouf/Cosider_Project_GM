@@ -376,7 +376,7 @@ class Attachements(models.Model):
     def qte_cumule(self):
         try:
             ct=DQE.objects.get(nt=self.marche.nt,code_site=self.marche.code_site,code_tache=self.code_tache)
-            previous_cumule = Attachements.objects.filter(code_tache=ct.code_tache,date__lt=self.date)
+            previous_cumule = Attachements.objects.filter(code_tache=ct.code_tache,date__lt=self.date,est_bloquer=False)
             sum = self.qte
             if (previous_cumule):
                 for pc in previous_cumule:
@@ -390,7 +390,7 @@ class Attachements(models.Model):
     def qte_precedente(self):
         try:
             ct = DQE.objects.get(nt=self.marche.nt, code_site=self.marche.code_site,code_tache=self.code_tache)
-            previous_cumule = Attachements.objects.filter(code_tache=ct.code_tache, date__lt=self.date)
+            previous_cumule = Attachements.objects.filter(code_tache=ct.code_tache, date__lt=self.date,est_bloquer=False)
             sum = 0
             if (previous_cumule):
                 for pc in previous_cumule:
@@ -402,7 +402,7 @@ class Attachements(models.Model):
     def montant_precedent(self):
         try:
             ct = DQE.objects.get(nt=self.marche.nt, code_site=self.marche.code_site,code_tache=self.code_tache)
-            previous_cumule = Attachements.objects.filter(code_tache=ct.code_tache, date__lt=self.date)
+            previous_cumule = Attachements.objects.filter(code_tache=ct.code_tache, date__lt=self.date,est_bloquer=False)
             sum = 0
 
             if (previous_cumule):
@@ -417,7 +417,7 @@ class Attachements(models.Model):
     def montant_cumule(self):
         try:
             ct = DQE.objects.get(nt=self.marche.nt, code_site=self.marche.code_site,code_tache=self.code_tache)
-            previous_cumule = Attachements.objects.filter(code_tache=ct.code_tache,date__lt=self.date)
+            previous_cumule = Attachements.objects.filter(code_tache=ct.code_tache,date__lt=self.date,est_bloquer=False)
             sum = self.montant
             if (previous_cumule):
                 for pc in previous_cumule:
