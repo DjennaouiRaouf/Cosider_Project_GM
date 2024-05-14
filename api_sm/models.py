@@ -430,9 +430,7 @@ class Attachements(models.Model):
             if (previous_cumule):
                 for pc in previous_cumule:
                     sum += pc.qte
-                return sum
-            else:
-                return 0
+            return sum
         except Attachements.DoesNotExist:
             return 0
     @property
@@ -441,12 +439,12 @@ class Attachements(models.Model):
             ct = DQE.objects.get(nt=self.marche.nt, code_site=self.marche.code_site,code_tache=self.code_tache)
             previous_cumule = Attachements.objects.filter(code_tache=ct.code_tache, date__lt=self.date)
             sum = 0
+
             if (previous_cumule):
                 for pc in previous_cumule:
                     sum += pc.montant
-                return sum
-            else:
-                return 0
+            return sum
+
         except Attachements.DoesNotExist:
             return 0
 

@@ -861,7 +861,7 @@ class GetAttachements(generics.ListAPIView):
         for q in queryset:
             mt = mt + q.montant
         try:
-            qt = float(m.ht) / float(mt)
+            qt = (mt /m.ht)*100
         except Exception as e:
             qt=0
 

@@ -430,7 +430,7 @@ class AttachementsSerializer(serializers.ModelSerializer):
     qte_cumule = serializers.SerializerMethodField(label="Qte Cumulée")
 
     def get_montant_precedent(self, obj):
-        return 0
+        return obj.montant_precedent
 
     def get_montant_cumule(self, obj):
         return obj.montant_cumule
