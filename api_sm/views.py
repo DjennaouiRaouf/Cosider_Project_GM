@@ -18,11 +18,7 @@ from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from tablib import Dataset
-
-from api_sch.models import TabFiliale
 from .Filters import *
-from .Resources import DQEResource
 from .Serializers import *
 from .models import *
 from .tools import *
@@ -787,46 +783,6 @@ class AddCautions(generics.CreateAPIView):
             return Response('Caution ajoutée', status=status.HTTP_200_OK)
         except IntegrityError as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
-
-class GetODS(generics.ListAPIView):
-    #permission_classes = [IsAuthenticated,ViewODSPermission]
-    queryset = Ordre_De_Service.objects.all()
-    serializer_class = Ordre_De_ServiceSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_class = Ordre_De_ServiceFilter
-
-
-
-class AddODS(generics.CreateAPIView):
-    #permission_classes = [IsAuthenticated,AddODSPermission]
-    queryset = Ordre_De_Service.objects.all()
-    serializer_class = Ordre_De_ServiceSerializer
-
-
-    def create(self, request, *args, **kwargs):
-        try:
-
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-
-            self.perform_create(serializer)
-            custom_response = {
-                'status': 'success',
-                'message': 'ODS ajouté',
-                'data': serializer.data,
-            }
-
-            return Response(custom_response, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            custom_response = {
-                'status': 'error',
-                'message': str(e),
-                'data': None,
-            }
-
-            return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 
 

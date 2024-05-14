@@ -279,41 +279,6 @@ class DQE(CPkModel):
         unique_together=(('code_site','nt','code_tache'))
         app_label = 'api_sm'
 
-        
-
-
-
-
-
-class Ordre_De_Service(models.Model):
-    Types = [
-        ('Interruption', 'Interruption'),
-        ('Reprise', 'Interruption'),
-
-    ]
-    marche = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=True, related_name="ods_marche",to_field='id')
-    date = models.DateField(null=True,blank=True,verbose_name='Date Interruption')
-    rep_int=models.CharField(null=False,default='Interruption',max_length=300,choices=Types,verbose_name='Reprise/Interruption')
-    motif = models.TextField(null=True, blank=True,verbose_name='Motif')
-
-
-
-
-
-    class Meta:
-        verbose_name = 'Ordre de service'
-        verbose_name_plural = 'Ordre de service'
-        app_label = 'api_sm'
-        
-
-
-
-
-
-
-
-
-
 
 
 class TypeAvance(models.Model):

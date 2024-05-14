@@ -86,8 +86,7 @@ urlpatterns = [
     path('annulefacture/',DeleteInvoiceApiView.as_view()),
     path('delencaissements/',DeletedEncaissement.as_view()),
 
-    path('ods/',GetODS.as_view()),
-    path('addods/', AddODS.as_view()),
+
     path('delatt/',DelATT.as_view()),
 
 
