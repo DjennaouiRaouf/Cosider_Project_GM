@@ -869,11 +869,11 @@ class GetAttachements(generics.ListAPIView):
         return Response({'att': response_data,
                          'extra': {
                             'marche':m.id,
-                            'nt':m.nt,
+                            'nt':nt.nt,
                             'date':self.request.query_params.get('mm', None)+'/'+self.request.query_params.get('aa', None),
                             'site':m.code_site,
                              'objet':m.libelle,
-                             'client':nt.code_client.libelle,
+                             'client':nt.code_client,
                              'qt': qt,
                              'mt': mt,
 
