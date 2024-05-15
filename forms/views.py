@@ -816,6 +816,15 @@ class FactureFieldsApiView(APIView):
                                 obj['count'] = num_last_facture
                             except Exception as e:
                                 pass
+                        if (field_name == 'num_situation'):
+                            try:
+                                nt=request.query_params.get('nt', None)
+                                cs=request.query_params.get('cs', None)
+                                num_last_situation = Factures.objects.filter(marche__nt=nt,marche__code_site=cs,est_bloquer=False).last().num_situation
+                                obj['count'] = 2
+                            except Exception as e:
+                                pass
+
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                             anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
                             obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data

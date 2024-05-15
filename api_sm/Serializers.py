@@ -249,7 +249,9 @@ class EncaissementSerializer(serializers.ModelSerializer):
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-       
+        fields.pop('est_bloquer', None)
+        fields.pop('user_id', None)
+        fields.pop('date_modification', None)
 
 
         return fields
@@ -444,12 +446,23 @@ class RemboursementSerializer(serializers.ModelSerializer):
 
 
 class ECSerializer(serializers.ModelSerializer):
-    nt = serializers.PrimaryKeyRelatedField(source="nt.nt",label='NT',read_only=True)
-    client = serializers.PrimaryKeyRelatedField(source="nt.code_client",label='Client',read_only=True)
+    nt = serializers.SerializerMethodField(label='NT',read_only=True)
+    code_site = serializers.SerializerMethodField(label='Pole', read_only=True)
+
+    client = serializers.SerializerMethodField(label='Client',read_only=True)
 
     mgf = serializers.SerializerMethodField(label='M.G.Facturé')
     mgp = serializers.SerializerMethodField(label='M.G.Payé')
     mgc = serializers.SerializerMethodField(label='M.G.Créance')
+
+    def get_nt(self,obj):
+        return obj.nt
+
+    def get_code_site(self, obj):
+        return obj.code_site
+    def get_client(self, obj):
+        n=NT.objects.get(nt=obj.nt,code_site=obj.code_site)
+        return n.code_client
 
     def get_mgf(self, obj):
         return obj.montant_global_f
@@ -463,11 +476,10 @@ class ECSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Marche
-        fields = ['id','nt','client','mgf','mgp','mgc']
+        fields = ['id','nt','code_site','client','mgf','mgp','mgc']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['client'] = instance.nt.code_client.libelle
 
 
         return representation
