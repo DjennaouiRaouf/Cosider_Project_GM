@@ -88,7 +88,18 @@ def pre_save_factures(sender, instance, **kwargs):
         m=0
         attachements=Attachements.objects.filter(marche=instance.marche, date__lte=fin, date__gte=debut,est_bloquer=False)
         for attachement in attachements:
-            m+=attachement.montant
+            if(instance.marche.revisable):
+                try:
+                    coef=RevisionPrix.objects.get(marche=instance.marche.id,nt=instance.marche.nt,code_site=instance.marche.code_site,
+                                             code_debut=attachement.code_tache).coef
+                    m = m + attachement.montant*coef
+                except RevisionPrix.DoesNotExist:
+                    pass
+            else:
+                m += attachement.montant
+
+
+
 
         instance.montant = m
         instance.montant_rb = m * (instance.marche.rabais / 100)
