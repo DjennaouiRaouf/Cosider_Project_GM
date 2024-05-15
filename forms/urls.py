@@ -54,4 +54,6 @@ urlpatterns = [
 
     path('avancefilterfields/',AvanceFieldsFilterApiView.as_view()),
 
+    path('revfilterfields/',RevFieldsFilterApiView.as_view()),
+    path('revfields/',RevFieldsApiView.as_view()),
 ]

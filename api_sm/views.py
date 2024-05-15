@@ -189,6 +189,43 @@ class AjoutDQEApiView(generics.CreateAPIView):
 
 
 
+
+class AjoutRevisionApiView(generics.CreateAPIView):
+    #permission_classes = [IsAuthenticated]
+    queryset = RevisionPrix.objects.all()
+    serializer_class = RevisionPrixSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        print(serializer.initial_data)
+
+        try:
+            RevisionPrix(
+                marche=serializer.initial_data['contrat'],
+                code_site=serializer.initial_data['pole'],
+                nt=serializer.initial_data['nt'],
+                code_tache=serializer.initial_data['code_tache'],
+                coef=serializer.initial_data['coef'],
+                date_rev=serializer.initial_data['date_rev'],
+            ).save(force_insert=True)
+            return Response('Prix Révisés', status=status.HTTP_200_OK)
+        except IntegrityError as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
+class GetRevisionApiView(generics.ListAPIView):
+    queryset = RevisionPrix.objects.all()
+    serializer_class = RevisionPrixSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = RevFilter
+
+
+
+
+
+
+
+
 class GetSitesView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated, ViewSitePermission]
 

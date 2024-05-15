@@ -1639,3 +1639,56 @@ class AttachementFieldsFilterApiView(APIView):
 
         return Response({'fields': field_info},status=status.HTTP_200_OK)
 
+
+
+class RevFieldsFilterApiView(APIView):
+    def get(self,request):
+        field_info=[]
+        for field_name, field_instance in RevFilter.base_filters.items():
+            if(field_name not in ['marche','nt','code_site']):
+                obj = {
+                            'name': field_name,
+                            'type': str(field_instance.__class__.__name__),
+                            'label': field_instance.label or field_name,
+                }
+                field_info.append(obj)
+
+        return Response({'fields': field_info},status=status.HTTP_200_OK)
+
+
+
+
+class RevFieldsApiView(APIView):
+    def get(self, request):
+        flag = request.query_params.get('flag',None)
+        if flag=='l' or flag =='f':
+            serializer = RevisionPrixSerializer()
+            model_class = serializer.Meta.model
+            model_name = model_class.__name__
+            fields = serializer.get_fields()
+            if(flag=='l'): #data grid list (react ag-grid)
+                field_info = []
+                for field_name, field_instance in fields.items():
+                    if(field_name not in ['',]):
+                        obj = {
+                            'field': field_name,
+                            'headerName': field_instance.label or field_name,
+                            'info': str(field_instance.__class__.__name__),
+
+                        }
+                        if( field_name in ['contrat','pole','nt']):
+                            obj['hide'] = True
+                        if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField") and field_name not in ['marche']:
+                            obj['related'] = str(field_instance.queryset.model.__name__)
+                        if(field_name in ['coef']):
+                            obj['cellRenderer']='InfoRenderer'
+
+                        field_info.append(obj)
+
+
+            return Response({'fields':field_info,'models':model_name},status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+

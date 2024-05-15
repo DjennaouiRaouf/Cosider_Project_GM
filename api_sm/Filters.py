@@ -316,3 +316,22 @@ class ECFilter(django_filters.FilterSet):
                 field_instance.label = model_field.verbose_name
             except:
                 pass
+
+class RevFilter(django_filters.FilterSet):
+    nt = django_filters.CharFilter(field_name='nt', label='NT')
+    code_site = django_filters.ModelChoiceFilter(field_name="code_site",
+                                                 queryset=Sites.objects.filter(est_bloquer=False), label='Site')
+    code_tache = django_filters.CharFilter(field_name='code_tache', label='Code Tache')
+
+    class Meta:
+        model = RevisionPrix
+        fields = ['code_tache', 'code_site', 'nt','date_rev']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field_instance in self.base_filters.items():
+            try:
+                model_field = self.Meta.model._meta.get_field(field_name)
+                field_instance.label = model_field.verbose_name
+            except:
+                pass

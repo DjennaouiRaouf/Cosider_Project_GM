@@ -81,8 +81,8 @@ class SiteSerializer(serializers.ModelSerializer):
 
 
 class NTSerializer(serializers.ModelSerializer):
-    site=serializers.PrimaryKeyRelatedField(source='code_site',queryset=Sites.objects.all(), label='Pole')
-    client=serializers.PrimaryKeyRelatedField(source='code_client',queryset=Clients.objects.all(), label='Client')
+    site=serializers.PrimaryKeyRelatedField(source='code_site',queryset=Sites.objects.filter(est_bloquer=False), label='Pole')
+    client=serializers.PrimaryKeyRelatedField(source='code_client',queryset=Clients.objects.filter(est_bloquer=False), label='Client')
 
 
     class Meta:
@@ -108,7 +108,7 @@ class NTSerializer(serializers.ModelSerializer):
 
 class DQESerializer(serializers.ModelSerializer):
     prix_q = serializers.SerializerMethodField(label="Montant")
-    pole= serializers.PrimaryKeyRelatedField(source='code_site',queryset=Sites.objects.all(), label='Pole')
+    pole= serializers.PrimaryKeyRelatedField(source='code_site',queryset=Sites.objects.filter(est_bloquer=False), label='Pole')
 
 
 
@@ -138,7 +138,7 @@ class DQESerializer(serializers.ModelSerializer):
 
 
 class MarcheSerializer(serializers.ModelSerializer):
-    code_site=serializers.PrimaryKeyRelatedField(queryset=Sites.objects.all().distinct(),label='Site')
+    code_site=serializers.PrimaryKeyRelatedField(queryset=Sites.objects.filter(est_bloquer=False).distinct(),label='Site')
     nt=serializers.CharField(label='NT')
     montant_ht = serializers.SerializerMethodField(label='Montant en HT')
     montant_ttc = serializers.SerializerMethodField(label='Montant en TTC')
@@ -480,3 +480,22 @@ class ECSerializer(serializers.ModelSerializer):
 
 
         return representation
+
+
+class RevisionPrixSerializer(serializers.ModelSerializer):
+    pole = serializers.PrimaryKeyRelatedField(source='code_site', queryset=Sites.objects.filter(est_bloquer=False), label='Pole')
+    contrat = serializers.PrimaryKeyRelatedField(source='marche', queryset=Marche.objects.filter(est_bloquer=False), label='Marche')
+    libelle = serializers.SerializerMethodField(label='Libelle')
+
+    def get_libelle(self, obj):
+        return DQE.objects.get(nt=obj.nt,code_site=obj.code_site,code_tache=obj.code_tache).libelle
+
+    class Meta:
+        model = RevisionPrix
+        fields = ['contrat','pole','nt','code_tache','libelle','coef','date_rev']
+
+    def get_fields(self, *args, **kwargs):
+        fields = super().get_fields(*args, **kwargs)
+
+        return fields
+

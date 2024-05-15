@@ -4,18 +4,8 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Q
-
 from django_currentuser.middleware import get_current_user
 from api_sch.models import *
-
-
-
-
-
-
-
-
-
 
 
 class Clients(models.Model):
@@ -110,11 +100,6 @@ class Sites(models.Model):
         db_table = 'Tab_Site'
         verbose_name = 'Sites'
         verbose_name_plural = 'Sites'
-
-
-
-
-
 
 
 
@@ -222,14 +207,10 @@ class Marche(CPkModel):
         return self.montant_global_f-self.montant_global_p
 
     class Meta:
-
-            db_table = 'Marche'
-            verbose_name = 'Marchés'
-            verbose_name_plural = 'Marchés'
-
-
-
-
+        managed = False
+        db_table = 'Marche'
+        verbose_name = 'Marchés'
+        verbose_name_plural = 'Marchés'
 
 
 
@@ -243,7 +224,6 @@ class DQE(CPkModel):
     unite =models.ForeignKey('api_sch.TabUniteDeMesure',on_delete=models.DO_NOTHING, null=False,db_column='Code_Unite_Mesure', verbose_name='Unité')
     prix_u = models.FloatField(
         db_column='Prix_Unitaire',
-        
         validators=[MinValueValidator(0)], default=0
         , verbose_name='Prix unitaire'
     )
@@ -270,7 +250,6 @@ class DQE(CPkModel):
         return pq
 
 
-
     class Meta:
         managed = False
         db_table = 'Tab_NT_Taches'
@@ -284,20 +263,16 @@ class DQE(CPkModel):
 class TypeAvance(models.Model):
     libelle = models.CharField(max_length=500, null=False, unique=True)
     taux_max = models.FloatField(default=0,validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-
-
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
-
     def __str__(self):
         return self.libelle
 
-
-
     class Meta:
+        managed=False
         verbose_name = 'Type Avance'
         verbose_name_plural = 'Type Avance'
         db_table = 'TypeAvance'
@@ -315,32 +290,22 @@ class Avance(models.Model):
     taux_avance = models.FloatField(default=0,  verbose_name="Taux d'avance", editable=False,
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
 
-
     montant = models.FloatField( validators=[MinValueValidator(0)], default=0,null=False,verbose_name='Montant d\'avance')
 
     debut = models.FloatField(default=0,  verbose_name="Debut",
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
     fin=models.FloatField(default=80,  verbose_name="Fin",
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-
-
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
-
-
-
-
-
-
-
-
     date=models.DateField(null=False,verbose_name="Date d'avance")
     remboursee = models.BooleanField(default=False, null=False,verbose_name='Est Remboursée')
 
 
     class Meta:
+        managed=False
         verbose_name = 'Avance'
         verbose_name_plural = 'Avances'
         db_table='Avances'
@@ -532,6 +497,7 @@ class Factures(models.Model):
 
 
     class Meta:
+        managed=False
         db_table='Factures'
         verbose_name = 'Factures'
         verbose_name_plural = 'Factures'
@@ -576,6 +542,7 @@ class Remboursement(models.Model):
 
 
     class Meta:
+        managed=False
         db_table='Rembourcement'
         verbose_name = 'Remboursement'
         verbose_name_plural = 'Remboursements'
@@ -594,6 +561,7 @@ class DetailFacture(models.Model):
 
 
     class Meta:
+        managed=False
         db_table='Detail_Facture'
         verbose_name = 'Datails Facture'
         verbose_name_plural = 'Details Facture'
@@ -611,6 +579,7 @@ class ModePaiement(models.Model):
     def __str__(self):
         return  self.libelle
     class Meta:
+        managed=False
         db_table='Mode_Paiement'
         verbose_name = 'Mode de Paiement'
         verbose_name_plural = 'Mode de Paiement'
@@ -656,6 +625,7 @@ class Encaissement(models.Model):
 
 
     class Meta:
+        managed=False
         db_table="Encaissements"
         verbose_name = 'Encaissement'
         verbose_name_plural = 'Encaissement'
@@ -690,6 +660,7 @@ class TypeCaution(models.Model):
 
 
     class Meta:
+        managed=False
         db_table='Type_Caution'
         verbose_name = 'Type_Caution'
         verbose_name_plural = 'Type_Caution'
@@ -714,6 +685,7 @@ class Cautions(models.Model):
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
     class Meta:
+        managed=False
         db_table='Cautions'
         verbose_name = 'Caution'
         verbose_name_plural = 'Caution'
@@ -722,3 +694,17 @@ class Cautions(models.Model):
 
 
 
+class RevisionPrix(CPkModel):
+    marche = models.CharField(db_column='marche_id',primary_key=True, max_length=500)
+    code_site = models.CharField(db_column='Code_site', primary_key=True, max_length=10,
+                                 verbose_name='Code du Site')
+    nt = models.CharField(db_column='NT', max_length=20, primary_key=True, null=False, verbose_name='NT')
+    code_tache = models.CharField(db_column='Code_Tache', null=False, max_length=30
+                                  , verbose_name="Code Tache", primary_key=True)
+    date_rev = models.DateField(db_column='Date_Rev', primary_key=True,verbose_name='Date Révision')
+    coef = models.FloatField(db_column='Coef',verbose_name='Coefficient Révision')
+
+    class Meta:
+        managed = False
+        db_table = 'Revision_Prix'
+        unique_together = (('date_rev', 'code_site', 'marche', 'nt', 'code_tache'),)
