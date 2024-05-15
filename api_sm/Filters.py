@@ -322,9 +322,6 @@ class RevFilter(django_filters.FilterSet):
     code_site = django_filters.ModelChoiceFilter(field_name="code_site",
                                                  queryset=Sites.objects.filter(est_bloquer=False), label='Site')
     code_tache = django_filters.CharFilter(field_name='code_tache', label='Code Tache')
-    mm = django_filters.NumberFilter(field_name='date_rev__month', label='Mois')
-    aa = django_filters.NumberFilter(field_name='date_rev__year', label='Année')
-
 
     class Meta:
         model = RevisionPrix
