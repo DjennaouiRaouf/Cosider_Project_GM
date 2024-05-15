@@ -229,7 +229,7 @@ class AjoutRevisionApiView(APIView):
 
 
 class GetRevisionApiView(generics.ListAPIView):
-    queryset = RevisionPrix.objects
+    queryset = RevisionPrix.objects.filter(est_bloquer=False).order_by('date_rev')
     serializer_class = RevisionPrixSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = RevFilter
@@ -1132,57 +1132,10 @@ class DeletedEncaissement(generics.ListAPIView):
     filterset_class = EncaissementFilter
 
 
-class GetAttachements2(generics.ListAPIView):
-    queryset = Attachements.objects.filter(est_bloquer=False)
-    serializer_class = AttachementsSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_class = AttachementsFilter
-
-    def list(self, request, *args, **kwargs):
-        # Apply filtering
-        queryset = self.filter_queryset(self.get_queryset())
-
-        # Call the parent class's list method to get the default response
-        response_data = super().list(request, *args, **kwargs).data
-        smontant_precedent = 0
-        smontant_mois = 0
-        smontant_cumule = 0
-        marche = Marche.objects.get(id=self.request.query_params.get('marche', None))
-        mm = self.request.query_params.get('mm', None)
-        aa = self.request.query_params.get('aa', None)
-
-        num_situation = len(
-            Attachements.objects.values('date__month', 'date__year').distinct().annotate(count=Count('id')).filter(
-                Q(dqe__marche=marche) & Q(date__year__lte=aa) & Q(date__month__lte=mm)))
-
-        filiale = TabFiliale.objects.first()
-        if (response_data):
-            return Response({'attachement': response_data,
-                             'extra': {
-                                 'num_situation': num_situation,
-                                 'smontant_precedent': smontant_precedent,
-                                 'smontant_mois': smontant_mois,
-                                 'smontant_cumule': smontant_cumule,
-                                 'mm': num2words(smontant_mois, to='currency', lang='fr_DZ').upper(),
-                                 'client': str(marche.nt.code_client.libelle),
-                                 'objet': marche.nt.libelle,
-                                 'projet': marche.libelle,
-                                 'contrat': marche.id,
-                                 'du': marche.date_signature,
-                                 'nt': marche.nt.nt,
-                                 'filiale': 'Cosider ' + filiale.libelle_filiale
-
-                             }
-                             }, status=status.HTTP_200_OK)
-        else:
-            return Response({'message': "La rechercher n'a pas pu aboutir à un résultat"},
-                            status=status.HTTP_404_NOT_FOUND)
-
-
 
 
 class Etat_Creances(generics.ListAPIView):
-    queryset = Marche.objects.all()
+    queryset = Marche.objects.filter(est_bloquer=False)
     serializer_class = ECSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ECFilter

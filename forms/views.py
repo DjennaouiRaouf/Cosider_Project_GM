@@ -1676,6 +1676,7 @@ class RevFieldsApiView(APIView):
                             'info': str(field_instance.__class__.__name__),
 
                         }
+
                         if( field_name in ['contrat','pole','nt']):
                             obj['hide'] = True
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField") and field_name not in ['marche']:
