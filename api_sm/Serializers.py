@@ -231,6 +231,9 @@ class ModePaiementSerializer(serializers.ModelSerializer):
         fields='__all__'
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
+        fields.pop('est_bloquer', None)
+        fields.pop('user_id', None)
+        fields.pop('date_modification', None)
 
         return fields
 
@@ -274,31 +277,21 @@ class EncaissementSerializer(serializers.ModelSerializer):
 
 
 class DetailFactureSerializer(serializers.ModelSerializer):
-    date = serializers.CharField(source='detail.date', read_only=True, label="Date Attachement")
-    code_tache = serializers.CharField(source='detail.dqe.code_tache', read_only=True, label="Code Tache")
-    libelle_tache = serializers.CharField(source='detail.dqe.libelle', read_only=True, label="Libelle Tache")
-    qte_attache = serializers.CharField(source='detail.qte_mois', read_only=True, label="Quantite attachée")
-    unite = serializers.CharField(source='detail.dqe.unite.libelle', read_only=True, label="Unite")
-    prix_attache = serializers.CharField(source='detail.montant_mois', read_only=True, label="Prix attaché")
-    qte_contr = serializers.CharField(source='detail.dqe.quantite', read_only=True, label="Quantite Contrat")
-    prix_contr = serializers.CharField(source='detail.dqe.prix_u', read_only=True, label="Prix Contrat")
-
     class Meta:
             model=DetailFacture
             fields='__all_'
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        fields.pop('id', None)
-       
-
+        fields.pop('est_bloquer', None)
+        fields.pop('user_id', None)
+        fields.pop('date_modification', None)
 
         return fields
 
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        del representation['facture']
-        del representation['detail']
+
         return representation
 
 
@@ -310,7 +303,10 @@ class AvanceSerializer(serializers.ModelSerializer):
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-       
+        fields.pop('est_bloquer', None)
+        fields.pop('user_id', None)
+        fields.pop('date_modification', None)
+
         return fields
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -326,8 +322,9 @@ class TypeAvanceSerializer(serializers.ModelSerializer):
         fields='__all__'
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-       
-
+        fields.pop('est_bloquer', None)
+        fields.pop('user_id', None)
+        fields.pop('date_modification', None)
 
         return fields
 

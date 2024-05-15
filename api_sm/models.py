@@ -587,9 +587,6 @@ class Remboursement(models.Model):
 class DetailFacture(models.Model):
     facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,null=True,blank=True,to_field="numero_facture")
     detail=models.ForeignKey(Attachements,on_delete=models.DO_NOTHING)
-    coef_rev=models.FloatField(db_column='Coef_Rev', blank=True,verbose_name="Coéf Révi",
-                                     validators=[MinValueValidator(1)], default=1)
-
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)

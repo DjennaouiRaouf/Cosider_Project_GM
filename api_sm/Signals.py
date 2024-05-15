@@ -151,7 +151,7 @@ def post_save_facture(sender, instance, created, **kwargs):
     if created:
         debut = instance.du
         fin = instance.au
-        details = Attachements.objects.filter(marche=instance.marche, date__lte=fin, date__gte=debut,est_bloque=False)
+        details = Attachements.objects.filter(marche=instance.marche, date__lte=fin, date__gte=debut)
         for d in details:
             DetailFacture(
                 facture=instance,
