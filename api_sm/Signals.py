@@ -153,10 +153,11 @@ def post_save_facture(sender, instance, created, **kwargs):
         fin = instance.au
         details = Attachements.objects.filter(marche=instance.marche, date__lte=fin, date__gte=debut)
         for d in details:
-            DetailFacture(
-                facture=instance,
-                detail=d
-            ).save()
+            if(d.est_bloquer == False):
+                DetailFacture(
+                    facture=instance,
+                    detail=d
+                ).save()
 
 
 
