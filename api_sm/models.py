@@ -703,6 +703,10 @@ class RevisionPrix(CPkModel):
                                   , verbose_name="Code Tache", primary_key=True)
     date_rev = models.DateField(db_column='Date_Rev', primary_key=True,verbose_name='Date Révision')
     coef = models.FloatField(db_column='Coef',verbose_name='Coefficient Révision')
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
+    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
     class Meta:
         managed = False

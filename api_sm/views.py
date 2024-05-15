@@ -190,31 +190,46 @@ class AjoutDQEApiView(generics.CreateAPIView):
 
 
 
-class AjoutRevisionApiView(generics.CreateAPIView):
-    #permission_classes = [IsAuthenticated]
-    queryset = RevisionPrix.objects.all()
-    serializer_class = RevisionPrixSerializer
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        print(serializer.initial_data)
-
+class AjoutRevisionApiView(APIView):
+    def post(self, request, *args, **kwargs):
+        rev_file = request.FILES['file']
+        nt = request.data.get('nt')
+        cs = request.data.get('cs')
         try:
-            RevisionPrix(
-                marche=serializer.initial_data['contrat'],
-                code_site=serializer.initial_data['pole'],
-                nt=serializer.initial_data['nt'],
-                code_tache=serializer.initial_data['code_tache'],
-                coef=serializer.initial_data['coef'],
-                date_rev=serializer.initial_data['date_rev'],
-            ).save(force_insert=True)
-            return Response('Prix Révisés', status=status.HTTP_200_OK)
-        except IntegrityError as e:
+            workbook = openpyxl.load_workbook(rev_file)
+            sheet = workbook.active
+            newRows = 0
+            updatedRows = 0
+            for row in sheet.iter_rows(min_row=2, values_only=True):
+                try:
+                    RevisionPrix(
+                        marche=row[0],
+                        code_site=row[1],
+                        nt=row[2],
+                        code_tache=row[3],
+                        coef=row[5],
+                        date_rev=row[6],
+                    ).save(force_insert=True)
+                    newRows += 1
+                except IntegrityError as e:
+                    RevisionPrix(
+                        marche=row[0],
+                        code_site=row[1],
+                        nt=row[2],
+                        code_tache=row[3],
+                        coef=row[5],
+                        date_rev=row[6],
+                    ).save(force_update=True)
+                    updatedRows += 1
+
+            return Response(f'Creation de {newRows} ligne(s) \n Mise à jour de {updatedRows} ligne(s) ',
+                            status=status.HTTP_201_CREATED)
+        except Exception as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
 class GetRevisionApiView(generics.ListAPIView):
-    queryset = RevisionPrix.objects.all()
+    queryset = RevisionPrix.objects
     serializer_class = RevisionPrixSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = RevFilter
