@@ -96,7 +96,7 @@ DATABASES = {
 DATABASES = {
     'default': {
         "ENGINE": "mssql",
-        "NAME": "sm",
+        "NAME": "ca_ch",
         "USER": "",
         "PASSWORD": "",
         "HOST": "localhost\MSSQLSERVER",
