@@ -6,15 +6,11 @@ from django.contrib.auth.hashers import check_password
 from django.db import IntegrityError
 from django.db.models import Count, Sum, Min, Max
 from django_filters.rest_framework import DjangoFilterBackend
-from import_export.admin import ImportMixin, ExportMixin
-from import_export.results import RowResult
-from rest_framework import generics, viewsets
+from rest_framework import generics
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 from rest_framework.exceptions import NotFound
 from rest_framework.mixins import DestroyModelMixin
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView

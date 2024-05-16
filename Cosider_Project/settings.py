@@ -24,21 +24,16 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
 
-    'django.contrib.admin',
+
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'simple_history',
-    'colorfield',
-    'djangoql',
-    'safedelete',
     'rest_framework',
     'rest_framework.authtoken',
     'django_filters',
     'corsheaders',
-    'import_export',
     'api_sm',
     'api_sch',
     'forms',
@@ -58,7 +53,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_currentuser.middleware.ThreadLocalUserMiddleware',
-    'simple_history.middleware.HistoryRequestMiddleware',
     'django.middleware.locale.LocaleMiddleware',
 ]
 
@@ -102,7 +96,7 @@ DATABASES = {
 DATABASES = {
     'default': {
         "ENGINE": "mssql",
-        "NAME": "ca_ch",
+        "NAME": "sm",
         "USER": "",
         "PASSWORD": "",
         "HOST": "localhost\MSSQLSERVER",

@@ -8,9 +8,6 @@ from django.db.models import Q, Count, F
 from django.db.models.signals import post_save, pre_save, post_delete, pre_delete
 from django.dispatch import *
 from num2words import num2words
-from safedelete.signals import post_softdelete, pre_softdelete
-from simple_history import register
-from simple_history.signals import pre_create_historical_record
 from .models import *
 
 

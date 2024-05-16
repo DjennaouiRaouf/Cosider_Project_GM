@@ -8,6 +8,8 @@ from django_currentuser.middleware import get_current_user
 from api_sch.models import *
 
 
+
+
 class Clients(models.Model):
     id =models.CharField(db_column='Code_Client', primary_key=True,
                                    max_length=20,verbose_name="Code Client")
