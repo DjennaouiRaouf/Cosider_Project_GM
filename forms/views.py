@@ -586,6 +586,9 @@ class SiteFieldsApiView(APIView):
                             obj['choices']= [{'key': key, 'value': value} for key, value in dict(field_instance.choices).items()]
                     except:
                         pass
+
+                    if (str(field_instance.style.get("base_template")).find('textarea') != -1):
+                        obj['textarea'] = True
                     if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                         anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
                         serialized_data = anySerilizer(field_instance.queryset, many=True).data
@@ -675,6 +678,9 @@ class NTFieldsApiView(APIView):
                             readOnly=True
                         else:
                             readOnly = False
+
+                        if (str(field_instance.style.get("base_template")).find('textarea') != -1):
+                            obj['textarea'] = True
 
                         obj['readOnly']=readOnly
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):

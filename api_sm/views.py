@@ -1139,3 +1139,9 @@ class Etat_Creances(generics.ListAPIView):
     serializer_class = ECSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ECFilter
+
+
+
+class GetRemb(generics.ListAPIView):
+    queryset = Remboursement.objects.filter(est_bloquer=True)
+    serializer_class = EncaissementSerializer

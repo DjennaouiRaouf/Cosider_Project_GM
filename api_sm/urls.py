@@ -87,6 +87,8 @@ urlpatterns = [
 
     path('delatt/',DelATT.as_view()),
 
+    path('remb/',GetRemb.as_view()),
+
 
 
 

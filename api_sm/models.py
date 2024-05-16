@@ -51,7 +51,7 @@ class Sites(models.Model):
             ('C','Centre'),
     )
     id = models.CharField(db_column='Code_site', primary_key=True, max_length=10 ,
-                                 verbose_name='Code du Site')
+                                 verbose_name='Code Pole')
     code_filiale = models.ForeignKey(TabFiliale, models.DO_NOTHING,
                                      db_column='Code_Filiale',verbose_name='Code Filiale')
     code_region = models.CharField(db_column='Code_Region', max_length=1, blank=True,
@@ -543,7 +543,7 @@ class Remboursement(models.Model):
 
     class Meta:
         managed=False
-        db_table='Rembourcement'
+        db_table='Remboursement'
         verbose_name = 'Remboursement'
         verbose_name_plural = 'Remboursements'
         app_label = 'api_sm'
