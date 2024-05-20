@@ -33,6 +33,7 @@ urlpatterns = [
     path('userprofile/',UserProfile.as_view()),
     path('editusr/',EditUserProfile.as_view()),
 
+    path('importdqeav/',ImportDQEAvenantAPIView.as_view()),
 
     path('etatcreance/',Etat_Creances.as_view()),
 

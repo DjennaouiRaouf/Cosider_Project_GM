@@ -1324,3 +1324,72 @@ class AjoutDQEAvenantApiView(generics.CreateAPIView):
         except IntegrityError as e:
            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
+
+
+
+class ImportDQEAvenantAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request, *args, **kwargs):
+        dqe_file = request.FILES['file']
+        nt=request.data.get('nt')
+        cs = request.data.get('cs')
+        num_av=request.data.get('num_av')
+        try:
+            MarcheAvenant.objects.filter(code_site=cs,nt=nt,num_avenant=num_av)
+        except MarcheAvenant.DoesNotExist:
+            return Response('Impossible d\' ajouter un avenant', status=status.HTTP_200_OK)
+
+        try:
+            workbook = openpyxl.load_workbook(dqe_file)
+            sheet = workbook.active
+            newRows=0
+            updatedRows=0
+
+
+            for row in sheet.iter_rows(min_row=2,values_only=True):
+                try:
+                    dqe = DQE.objects.get(nt=row[1], code_site=row[0],
+                                          code_tache=row[2])
+                    DQEAvenant(
+                        code_site=row[0], nt=row[1],
+                        code_tache=row[2], prix_u=row[6],
+                        num_avenant=num_av,
+                        est_tache_composite=row[4],
+                        est_tache_complementaire=False,
+                        unite=TabUniteDeMesure.objects.get(libelle=row[8]),
+                        libelle=row[3], quantite=row[7], user_id=request.user.username).save(force_insert=True)
+
+                    qte = float(dqe.quantite) + float(row[7])
+                    if (qte < 0):
+                        qte = 0
+                    dqe.quantite = qte
+                    dqe.prix_u = float(row[6])
+                    dqe.save(force_update=True)
+                    return (Response('Tache mise à jour', status=status.HTTP_200_OK))
+
+                except DQE.DoesNotExist:
+                    DQEAvenant(
+                        code_site=row[0], nt=row[1],
+                        code_tache=row[2], prix_u=row[6],
+                        num_avenant=num_av,
+                        est_tache_composite=row[4],
+                        est_tache_complementaire=True,
+                        unite=TabUniteDeMesure.objects.get(libelle=row[8]),
+                        libelle=row[3], quantite=row[7], user_id=request.user.username).save(force_insert=True)
+
+                    DQE(
+                        code_site=row[0], nt=row[1],
+                        code_tache=row[2], prix_u=row[6],
+                        est_tache_composite=row[4],
+                        est_tache_complementaire=True,
+                        unite=TabUniteDeMesure.objects.get(libelle=row[8]),
+                        libelle=row[3], quantite=row[7], user_id=request.user.username
+                    ).save(force_insert=True)
+
+                    return Response('Tache complémentaire ajouté', status=status.HTTP_200_OK)
+
+                return Response(f'Creation de {newRows} ligne(s) \n Mise à jour de {updatedRows} ligne(s) ', status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
