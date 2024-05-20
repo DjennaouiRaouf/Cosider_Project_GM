@@ -26,6 +26,7 @@ class UserFieldsApiView(APIView):
                         'type': str(field_instance.__class__.__name__),
                         "required": field_instance.required,
                         'label': field_instance.label or field_name,
+                'required': True,
                 }
             field_info.append(obj)
             if (field_name == "password"):
