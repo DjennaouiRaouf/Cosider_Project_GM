@@ -164,6 +164,8 @@ class Marche(CPkModel):
 
     date_signature = models.DateField(null=False, verbose_name='Date de signature')
 
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
@@ -242,7 +244,12 @@ class MarcheAvenant(CPkModel):
                              validators=[MinValueValidator(0), MaxValueValidator(100)], null=False
                              , verbose_name='Taux de retenue de garantie')
     date_signature = models.DateField(null=False, verbose_name='Date de signature')
+
+
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
+
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
     class Meta:
@@ -354,6 +361,9 @@ class TypeAvance(models.Model):
     id = models.AutoField(db_column='Id_Type_Avance', primary_key=True)
     libelle = models.CharField(db_column='Libelle',max_length=500, null=False, unique=True)
     taux_max = models.FloatField(db_column='Taux',default=0,validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
+
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
@@ -385,6 +395,9 @@ class Avance(models.Model):
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
     fin=models.FloatField(default=80,  verbose_name="Fin",
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
+
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
     date=models.DateField(null=False,verbose_name="Date d'avance")
@@ -417,6 +430,8 @@ class Attachements(models.Model):
     montant= models.FloatField( validators=[MinValueValidator(0)], default=0,verbose_name='Montant du Mois',editable=False)
     date=models.DateField(null=False,db_column='Mmaa',verbose_name='Date')
 
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
@@ -515,6 +530,8 @@ class Factures(models.Model):
 
 
 
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
@@ -597,6 +614,8 @@ class Remboursement(models.Model):
                                          ,editable=False)
 
 
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
@@ -637,6 +656,9 @@ class Remboursement(models.Model):
 class DetailFacture(models.Model):
     facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,null=True,blank=True,to_field="numero_facture",db_column='Num_Facture')
     detail=models.ForeignKey(Attachements,on_delete=models.DO_NOTHING,db_column='Detail')
+
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
@@ -653,6 +675,9 @@ class DetailFacture(models.Model):
 class ModePaiement(models.Model):
     id=models.AutoField(db_column='Id_Mode', primary_key=True)
     libelle=models.CharField(max_length=500,null=False,unique=True)
+
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
@@ -678,6 +703,8 @@ class Encaissement(models.Model):
 
     numero_piece = models.CharField(max_length=300,null=False,verbose_name="Numero de piéce")
 
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
@@ -723,6 +750,9 @@ class TypeCaution(models.Model):
     taux_max = models.FloatField(db_column='Taux_Max',
                                    validators=[MinValueValidator(0), MaxValueValidator(100)], null=True,blank=True)
 
+
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
@@ -754,6 +784,9 @@ class Cautions(models.Model):
         validators=[MinValueValidator(0)], default=0,
     )
     est_recupere = models.BooleanField(default=False,db_column='Est_Recupere', null=False,verbose_name='Est Recuperée')
+
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 

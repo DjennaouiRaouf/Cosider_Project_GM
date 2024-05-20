@@ -158,13 +158,13 @@ class AjoutMarcheApiView(generics.CreateAPIView):
                 force_insert=True)
             try:
                 m = Marche.objects.get(id=serializer.initial_data['id'])
+
                 if (m.num_avenant == 0):
                     MarcheAvenant(id=m.id, code_site=m.code_site, nt=m.nt,
                                   libelle=m.libelle, ods_depart=m.ods_depart,
                                   num_avenant=m.num_avenant,
                                   delai_paiement_f=m.delai_paiement_f,
                                   rabais=m.rabais or 0, tva=m.tva or 0, rg=m.rg,
-                                  montant_ht=m.ht, montant_ttc=m.ttc,
                                   date_signature=m.date_signature).save(
                         force_insert=True)
             except:

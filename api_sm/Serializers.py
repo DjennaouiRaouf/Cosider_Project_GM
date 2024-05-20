@@ -94,6 +94,9 @@ class NTSerializer(serializers.ModelSerializer):
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
+        fields.pop('est_bloquer', None)
+        fields.pop('user_id', None)
+        fields.pop('date_modification', None)
         return fields
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -130,7 +133,9 @@ class DQESerializer(serializers.ModelSerializer):
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-       
+        fields.pop('est_bloquer', None)
+        fields.pop('user_id', None)
+        fields.pop('date_modification', None)
 
         return fields
 
@@ -182,6 +187,9 @@ class MarcheSerializer(serializers.ModelSerializer):
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
+        fields.pop('est_bloquer', None)
+        fields.pop('user_id', None)
+        fields.pop('date_modification', None)
         return fields
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -211,6 +219,9 @@ class MarcheSerializer(serializers.ModelSerializer):
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
+        fields.pop('est_bloquer', None)
+        fields.pop('user_id', None)
+        fields.pop('date_modification', None)
         return fields
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -246,6 +257,9 @@ class MarcheAvenantSerializer(serializers.ModelSerializer):
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
+        fields.pop('est_bloquer', None)
+        fields.pop('user_id', None)
+        fields.pop('date_modification', None)
         return fields
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -289,6 +303,9 @@ class FactureSerializer(serializers.ModelSerializer):
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
+        fields.pop('est_bloquer', None)
+        fields.pop('user_id', None)
+        fields.pop('date_modification', None)
        
 
         return fields
@@ -309,9 +326,10 @@ class ModePaiementSerializer(serializers.ModelSerializer):
         fields='__all__'
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        
+        fields.pop('est_bloquer', None)
         fields.pop('user_id', None)
         fields.pop('date_modification', None)
+
 
         return fields
 
@@ -330,7 +348,7 @@ class EncaissementSerializer(serializers.ModelSerializer):
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        
+        fields.pop('est_bloquer', None)
         fields.pop('user_id', None)
         fields.pop('date_modification', None)
 
@@ -360,7 +378,7 @@ class DetailFactureSerializer(serializers.ModelSerializer):
             fields='__all_'
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        
+        fields.pop('est_bloquer', None)
         fields.pop('user_id', None)
         fields.pop('date_modification', None)
 
@@ -381,7 +399,7 @@ class AvanceSerializer(serializers.ModelSerializer):
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        
+        fields.pop('est_bloquer', None)
         fields.pop('user_id', None)
         fields.pop('date_modification', None)
 
@@ -400,7 +418,7 @@ class TypeAvanceSerializer(serializers.ModelSerializer):
         fields='__all__'
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        
+        fields.pop('est_bloquer', None)
         fields.pop('user_id', None)
         fields.pop('date_modification', None)
 
@@ -425,7 +443,7 @@ class CautionSerializer(serializers.ModelSerializer):
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        
+        fields.pop('est_bloquer', None)
         fields.pop('user_id', None)
         fields.pop('date_modification', None)
         return fields
@@ -446,8 +464,10 @@ class TypeCautionSerializer(serializers.ModelSerializer):
         fields='__all__'
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-       
 
+        fields.pop('est_bloquer', None)
+        fields.pop('user_id', None)
+        fields.pop('date_modification', None)
 
         return fields
 
@@ -482,6 +502,9 @@ class AttachementsSerializer(serializers.ModelSerializer):
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
+        fields.pop('est_bloquer', None)
+        fields.pop('user_id', None)
+        fields.pop('date_modification', None)
         return fields
 
     def to_representation(self, instance):
@@ -511,7 +534,9 @@ class RemboursementSerializer(serializers.ModelSerializer):
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-       
+        fields.pop('est_bloquer', None)
+        fields.pop('user_id', None)
+        fields.pop('date_modification', None)
         fields.pop('id', None)
 
 
