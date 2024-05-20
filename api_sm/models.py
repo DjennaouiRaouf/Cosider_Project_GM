@@ -68,7 +68,7 @@ class Sites(models.Model):
     code_commune_site = models.CharField(db_column='Code_Commune_Site', max_length=10, blank=True,
                                          null=True,verbose_name='Code Commune')
     jour_cloture_mouv_rh_paie = models.CharField(db_column='Jour_Cloture_Mouv_RH_Paie', max_length=2, blank=True,
-                                                 null=True)  
+                                                 null=True)
     date_ouverture_site = models.DateField(db_column='Date_Ouverture_Site', blank=True,
                                            null=True,verbose_name='Date Ouverture')
     date_cloture_site = models.DateField(db_column='Date_Cloture_Site', blank=True,
@@ -137,14 +137,15 @@ class NT(CPkModel):
 
 
 class Marche(CPkModel):
-
-    id=models.CharField(max_length=500,primary_key=True,verbose_name='Contrat N°')
+    id = models.CharField(db_column='Num_Contrat', primary_key=True,verbose_name='Contrat N°',
+                                   max_length=500)
+    num_avenant = models.IntegerField(db_column='Num_Avenant',editable=False,verbose_name='Avenant N°',default=0)
     code_site = models.CharField(db_column='Code_site', max_length=10,
                                  verbose_name='Code du Site')
     nt = models.CharField(db_column='NT', max_length=20, null=False, verbose_name='NT')
 
     libelle = models.TextField(null=False,verbose_name='Libellé')
-    ods_depart = models.DateField(null=False, blank=True
+    ods_depart = models.DateField(null=False
                                   , verbose_name='ODS de démarrage')
     delais = models.IntegerField(default=0, null=True
                                          , verbose_name='Délai des travaux')
@@ -157,14 +158,12 @@ class Marche(CPkModel):
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
     tva = models.FloatField(default=0,  verbose_name='TVA',
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    rg = models.FloatField(default=0, 
+    rg = models.FloatField(default=0,
                              validators=[MinValueValidator(0), MaxValueValidator(100)], null=False
                              , verbose_name='Taux de retenue de garantie')
 
     date_signature = models.DateField(null=False, verbose_name='Date de signature')
 
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
-                                      editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
@@ -216,6 +215,56 @@ class Marche(CPkModel):
 
 
 
+
+class MarcheAvenant(CPkModel):
+    id = models.CharField(db_column='Num_Contrat', primary_key=True,verbose_name='Contrat N°',
+                                   max_length=500)
+    num_avenant = models.IntegerField(db_column='Num_Avenant',primary_key=True,editable=False,verbose_name='Avenant N°',default=0)
+    code_site = models.CharField(db_column='Code_site', max_length=10,
+                                 verbose_name='Code du Site')
+    nt = models.CharField(db_column='NT', max_length=20, null=False, verbose_name='NT')
+
+    libelle = models.TextField(null=False,verbose_name='Libellé')
+    ods_depart = models.DateField(null=False
+                                  , verbose_name='ODS de démarrage')
+    delais = models.IntegerField(default=0, null=True
+                                         , verbose_name='Délai des travaux')
+    revisable = models.BooleanField(default=True, null=False
+                                    , verbose_name='Est-il révisable ?')
+    delai_paiement_f=models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)],
+                                         null=True
+                                                 , verbose_name='Délai de paiement')
+    rabais =  models.FloatField(default=0,  verbose_name='Taux de rabais',
+                              validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
+    tva = models.FloatField(default=0,  verbose_name='TVA',
+                              validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
+    rg = models.FloatField(default=0,
+                             validators=[MinValueValidator(0), MaxValueValidator(100)], null=False
+                             , verbose_name='Taux de retenue de garantie')
+    date_signature = models.DateField(null=False, verbose_name='Date de signature')
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
+    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
+
+    class Meta:
+        managed = False
+        db_table = 'Marche_Avenant'
+
+    @property
+    def ht(self):
+        try:
+            dqes = DQEAvenant.objects.filter(code_site=self.code_site, nt=self.nt,num_avenant=self.num_avenant)
+            sum = 0
+            for dqe in dqes:
+                sum = sum + dqe.prix_q
+            return sum
+        except DQEAvenant.DoesNotExist:
+            return 0
+
+    @property
+    def ttc(self):
+        return round(self.ht + (self.ht * self.tva / 100), 4)
+
+
 class DQE(CPkModel):
     code_site = models.CharField(db_column='Code_site',primary_key=True, max_length=10,
                                  verbose_name='Code du Site')
@@ -230,9 +279,9 @@ class DQE(CPkModel):
         , verbose_name='Prix unitaire'
     )
     est_tache_composite = models.BooleanField(db_column='Est_Tache_Composite', blank=True,
-                                              null=False,default=False,verbose_name="Tache composée")
+                                              null=False,default=False,verbose_name="Tache composée ?")
     est_tache_complementaire = models.BooleanField(db_column='Est_Tache_Complementaire', blank=True,
-                                                   null=False,default=False,verbose_name="Tache complementaire")
+                                                   null=False,default=False,verbose_name="Tache complementaire ?")
     quantite = models.FloatField( validators=[MinValueValidator(0)], default=0,verbose_name='Quantité')
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
@@ -248,9 +297,11 @@ class DQE(CPkModel):
 
     @property
     def prix_q(self):
-        pq= self.prix_u*self.quantite
-        return pq
-
+        try:
+            pq= float(self.prix_u)*float(self.quantite)
+            return pq
+        except:
+            return 0
 
     class Meta:
         managed = False
@@ -262,11 +313,47 @@ class DQE(CPkModel):
 
 
 
+
+class DQEAvenant(CPkModel):
+    code_site = models.CharField(db_column='Code_site', primary_key=True, max_length=10,
+                                 verbose_name='Code du Site')
+    nt = models.CharField(db_column='NT', max_length=20, primary_key=True, null=False, verbose_name='NT')
+    code_tache = models.CharField(db_column='Code_Tache', null=False, max_length=30
+                                  , verbose_name="Code Tache", primary_key=True)
+    num_avenant = models.IntegerField(db_column='Num_Avenant', blank=True, null=True,verbose_name='Avenant N°')  # Field name made lowercase.
+    est_tache_composite = models.BooleanField(db_column='Est_Tache_Composite', blank=True, null=True,verbose_name='Est Composée ?')  # Field name made lowercase.
+    est_tache_complementaire = models.BooleanField(db_column='Est_Tache_Complementaire', blank=True, null=True,verbose_name='Est Complémentaire ?')  # Field name made lowercase.
+    libelle = models.TextField(db_column='Libelle_Tache', blank=True, null=True)  # Field name made lowercase.
+    unite =models.ForeignKey('api_sch.TabUniteDeMesure',on_delete=models.DO_NOTHING, null=False,db_column='Code_Unite_Mesure', verbose_name='Unité')
+    quantite = models.FloatField(db_column='Quantite', blank=True, null=True)  # Field name made lowercase.
+    prix_u = models.DecimalField(db_column='Prix_Unitaire', max_digits=19, decimal_places=4, blank=True, null=True,verbose_name='Prix Unit')  # Field name made lowercase.
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', blank=True, null=True)  # Field name made lowercase.
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False, default=get_current_user)
+    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
+
+
+    @property
+    def prix_q(self):
+        try:
+            pq= float(self.prix_u)*float(self.quantite)
+            return pq
+        except:
+            return 0
+
+
+    class Meta:
+        managed = False
+        db_table = 'Tab_NT_Taches_Avenant'
+        unique_together = (('code_site', 'nt', 'code_tache'),)
+
+
+
+
+
 class TypeAvance(models.Model):
-    libelle = models.CharField(max_length=500, null=False, unique=True)
-    taux_max = models.FloatField(default=0,validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
-                                      editable=False)
+    id = models.AutoField(db_column='Id_Type_Avance', primary_key=True)
+    libelle = models.CharField(db_column='Libelle',max_length=500, null=False, unique=True)
+    taux_max = models.FloatField(db_column='Taux',default=0,validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
@@ -279,7 +366,7 @@ class TypeAvance(models.Model):
         verbose_name_plural = 'Type Avance'
         db_table = 'TypeAvance'
         app_label = 'api_sm'
-        
+
 
 
 class Avance(models.Model):
@@ -298,8 +385,6 @@ class Avance(models.Model):
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
     fin=models.FloatField(default=80,  verbose_name="Fin",
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
-                                      editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
     date=models.DateField(null=False,verbose_name="Date d'avance")
@@ -311,14 +396,16 @@ class Avance(models.Model):
         verbose_name = 'Avance'
         verbose_name_plural = 'Avances'
         db_table='Avances'
-        
+
 
 
 
 
 
 class Attachements(models.Model):
-    marche=models.ForeignKey(Marche,db_column='Num_Marche', on_delete=models.DO_NOTHING,null=False, blank=False,to_field='id')
+    id = models.AutoField(db_column='Id_Attachement', primary_key=True)
+    marche = models.ForeignKey('Marche', models.DO_NOTHING, db_column='Num_Marche', blank=True,
+                                   null=True)
     code_site = models.CharField(db_column='Code_site', max_length=10,
                                  verbose_name='Code du Site')
     nt = models.CharField(db_column='NT', max_length=20, null=False, verbose_name='NT')
@@ -328,10 +415,8 @@ class Attachements(models.Model):
     prix_u = models.FloatField( validators=[MinValueValidator(0)], default=0,
                                      editable=False,verbose_name='Prix unitaire')
     montant= models.FloatField( validators=[MinValueValidator(0)], default=0,verbose_name='Montant du Mois',editable=False)
-    date=models.DateField(null=False,verbose_name='Date')
+    date=models.DateField(null=False,db_column='Mmaa',verbose_name='Date')
 
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
-                                      editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
@@ -343,7 +428,7 @@ class Attachements(models.Model):
     def qte_cumule(self):
         try:
             ct=DQE.objects.get(nt=self.marche.nt,code_site=self.marche.code_site,code_tache=self.code_tache)
-            previous_cumule = Attachements.objects.filter(code_tache=ct.code_tache,date__lt=self.date,est_bloquer=False)
+            previous_cumule = Attachements.objects.filter(code_tache=ct.code_tache,date__lt=self.date)
             sum = self.qte
             if (previous_cumule):
                 for pc in previous_cumule:
@@ -357,7 +442,7 @@ class Attachements(models.Model):
     def qte_precedente(self):
         try:
             ct = DQE.objects.get(nt=self.marche.nt, code_site=self.marche.code_site,code_tache=self.code_tache)
-            previous_cumule = Attachements.objects.filter(code_tache=ct.code_tache, date__lt=self.date,est_bloquer=False)
+            previous_cumule = Attachements.objects.filter(code_tache=ct.code_tache, date__lt=self.date)
             sum = 0
             if (previous_cumule):
                 for pc in previous_cumule:
@@ -369,7 +454,7 @@ class Attachements(models.Model):
     def montant_precedent(self):
         try:
             ct = DQE.objects.get(nt=self.marche.nt, code_site=self.marche.code_site,code_tache=self.code_tache)
-            previous_cumule = Attachements.objects.filter(code_tache=ct.code_tache, date__lt=self.date,est_bloquer=False)
+            previous_cumule = Attachements.objects.filter(code_tache=ct.code_tache, date__lt=self.date)
             sum = 0
 
             if (previous_cumule):
@@ -384,7 +469,7 @@ class Attachements(models.Model):
     def montant_cumule(self):
         try:
             ct = DQE.objects.get(nt=self.marche.nt, code_site=self.marche.code_site,code_tache=self.code_tache)
-            previous_cumule = Attachements.objects.filter(code_tache=ct.code_tache,date__lt=self.date,est_bloquer=False)
+            previous_cumule = Attachements.objects.filter(code_tache=ct.code_tache,date__lt=self.date)
             sum = self.montant
             if (previous_cumule):
                 for pc in previous_cumule:
@@ -404,15 +489,15 @@ class Attachements(models.Model):
         verbose_name_plural = 'Attachements'
         unique_together=(('marche','code_tache','date'),)
         app_label = 'api_sm'
-        
+
 
 
 class Factures(models.Model):
     numero_facture=models.CharField(max_length=800,db_column='Num_facture',primary_key=True,verbose_name='Numero de facture')
     num_situation=models.IntegerField(null=False,db_column='Num_Situation',verbose_name='Numero de situation')
     marche=models.ForeignKey(Marche,db_column='Num_Marche',on_delete=models.DO_NOTHING,null=False,verbose_name='Marche',to_field="id")
-    du = models.DateField(null=False,verbose_name='Du')
-    au = models.DateField(null=False,verbose_name='Au')
+    du = models.DateField(db_column='Date_Debut',null=False,verbose_name='Du')
+    au = models.DateField(db_column='Date_Fin',null=False,verbose_name='Au')
     paye = models.BooleanField(default=False,db_column='Paye', null=False,editable=False)
     date = models.DateField(auto_now=True, editable=False)
     montant= models.FloatField( db_column='Montant_Mois',validators=[MinValueValidator(0)], default=0,
@@ -430,8 +515,6 @@ class Factures(models.Model):
 
 
 
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
-                                      editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
@@ -504,7 +587,7 @@ class Factures(models.Model):
         verbose_name = 'Factures'
         verbose_name_plural = 'Factures'
         app_label = 'api_sm'
-        
+
 class Remboursement(models.Model):
     facture = models.ForeignKey(Factures,db_column='Num_Facture', on_delete=models.DO_NOTHING, null=True, blank=True, to_field="numero_facture")
     avance=models.ForeignKey(Avance,db_column='Avance', on_delete=models.DO_NOTHING, null=True, blank=True)
@@ -514,8 +597,6 @@ class Remboursement(models.Model):
                                          ,editable=False)
 
 
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
-                                      editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
@@ -554,10 +635,8 @@ class Remboursement(models.Model):
 
 
 class DetailFacture(models.Model):
-    facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,null=True,blank=True,to_field="numero_facture")
-    detail=models.ForeignKey(Attachements,on_delete=models.DO_NOTHING)
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
-                                      editable=False)
+    facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,null=True,blank=True,to_field="numero_facture",db_column='Num_Facture')
+    detail=models.ForeignKey(Attachements,on_delete=models.DO_NOTHING,db_column='Detail')
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
@@ -568,13 +647,12 @@ class DetailFacture(models.Model):
         verbose_name = 'Datails Facture'
         verbose_name_plural = 'Details Facture'
         app_label = 'api_sm'
-        
+
 
 
 class ModePaiement(models.Model):
+    id=models.AutoField(db_column='Id_Mode', primary_key=True)
     libelle=models.CharField(max_length=500,null=False,unique=True)
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
-                                      editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
@@ -586,13 +664,11 @@ class ModePaiement(models.Model):
         verbose_name = 'Mode de Paiement'
         verbose_name_plural = 'Mode de Paiement'
         app_label = 'api_sm'
-        
+
 
 
 
 class Encaissement(models.Model):
-
-
     facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,null=True,blank=True,verbose_name="Facture")
     date_encaissement=models.DateField(null=False,verbose_name="Date d'encaissement")
     mode_paiement=models.ForeignKey(ModePaiement,on_delete=models.DO_NOTHING,null=False,verbose_name="Mode de paiement")
@@ -602,8 +678,6 @@ class Encaissement(models.Model):
 
     numero_piece = models.CharField(max_length=300,null=False,verbose_name="Numero de piéce")
 
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
-                                      editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
@@ -637,19 +711,18 @@ class Encaissement(models.Model):
 
 
 class TypeCaution(models.Model):
+    id = models.AutoField(db_column='Id_Type_Caution', primary_key=True)  # Field name made lowercase.
 
     libelle = models.CharField(max_length=500,null=True,blank=True)
     type_avance = models.ForeignKey(TypeAvance, on_delete=models.DO_NOTHING, null=True,blank=True, to_field='id',
-                             verbose_name="Type d'avance")
-    taux_exact= models.FloatField(
+                             verbose_name="Type d'avance",db_column='Type_Avance',)
+    taux_exact= models.FloatField(db_column='Taux_Exact',
                                    validators=[MinValueValidator(0), MaxValueValidator(100)], null=True,blank=True)
-    taux_min = models.FloatField(
+    taux_min = models.FloatField(db_column='Taux_Min',
                                validators=[MinValueValidator(0), MaxValueValidator(100)], null=True,blank=True)
-    taux_max = models.FloatField( 
+    taux_max = models.FloatField(db_column='Taux_Max',
                                    validators=[MinValueValidator(0), MaxValueValidator(100)], null=True,blank=True)
 
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
-                                      editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
@@ -681,8 +754,6 @@ class Cautions(models.Model):
         validators=[MinValueValidator(0)], default=0,
     )
     est_recupere = models.BooleanField(default=False,db_column='Est_Recupere', null=False,verbose_name='Est Recuperée')
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
-                                      editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
@@ -694,23 +765,3 @@ class Cautions(models.Model):
         app_label = 'api_sm'
 
 
-
-
-class RevisionPrix(CPkModel):
-    marche = models.CharField(db_column='marche_id',primary_key=True, max_length=500)
-    code_site = models.CharField(db_column='Code_site', primary_key=True, max_length=10,
-                                 verbose_name='Code du Site')
-    nt = models.CharField(db_column='NT', max_length=20, primary_key=True, null=False, verbose_name='NT')
-    code_tache = models.CharField(db_column='Code_Tache', null=False, max_length=30
-                                  , verbose_name="Code Tache", primary_key=True)
-    date_rev = models.DateField(db_column='Date_Rev', primary_key=True,verbose_name='Date Révision')
-    coef = models.FloatField(db_column='Coef',verbose_name='Coefficient Révision')
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
-                                      editable=False)
-    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
-    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
-
-    class Meta:
-        managed = False
-        db_table = 'Revision_Prix'
-        unique_together = (('date_rev', 'code_site', 'marche', 'nt', 'code_tache'),)

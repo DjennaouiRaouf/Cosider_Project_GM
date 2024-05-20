@@ -57,15 +57,19 @@ urlpatterns = [
 
     path('getlibmp/',LibMP.as_view()),
 
-    path('revprix/',AjoutRevisionApiView.as_view()),
-    path('getrev/',GetRevisionApiView.as_view()),
+
 
     path('delfacture/',DeletedFacture.as_view()),
     path('flashm/',FlashMonths.as_view()),
     path('attm/',AttMonths.as_view()),
     path('detail/',getDetailFacture.as_view()),
     path('det/',getDetFacture.as_view()),
+    path('mav/',GetMarcheAvenent.as_view()),
 
+    path('addmav/',AjoutAvenantMarcheApiView.as_view()),
+    path('adddqeav/',AjoutDQEAvenantApiView.as_view()),
+
+    path('dqeav/',GetDQEAvenent.as_view()),
     path("getlibav/",LibAV.as_view()),
 
     path("getlibcaut/", LibCaut.as_view()),

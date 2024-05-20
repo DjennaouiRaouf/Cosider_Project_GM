@@ -257,7 +257,7 @@ class MarcheFieldsStateApiView(APIView):
         if(marche == None):
 
             for field_name, field_instance in fields.items():
-                if (field_name not in ['id', 'montant_ht', 'montant_ttc']):
+                if (field_name not in ['id', 'montant_ht', 'montant_ttc','num_avenant']):
                     default_value = None
                     if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                         default_value =[]
@@ -314,7 +314,7 @@ class MarcheFieldsApiView(APIView):
                 field_info = []
                 for field_name, field_instance in fields.items():
 
-                    if(field_name not in ['montant_ht','montant_ttc']):
+                    if(field_name not in ['montant_ht','montant_ttc','num_avenant']):
 
                         if (field_name in ['id','nt','code_site',"libelle"]):
                             readOnly = True
@@ -818,7 +818,7 @@ class FactureFieldsApiView(APIView):
                             try:
                                 num_last_facture = Factures.objects.annotate(
                                     numero_facture_int=Cast('numero_facture', IntegerField())
-                                ).filter(est_bloquer=False).last().numero_facture
+                                ).all().last().numero_facture
                                 obj['count'] = num_last_facture
                             except Exception as e:
                                 pass
@@ -1697,4 +1697,221 @@ class RevFieldsApiView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+class AvenantFieldsApiView(APIView):
+    def get(self, request):
+        flag = request.query_params.get('flag',None)
+        if flag=='l' or flag =='f':
+            serializer = MarcheAvenantSerializer()
+            fields = serializer.get_fields()
+            model_class = serializer.Meta.model
+            model_name = model_class.__name__
+
+            if(flag=='f'): # react form
+
+                field_info = []
+                for field_name, field_instance in fields.items():
+
+                    if(field_name not in ['montant_ht','montant_ttc',]):
+
+                        if (field_name in ['id','nt','code_site',"libelle"]):
+                            readOnly = True
+                        else:
+                            readOnly = False
+
+
+
+                        obj={
+                            'name':field_name,
+                            'type': str(field_instance.__class__.__name__),
+                            "required": field_instance.required,
+                            'label': field_instance.label or field_name,
+                            'source':field_instance.source,
+                            'readOnly': readOnly
+                        }
+
+                        if (str(field_instance.style.get("base_template")).find('textarea') != -1):
+                            obj['textarea'] = True
+
+
+                        if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
+                            anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
+                            serialized_data = anySerilizer(field_instance.queryset, many=True).data
+                            filtered_data = []
+                            for item in serialized_data:
+                                if (field_name in ['code_site']):
+                                    filtered_item = {
+                                        'value': item['id'],
+                                        'label': item['id']
+                                    }
+                                else:
+                                    filtered_item = {
+                                        'value': item['id'],
+                                        'label': item['libelle'] or item['id']
+                                    }
+                                filtered_data.append(filtered_item)
+
+                            obj['queryset'] = filtered_data
+
+                        field_info.append(obj)
+
+            if(flag=='l'): #data grid list (react ag-grid)
+                field_info = []
+                for field_name, field_instance in fields.items():
+
+                    obj={
+                        'field': field_name,
+                        'headerName': field_instance.label or field_name,
+                        'info': str(field_instance.__class__.__name__),
+                    }
+
+
+                    if (field_name in ['rg','rabais','tva', 'montant_ttc', 'montant_ht']):
+                        obj['cellRenderer'] = 'InfoRenderer'
+
+                    field_info.append(obj)
+            return Response({'fields':field_info,'models':model_name,'pk':Marche._meta.pk.name},status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+class AvenantFieldsStateApiView(APIView):
+    def get(self, request):
+        serializer = MarcheAvenantSerializer()
+        fields = serializer.get_fields()
+        field_info = []
+        id = request.query_params.get('id', None)
+        num_av=request.query_params.get('av', None)
+
+        if id and num_av:
+            marche = MarcheAvenant.objects.get(id=id,num_avenant=num_av)
+        else:
+            marche = None
+        if(marche == None):
+
+            for field_name, field_instance in fields.items():
+                if (field_name not in ['id', 'montant_ht', 'montant_ttc','num_avenant']):
+                    default_value = None
+                    if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
+                        default_value =[]
+
+                    if str(field_instance.__class__.__name__) == 'BooleanField':
+                        default_value= False
+                    if str(field_instance.__class__.__name__) in ['PositiveSmallIntegerField','DecimalField','PositiveIntegerField',
+                                                                  'IntegerField','FloatField']:
+                        default_value = 0
+
+                    field_info.append({
+                        field_name:default_value ,
+
+                    })
+                    state = {}
+
+                    for d in field_info:
+                        state.update(d)
+            return Response({'state': state}, status=status.HTTP_200_OK)
+
+        else:
+            update_marche=MarcheSerializer(marche).data
+            for field_name, field_instance in fields.items():
+
+                    default_value = update_marche[field_name]
+                    field_info.append({
+                        field_name:default_value ,
+
+                    })
+                    state = {}
+
+
+                    for d in field_info:
+                        state.update(d)
+
+            s=Sites.objects.get(id=state['code_site'])
+
+            state['code_site']=[{'value':s.id,'label':s.libelle}]
+
+        return Response({'state': state}, status=status.HTTP_200_OK)
+
+
+
+
+
+class DQEAVFieldsApiView(APIView):
+    def get(self, request):
+        flag = request.query_params.get('flag',None)
+        if flag=='l' or flag =='f':
+            serializer = DQEAvenantSerializer()
+            model_class = serializer.Meta.model
+            model_name = model_class.__name__
+            fields = serializer.get_fields()
+
+            if(flag=='f'): # react form
+                field_info = []
+                for field_name, field_instance in fields.items():
+
+                    if (field_name not in ['prix_q','id','pole','nt','num_avenant']):
+
+                        if( field_name in ['prix_u','quantite']):
+                            readOnly=False
+                        else:
+                            readOnly = True
+                        obj = {
+                            'name': field_name,
+                            'type': str(field_instance.__class__.__name__),
+                            "required": field_instance.required,
+                            'label': field_instance.label or field_name,
+                            'readOnly': readOnly
+                        }
+                        if (str(field_instance.style.get("base_template")).find('textarea') != -1):
+                            obj['textarea'] = True
+
+                        if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
+                            anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
+                            serialized_data = anySerilizer(field_instance.queryset, many=True).data
+                            filtered_data = []
+                            for item in serialized_data:
+                                filtered_item = {
+                                    'value': item['id'],
+                                    'label': item['libelle']
+                                }
+                                filtered_data.append(filtered_item)
+
+                            obj['queryset'] = filtered_data
+
+                        field_info.append(obj)
+
+            if(flag=='l'): #data grid list (react ag-grid)
+                field_info = []
+                for field_name, field_instance in fields.items():
+                    if(field_name not in ['',]):
+                        obj = {
+                            'field': field_name,
+                            'headerName': field_instance.label or field_name,
+                            'info': str(field_instance.__class__.__name__),
+
+                        }
+                        if( field_name in ['pole','nt','num_avenant']):
+                            obj['hide'] = True
+                        if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField") and field_name not in ['marche']:
+                            obj['related'] = str(field_instance.queryset.model.__name__)
+                        if(field_name in ['prix_u','prix_q','quantite']):
+                            obj['cellRenderer']='InfoRenderer'
+
+                        field_info.append(obj)
+
+
+            return Response({'fields':field_info,'models':model_name,'pk':DQE._meta.pk.name},status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
 

@@ -156,6 +156,20 @@ class AjoutMarcheApiView(generics.CreateAPIView):
                    rabais=serializer.initial_data['rabais']or 0, tva=serializer.initial_data['tva']or 0, rg=serializer.initial_data['rg'],
                    date_signature=serializer.initial_data['date_signature']).save(
                 force_insert=True)
+            try:
+                m = Marche.objects.get(id=serializer.initial_data['id'])
+                if (m.num_avenant == 0):
+                    MarcheAvenant(id=m.id, code_site=m.code_site, nt=m.nt,
+                                  libelle=m.libelle, ods_depart=m.ods_depart,
+                                  num_avenant=m.num_avenant,
+                                  delai_paiement_f=m.delai_paiement_f,
+                                  rabais=m.rabais or 0, tva=m.tva or 0, rg=m.rg,
+                                  montant_ht=m.ht, montant_ttc=m.ttc,
+                                  date_signature=m.date_signature).save(
+                        force_insert=True)
+            except:
+                pass
+
             return Response('Marché ajouté' ,status=status.HTTP_200_OK)
         except IntegrityError as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
@@ -166,7 +180,7 @@ class AjoutMarcheApiView(generics.CreateAPIView):
 
 class AjoutDQEApiView(generics.CreateAPIView):
     #permission_classes = [IsAuthenticated, AddDQEPermission]
-    queryset = DQE.objects.filter(est_bloquer=False)
+    queryset = DQE.objects.all()
     serializer_class = DQESerializer
 
     def create(self, request, *args, **kwargs):
@@ -179,58 +193,22 @@ class AjoutDQEApiView(generics.CreateAPIView):
                 est_tache_composite=serializer.initial_data['est_tache_composite'],
                 est_tache_complementaire=serializer.initial_data['est_tache_complementaire'],quantite=serializer.initial_data['quantite'],
                 unite=TabUniteDeMesure.objects.get(id=serializer.initial_data['unite']),libelle=serializer.initial_data['libelle']).save(force_insert=True)
+            try:
+                m = Marche.objects.get(nt=serializer.initial_data['nt'], code_site=serializer.initial_data['pole'])
+                print(m.num_avenant)
+                if (m.num_avenant == 0):
+                    DQEAvenant(code_site=serializer.initial_data['pole'], num_avenant=m.num_avenant, nt=serializer.initial_data['nt'],
+                    code_tache=serializer.initial_data['code_tache'], prix_u=serializer.initial_data['prix_u'],
+                    est_tache_composite=serializer.initial_data['est_tache_composite'],
+                    est_tache_complementaire=serializer.initial_data['est_tache_complementaire'], quantite=serializer.initial_data['quantite'],
+                    unite=TabUniteDeMesure.objects.get(id=serializer.initial_data['unite']), libelle =
+                    serializer.initial_data['libelle']).save(force_insert=True)
+            except:
+                pass
+
             return Response('Tache ajoutée', status=status.HTTP_200_OK)
         except IntegrityError as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
-class AjoutRevisionApiView(APIView):
-    def post(self, request, *args, **kwargs):
-        rev_file = request.FILES['file']
-        nt = request.data.get('nt')
-        cs = request.data.get('cs')
-        try:
-            workbook = openpyxl.load_workbook(rev_file)
-            sheet = workbook.active
-            newRows = 0
-            updatedRows = 0
-            for row in sheet.iter_rows(min_row=2, values_only=True):
-                try:
-                    RevisionPrix(
-                        marche=row[0],
-                        code_site=row[1],
-                        nt=row[2],
-                        code_tache=row[3],
-                        coef=row[5],
-                        date_rev=row[6],
-                    ).save(force_insert=True)
-                    newRows += 1
-                except IntegrityError as e:
-                    RevisionPrix(
-                        marche=row[0],
-                        code_site=row[1],
-                        nt=row[2],
-                        code_tache=row[3],
-                        coef=row[5],
-                        date_rev=row[6],
-                    ).save(force_update=True)
-                    updatedRows += 1
-
-            return Response(f'Creation de {newRows} ligne(s) \n Mise à jour de {updatedRows} ligne(s) ',
-                            status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
-
-
-class GetRevisionApiView(generics.ListAPIView):
-    queryset = RevisionPrix.objects.filter(est_bloquer=False).order_by('date_rev')
-    serializer_class = RevisionPrixSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_class = RevFilter
-
-
 
 
 
@@ -264,7 +242,7 @@ class GetProdParams(APIView):
 
 class GetDQEView(generics.ListAPIView):
     #permission_classes = [permissions.IsAuthenticated,ViewDQEPermission]
-    queryset = DQE.objects.filter(est_bloquer=False)
+    queryset = DQE.objects.all()
     serializer_class = DQESerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = DQEFilter
@@ -296,27 +274,64 @@ class ImportDQEAPIView(APIView):
             sheet = workbook.active
             newRows=0
             updatedRows=0
+            m = Marche.objects.get(nt=nt, code_site=cs)
+
             for row in sheet.iter_rows(min_row=2,values_only=True):
                 try:
-                    DQE(
-                        code_site=row[0], nt=row[1],
-                        code_tache=row[2], prix_u=row[6],
-                        est_tache_composite=row[4],
-                        est_tache_complementaire=row[5],
-                        unite=TabUniteDeMesure.objects.get(libelle=row[8]),
-                        libelle=row[3],quantite=row[7],user_id=request.user.username
-                    ).save(force_insert=True)
-                    newRows += 1
+                    try:
+                        if(m.num_avenant == 0):
+                            DQE(
+                                code_site=row[0], nt=row[1],
+                                code_tache=row[2], prix_u=row[6],
+                                est_tache_composite=row[4],
+                                est_tache_complementaire=row[5],
+                                unite=TabUniteDeMesure.objects.get(libelle=row[8]),
+                                libelle=row[3],quantite=row[7],user_id=request.user.username
+                            ).save(force_insert=True)
+                            newRows += 1
+                    except:
+                        pass
                 except IntegrityError as e:
-                    DQE(
-                        code_site=row[0], nt=row[1],
-                        code_tache=row[2], prix_u=row[6],
-                        est_tache_composite=row[4],
-                        est_tache_complementaire=row[5],
-                        unite=TabUniteDeMesure.objects.get(libelle=row[8]),
-                        libelle=row[3], quantite=row[7], user_id=request.user.username
-                    ).save(force_update=True)
-                    updatedRows += 1
+                    try:
+                        if(m.num_avenant == 0):
+
+                            DQE(
+                                code_site=row[0], nt=row[1],
+                                code_tache=row[2], prix_u=row[6],
+                                est_tache_composite=row[4],
+                                est_tache_complementaire=row[5],
+                                unite=TabUniteDeMesure.objects.get(libelle=row[8]),
+                                libelle=row[3], quantite=row[7], user_id=request.user.username
+                            ).save(force_update=True)
+
+                            updatedRows += 1
+
+                    except:
+                        pass
+
+
+                try:
+                    if (m.num_avenant == 0):
+                        DQEAvenant(
+                            num_avenant=m.num_avenant,
+                            code_site=row[0], nt=row[1],
+                            code_tache=row[2], prix_u=row[6],
+                            est_tache_composite=row[4],
+                            est_tache_complementaire=row[5],
+                            unite=TabUniteDeMesure.objects.get(libelle=row[8]),
+                            libelle=row[3], quantite=row[7], user_id=request.user.username
+                        ).save(force_insert=True)
+                except IntegrityError as e:
+                    if (m.num_avenant == 0):
+                        DQEAvenant(
+                            code_site=row[0], nt=row[1],
+                            code_tache=row[2], prix_u=row[6],
+                            num_avenant=m.num_avenant,
+                            est_tache_composite=row[4],
+                            est_tache_complementaire=row[5],
+                            unite=TabUniteDeMesure.objects.get(libelle=row[8]),
+                            libelle=row[3], quantite=row[7], user_id=request.user.username
+                        ).save(force_update=True)
 
             return Response(f'Creation de {newRows} ligne(s) \n Mise à jour de {updatedRows} ligne(s) ', status=status.HTTP_201_CREATED)
         except Exception as e:
@@ -355,12 +370,12 @@ class AjoutNTApiView(generics.CreateAPIView):
 
 
 class GetDQEbyId(generics.ListAPIView):
-    queryset = DQE.objects.filter(est_bloquer=False)
+    queryset = DQE.objects.all()
     serializer_class = DQESerializer
     lookup_field = 'marche'
 
 class GetFacture(generics.ListAPIView):
-    queryset = Factures.objects.filter(est_bloquer=False).order_by('num_situation')
+    queryset = Factures.objects.all().order_by('num_situation')
     serializer_class = FactureSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = FactureFilter
@@ -401,7 +416,7 @@ class GetFacture(generics.ListAPIView):
 
 
 class DeletedFacture(generics.ListAPIView):
-    queryset = Factures.objects.filter(est_bloquer=True)
+    queryset = Factures.objects.all()
     serializer_class = FactureSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = FactureFilter
@@ -461,7 +476,7 @@ class getDetFacture(generics.ListAPIView):
 
 
 class GetFactureRG(generics.ListAPIView):
-    queryset = DQE.objects.filter(est_bloquer=False)
+    queryset = DQE.objects.all()
     serializer_class = FactureSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = FactureFilter
@@ -491,7 +506,7 @@ class GetFactureRG(generics.ListAPIView):
 
 class DelDQEByID(generics.DestroyAPIView):
     #permission_classes = [IsAuthenticated,DeleteDQEPermission]
-    queryset = DQE.objects.filter(est_bloquer=False)
+    queryset = DQE.objects.all()
     serializer_class = DQESerializer
 
     def delete(self, request, *args, **kwargs):
@@ -506,7 +521,7 @@ class DelDQEByID(generics.DestroyAPIView):
 
 class DelATT(generics.DestroyAPIView):
     #permission_classes = [IsAuthenticated,DeleteDQEPermission]
-    queryset = Attachements.objects.filter(est_bloquer=False)
+    queryset = Attachements.objects.all()
     serializer_class = AttachementsSerializer
     def delete(self, request, *args, **kwargs):
         pk_list = request.data.get(Attachements._meta.pk.name)
@@ -523,19 +538,61 @@ class DelATT(generics.DestroyAPIView):
 
 
 class UpdateDQEApiVew(generics.UpdateAPIView):
-    queryset = DQE.objects.filter(est_bloquer=False)
+    queryset = DQE.objects.all()
     serializer_class = DQESerializer
-    lookup_field = "pk"
     def get_object(self):
-        pk = self.request.data.get(DQE._meta.pk.name)
+        cs = self.request.data.get('pole')
+        nt = self.request.data.get('nt')
+        ct = self.request.data.get('code_tache')
+
         try:
-            obj = DQE.objects.get(pk=pk)
+            obj = DQE.objects.get(code_site=cs,nt=nt,code_tache=ct)
         except DQE.DoesNotExist:
             raise NotFound("Object n'éxiste pas")
         self.check_object_permissions(self.request, obj)
 
         return obj
 
+    def update(self, request, *args, **kwargs):
+
+        try:
+            instance = self.get_object()
+            serializer = self.get_serializer(instance, data=request.data)
+            m=Marche.objects.get(nt=serializer.initial_data['nt'],code_site=serializer.initial_data['pole'])
+            if(m.num_avenant == 0):
+                DQE(
+                    code_site=serializer.initial_data['pole'],
+                    code_tache=serializer.initial_data['code_tache'],
+                    nt=serializer.initial_data['nt'],
+                   libelle=serializer.initial_data['libelle'],
+                   est_tache_composite=serializer.initial_data['est_tache_composite'],
+                   est_tache_complementaire=serializer.initial_data['est_tache_complementaire'],
+                   prix_u=serializer.initial_data['prix_u'],
+                    quantite=serializer.initial_data['quantite'],
+                   user_id=request.user.username,
+                   unite=TabUniteDeMesure.objects.get(id=serializer.initial_data['unite']),
+                ).save(force_update=True)
+
+                try:
+                    DQEAvenant(
+                        num_avenant=m.num_avenant,
+                        code_site=serializer.initial_data['pole'],
+                        code_tache=serializer.initial_data['code_tache'],
+                        nt=serializer.initial_data['nt'],
+                        libelle=serializer.initial_data['libelle'],
+                        est_tache_composite=serializer.initial_data['est_tache_composite'],
+                        est_tache_complementaire=serializer.initial_data['est_tache_complementaire'],
+                        prix_u=serializer.initial_data['prix_u'],
+                        quantite=serializer.initial_data['quantite'],
+                        user_id=request.user.username,
+                        unite=TabUniteDeMesure.objects.get(id=serializer.initial_data['unite']),
+                    ).save(force_update=True)
+                except DQEAvenant.DoesNotExist:
+                    pass
+        except IntegrityError as e:
+            print(e)
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+        return Response('NT mis à jour avec succès', status=status.HTTP_200_OK)
 
 
 class UpdateNTApiVew(generics.UpdateAPIView):
@@ -573,7 +630,7 @@ class UpdateNTApiVew(generics.UpdateAPIView):
 
 
 class AddFactureApiView(generics.CreateAPIView):
-    queryset = Factures.objects.filter(est_bloquer=False)
+    queryset = Factures.objects.all()
     serializer_class = FactureSerializer
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -628,7 +685,7 @@ class AddEncaissement(generics.CreateAPIView):
 
 
 class UpdateMarcheView(generics.UpdateAPIView):
-    queryset = Marche.objects.filter(est_bloquer=False)
+    queryset = Marche.objects.all()
     serializer_class = MarcheSerializer
     lookup_field = "id"
     def get_object(self):
@@ -773,7 +830,7 @@ class GetCautions(generics.ListAPIView):
 
 
 class AddCautions(generics.CreateAPIView):
-    queryset = Cautions.objects.filter(est_bloquer=False)
+    queryset = Cautions.objects.all()
     serializer_class = CautionSerializer
 
     def create(self, request, *args, **kwargs):
@@ -805,7 +862,7 @@ class AddCautions(generics.CreateAPIView):
 
 
 class AddAttachementApiView(generics.CreateAPIView):
-    queryset = Attachements.objects.filter(est_bloquer=False)
+    queryset = Attachements.objects.all()
     serializer_class = AttachementsSerializer
 
     def create(self, request, *args, **kwargs):
@@ -821,7 +878,7 @@ class AddAttachementApiView(generics.CreateAPIView):
         return Response('Attachement ajouté', status=status.HTTP_200_OK)
 
 class GetAttachements(generics.ListAPIView):
-    queryset = Attachements.objects.filter(est_bloquer=False)
+    queryset = Attachements.objects.all()
     serializer_class = AttachementsSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = AttachementsFilter
@@ -916,7 +973,7 @@ class CInvoice(APIView):
 
 
 class GetECF(generics.ListAPIView):
-    queryset = DQE.objects.filter(est_bloquer=False)
+    queryset = DQE.objects.all()
     serializer_class = FactureSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = FactureFilter
@@ -963,7 +1020,7 @@ class UpdateCautionApiView(generics.UpdateAPIView):
 
 
 class DeleteInvoiceApiView(generics.DestroyAPIView):
-    queryset = DQE.objects.filter(est_bloquer=False)
+    queryset = DQE.objects.all()
     serializer_class = FactureSerializer
     def delete(self, request, *args, **kwargs):
         pk = request.data.get(Factures._meta.pk.name)
@@ -1035,7 +1092,7 @@ class EditUserProfile(APIView):
 
 class WorkState(generics.ListAPIView):
     #permission_classes = [IsAuthenticated]
-    queryset = Attachements.objects.filter(est_bloquer=False)
+    queryset = Attachements.objects.all()
     serializer_class = AttachementsSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = WorkStateFilter
@@ -1073,7 +1130,7 @@ class WorkState(generics.ListAPIView):
 
 class GetDQEStateView(generics.ListAPIView):
     #permission_classes = [permissions.IsAuthenticated,ViewDQEPermission]
-    queryset = DQE.objects.filter(est_bloquer=False)
+    queryset = DQE.objects.all()
     serializer_class = DQESerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = DQEFilter
@@ -1122,7 +1179,7 @@ class DelEnc(generics.DestroyAPIView,DestroyModelMixin):
 
 
 class DeletedEncaissement(generics.ListAPIView):
-    queryset = Encaissement.objects.filter(est_bloquer=True)
+    queryset = Encaissement.objects.all()
     serializer_class = EncaissementSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = EncaissementFilter
@@ -1131,7 +1188,7 @@ class DeletedEncaissement(generics.ListAPIView):
 
 
 class Etat_Creances(generics.ListAPIView):
-    queryset = Marche.objects.filter(est_bloquer=False)
+    queryset = Marche.objects.all()
     serializer_class = ECSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ECFilter
@@ -1139,5 +1196,131 @@ class Etat_Creances(generics.ListAPIView):
 
 
 class GetRemb(generics.ListAPIView):
-    queryset = Remboursement.objects.filter(est_bloquer=True)
-    serializer_class = EncaissementSerializer
+    queryset = Remboursement.objects.all()
+    serializer_class = RemboursementSerializer
+
+
+class GetMarcheAvenent(generics.ListAPIView):
+    queryset =MarcheAvenant.objects.all()
+    serializer_class = MarcheAvenantSerializer
+
+
+class AjoutAvenantMarcheApiView(generics.CreateAPIView):
+    #permission_classes = [IsAuthenticated, AddMarchePermission]
+
+    queryset = MarcheAvenant.objects.all()
+    serializer_class = MarcheAvenantSerializer
+
+    def create(self, request, *args, **kwargs):
+
+        serializer = self.get_serializer(data=request.data)
+        revisable=False
+        try:
+            revisable=serializer.initial_data['revisable']
+            print(revisable)
+        except Exception as e:
+            revisable=False
+        print(serializer.initial_data)
+        try:
+            MarcheAvenant(num_avenant=serializer.initial_data['num_avenant'],id=serializer.initial_data['id'], code_site=serializer.initial_data['code_site'], nt=serializer.initial_data['nt'],
+                   libelle=serializer.initial_data['libelle'], ods_depart=serializer.initial_data['ods_depart'],
+
+                   delai_paiement_f=serializer.initial_data['delai_paiement_f'],
+                   rabais=serializer.initial_data['rabais']or 0, tva=serializer.initial_data['tva']or 0, rg=serializer.initial_data['rg'],
+                   date_signature=serializer.initial_data['date_signature']).save(
+                force_insert=True)
+
+            m=Marche.objects.get(nt=serializer.initial_data['nt'],code_site=serializer.initial_data['code_site'])
+            m.num_avenant=serializer.initial_data['num_avenant']
+            m.libelle=serializer.initial_data['libelle']
+            m.ods_depart=serializer.initial_data['ods_depart']
+            m.delai_paiement_f=serializer.initial_data['delai_paiement_f']
+            m.rabais=serializer.initial_data['rabais'] or 0
+            m.tva=serializer.initial_data['tva'] or 0
+            m.rg=serializer.initial_data['rg'] or 0
+            m.date_signature=serializer.initial_data['date_signature']
+            m.save(force_update=True)
+
+            return Response('Marché ajouté' ,status=status.HTTP_200_OK)
+
+        except IntegrityError as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
+class GetDQEAvenent(generics.ListAPIView):
+        queryset = DQEAvenant.objects.all()
+        serializer_class = DQEAvenantSerializer
+        filter_backends = [DjangoFilterBackend]
+        filterset_class = DQEAvenantFilter
+
+        def list(self, request, *args, **kwargs):
+            queryset = self.filter_queryset(self.get_queryset())
+
+            mt = 0
+            response_data = super().list(request, *args, **kwargs).data
+            for q in queryset:
+                mt = mt + q.prix_q
+
+            return Response({'dqe': response_data,
+                             'extra': {
+                                 'mt': mt,
+
+                             }}, status=status.HTTP_200_OK)
+
+
+
+class AjoutDQEAvenantApiView(generics.CreateAPIView):
+    #permission_classes = [IsAuthenticated, AddDQEPermission]
+    queryset = DQEAvenant.objects.all()
+    serializer_class = DQEAvenantSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        print(serializer.initial_data)
+        try:
+            MarcheAvenant.objects.filter(code_site=serializer.initial_data['pole'],nt=serializer.initial_data['nt'],num_avenant=serializer.initial_data['num_avenant'])
+        except MarcheAvenant.DoesNotExist:
+            return Response('Impossible d\' ajouter un avenant', status=status.HTTP_200_OK)
+
+        try:
+            try:
+                dqe = DQE.objects.get(nt=serializer.initial_data['nt'], code_site=serializer.initial_data['pole'],
+                                      code_tache=serializer.initial_data['code_tache'])
+                DQEAvenant(code_site=serializer.initial_data['pole'],
+                               num_avenant=serializer.initial_data['num_avenant'],
+                               nt=serializer.initial_data['nt'],
+                               code_tache=serializer.initial_data['code_tache'],
+                               prix_u=serializer.initial_data['prix_u'],
+                               est_tache_composite=serializer.initial_data['est_tache_composite'],
+                               est_tache_complementaire=False, quantite=serializer.initial_data['quantite'],
+                               unite=TabUniteDeMesure.objects.get(id=serializer.initial_data['unite']), libelle=
+                               serializer.initial_data['libelle']).save(force_insert=True)
+
+                qte= float(dqe.quantite) + float(serializer.initial_data['quantite'])
+                if(qte < 0):
+                    qte=0
+                dqe.quantite=qte
+                dqe.prix_u = float(serializer.initial_data['prix_u'])
+                dqe.save(force_update=True)
+                return (Response('Tache mise à jour', status=status.HTTP_200_OK))
+
+            except DQE.DoesNotExist:
+                DQEAvenant(code_site=serializer.initial_data['pole'],
+                           num_avenant=serializer.initial_data['num_avenant'],
+                           nt=serializer.initial_data['nt'],
+                           code_tache=serializer.initial_data['code_tache'], prix_u=serializer.initial_data['prix_u'],
+                           est_tache_composite=serializer.initial_data['est_tache_composite'],
+                           est_tache_complementaire=True, quantite=serializer.initial_data['quantite'],
+                           unite=TabUniteDeMesure.objects.get(id=serializer.initial_data['unite']), libelle=
+                           serializer.initial_data['libelle']).save(force_insert=True)
+                DQE(code_site=serializer.initial_data['pole'], nt=serializer.initial_data['nt'],
+                    code_tache=serializer.initial_data['code_tache'], prix_u=serializer.initial_data['prix_u'],
+                    est_tache_composite=serializer.initial_data['est_tache_composite'],
+                    est_tache_complementaire=True,
+                    quantite=serializer.initial_data['quantite'],
+                    unite=TabUniteDeMesure.objects.get(id=serializer.initial_data['unite']),
+                    libelle=serializer.initial_data['libelle']).save(force_insert=True)
+                return Response('Tache complémentaire ajouté', status=status.HTTP_200_OK)
+        except IntegrityError as e:
+           return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+

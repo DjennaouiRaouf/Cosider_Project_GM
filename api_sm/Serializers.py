@@ -43,7 +43,7 @@ class ClientsSerializer(serializers.ModelSerializer):
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
        
-        fields.pop('est_bloquer', None)
+        
         fields.pop('user_id', None)
         fields.pop('date_modification', None)
         return fields
@@ -59,7 +59,7 @@ class ClientsSerializer(serializers.ModelSerializer):
 class SiteSerializer(serializers.ModelSerializer):
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        fields.pop('est_bloquer', None)
+        
         fields.pop('user_id', None)
         fields.pop('date_modification', None)
         fields.pop('jour_cloture_mouv_rh_paie',None)
@@ -81,8 +81,8 @@ class SiteSerializer(serializers.ModelSerializer):
 
 
 class NTSerializer(serializers.ModelSerializer):
-    site=serializers.PrimaryKeyRelatedField(source='code_site',queryset=Sites.objects.filter(est_bloquer=False), label='Pole')
-    client=serializers.PrimaryKeyRelatedField(source='code_client',queryset=Clients.objects.filter(est_bloquer=False), label='Client')
+    site=serializers.PrimaryKeyRelatedField(source='code_site',queryset=Sites.objects.all(), label='Pole')
+    client=serializers.PrimaryKeyRelatedField(source='code_client',queryset=Clients.objects.all(), label='Client')
 
 
     class Meta:
@@ -108,7 +108,7 @@ class NTSerializer(serializers.ModelSerializer):
 
 class DQESerializer(serializers.ModelSerializer):
     prix_q = serializers.SerializerMethodField(label="Montant")
-    pole= serializers.PrimaryKeyRelatedField(source='code_site',queryset=Sites.objects.filter(est_bloquer=False), label='Pole')
+    pole= serializers.PrimaryKeyRelatedField(source='code_site',queryset=Sites.objects.all(), label='Pole')
 
 
 
@@ -135,10 +135,35 @@ class DQESerializer(serializers.ModelSerializer):
         return fields
 
 
+class DQEAvenantSerializer(serializers.ModelSerializer):
+    prix_q = serializers.SerializerMethodField(label="Montant")
+    pole = serializers.PrimaryKeyRelatedField(source='code_site', queryset=Sites.objects.all(), label='Pole')
+
+    def get_prix_q(self, obj):
+        return obj.prix_q
+
+    class Meta:
+        model = DQEAvenant
+        fields = ['pole', 'nt', 'code_tache','num_avenant','libelle', 'est_tache_composite', 'est_tache_complementaire', 'prix_u',
+                  'quantite', 'unite', 'prix_q']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if instance.unite:
+            representation['unite'] = instance.unite.libelle
+        else:
+            representation['unite'] = None
+
+        return representation
+
+    def get_fields(self, *args, **kwargs):
+        fields = super().get_fields(*args, **kwargs)
+
+        return fields
 
 
 class MarcheSerializer(serializers.ModelSerializer):
-    code_site=serializers.PrimaryKeyRelatedField(queryset=Sites.objects.filter(est_bloquer=False).distinct(),label='Site')
+    code_site=serializers.PrimaryKeyRelatedField(queryset=Sites.objects.all().distinct(),label='Site')
     nt=serializers.CharField(label='NT')
     montant_ht = serializers.SerializerMethodField(label='Montant en HT')
     montant_ttc = serializers.SerializerMethodField(label='Montant en TTC')
@@ -151,11 +176,8 @@ class MarcheSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Marche
-        fields = ['id','code_site','nt','libelle','ods_depart','date_signature','delais','delai_paiement_f','revisable','rabais','rg'
+        fields = ['id','code_site','nt','num_avenant','libelle','ods_depart','date_signature','delais','delai_paiement_f','revisable','rabais','rg'
             ,'tva','montant_ht','montant_ttc']
-
-
-
 
 
     def get_fields(self, *args, **kwargs):
@@ -166,12 +188,68 @@ class MarcheSerializer(serializers.ModelSerializer):
         representation['ht'] = instance.ht
         representation['ttc'] = instance.ttc
 
+        return representation
 
+
+class MarcheSerializer(serializers.ModelSerializer):
+    code_site=serializers.PrimaryKeyRelatedField(queryset=Sites.objects.all().distinct(),label='Site')
+    nt=serializers.CharField(label='NT')
+    montant_ht = serializers.SerializerMethodField(label='Montant en HT')
+    montant_ttc = serializers.SerializerMethodField(label='Montant en TTC')
+
+    def get_montant_ht(self, obj):
+        return obj.ht
+
+    def get_montant_ttc(self, obj):
+        return obj.ttc
+
+    class Meta:
+        model = Marche
+        fields = ['id','code_site','nt','num_avenant','libelle','ods_depart','date_signature','delais','delai_paiement_f','revisable','rabais','rg'
+            ,'tva','montant_ht','montant_ttc']
+
+
+    def get_fields(self, *args, **kwargs):
+        fields = super().get_fields(*args, **kwargs)
+        return fields
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['ht'] = instance.ht
+        representation['ttc'] = instance.ttc
 
         return representation
 
 
 
+
+
+
+class MarcheAvenantSerializer(serializers.ModelSerializer):
+    id=serializers.CharField(label='Contrat N°')
+    num_avenant = serializers.CharField(label='Avenant N°')
+    code_site=serializers.PrimaryKeyRelatedField(queryset=Sites.objects.all().distinct(),label='Site')
+    nt=serializers.CharField(label='NT')
+    montant_ht = serializers.SerializerMethodField(label='Montant en HT')
+    montant_ttc = serializers.SerializerMethodField(label='Montant en TTC')
+
+    def get_montant_ht(self, obj):
+        return obj.ht
+
+    def get_montant_ttc(self, obj):
+        return obj.ttc
+
+    class Meta:
+        model = MarcheAvenant
+        fields = ['id','num_avenant','code_site','nt','num_avenant','libelle','ods_depart','date_signature','delais','delai_paiement_f','revisable','rabais','rg'
+            ,'tva','montant_ht','montant_ttc']
+
+
+    def get_fields(self, *args, **kwargs):
+        fields = super().get_fields(*args, **kwargs)
+        return fields
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        return representation
 
 
 
@@ -231,7 +309,7 @@ class ModePaiementSerializer(serializers.ModelSerializer):
         fields='__all__'
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        fields.pop('est_bloquer', None)
+        
         fields.pop('user_id', None)
         fields.pop('date_modification', None)
 
@@ -252,7 +330,7 @@ class EncaissementSerializer(serializers.ModelSerializer):
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        fields.pop('est_bloquer', None)
+        
         fields.pop('user_id', None)
         fields.pop('date_modification', None)
 
@@ -282,7 +360,7 @@ class DetailFactureSerializer(serializers.ModelSerializer):
             fields='__all_'
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        fields.pop('est_bloquer', None)
+        
         fields.pop('user_id', None)
         fields.pop('date_modification', None)
 
@@ -303,7 +381,7 @@ class AvanceSerializer(serializers.ModelSerializer):
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        fields.pop('est_bloquer', None)
+        
         fields.pop('user_id', None)
         fields.pop('date_modification', None)
 
@@ -322,7 +400,7 @@ class TypeAvanceSerializer(serializers.ModelSerializer):
         fields='__all__'
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        fields.pop('est_bloquer', None)
+        
         fields.pop('user_id', None)
         fields.pop('date_modification', None)
 
@@ -347,7 +425,7 @@ class CautionSerializer(serializers.ModelSerializer):
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        fields.pop('est_bloquer', None)
+        
         fields.pop('user_id', None)
         fields.pop('date_modification', None)
         return fields
@@ -480,22 +558,4 @@ class ECSerializer(serializers.ModelSerializer):
 
 
         return representation
-
-
-class RevisionPrixSerializer(serializers.ModelSerializer):
-    pole = serializers.PrimaryKeyRelatedField(source='code_site', queryset=Sites.objects.filter(est_bloquer=False), label='Pole')
-    contrat = serializers.PrimaryKeyRelatedField(source='marche', queryset=Marche.objects.filter(est_bloquer=False), label='Marche')
-    libelle = serializers.SerializerMethodField(label='Libelle')
-
-    def get_libelle(self, obj):
-        return DQE.objects.get(nt=obj.nt,code_site=obj.code_site,code_tache=obj.code_tache).libelle
-
-    class Meta:
-        model = RevisionPrix
-        fields = ['contrat','pole','nt','code_tache','libelle','coef','date_rev']
-
-    def get_fields(self, *args, **kwargs):
-        fields = super().get_fields(*args, **kwargs)
-
-        return fields
 
