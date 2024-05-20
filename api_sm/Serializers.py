@@ -42,8 +42,8 @@ class UserSerializer(serializers.ModelSerializer):
 class ClientsSerializer(serializers.ModelSerializer):
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-       
-        
+
+        fields.pop('est_bloquer', None)
         fields.pop('user_id', None)
         fields.pop('date_modification', None)
         return fields
@@ -59,7 +59,7 @@ class ClientsSerializer(serializers.ModelSerializer):
 class SiteSerializer(serializers.ModelSerializer):
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-        
+        fields.pop('est_bloquer', None)
         fields.pop('user_id', None)
         fields.pop('date_modification', None)
         fields.pop('jour_cloture_mouv_rh_paie',None)
