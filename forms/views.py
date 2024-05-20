@@ -31,6 +31,7 @@ class UserFieldsApiView(APIView):
             if (field_name == "password"):
                 field_info.append({
                     'name': 'confirme' + field_name,
+                    'required':True,
                     'type': str(field_instance.__class__.__name__),
                     'label': 'Confirmer le mot de passe',
                 })
