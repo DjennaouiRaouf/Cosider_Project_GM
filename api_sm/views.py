@@ -1338,7 +1338,6 @@ class ImportDQEAvenantAPIView(APIView):
                     dqe.quantite = qte
                     dqe.prix_u = float(row[6])
                     dqe.save(force_update=True)
-                    return (Response('Tache mise à jour', status=status.HTTP_200_OK))
 
                 except DQE.DoesNotExist:
                     DQEAvenant(
@@ -1359,9 +1358,7 @@ class ImportDQEAvenantAPIView(APIView):
                         libelle=row[3], quantite=row[7], user_id=request.user.username
                     ).save(force_insert=True)
 
-                    return Response('Tache complémentaire ajouté', status=status.HTTP_200_OK)
-
-                return Response(f'Creation de {newRows} ligne(s) \n Mise à jour de {updatedRows} ligne(s) ',
+            return Response(f'Creation de {newRows} ligne(s) \n Mise à jour de {updatedRows} ligne(s) ',
                                 status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
