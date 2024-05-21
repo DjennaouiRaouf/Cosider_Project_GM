@@ -19,6 +19,7 @@ def pre_save_nt(sender, instance, **kwargs):
             raise ValidationError("Date de cloture doit etre supérieur ou égale à la date d\'ouverture")
 
 
+
 @receiver(post_save, sender=NT)
 def post_save_nt(sender, instance, created, **kwargs):
     if created:
@@ -30,37 +31,6 @@ def post_save_nt(sender, instance, created, **kwargs):
         if (instance.date_cloture_nt and instance.date_ouverture_nt):
             if (instance.date_cloture_nt <= instance.date_ouverture_nt):
                 raise ValidationError("Date de cloture doit etre supérieur ou égale à la date d\'ouverture")
-
-
-# DQE
-
-@receiver(pre_save, sender=DQE)
-def pre_save_dqe(sender, instance, **kwargs):
-    if not instance.pk:
-        instance.id = str(instance.code_tache) + "_" + str(instance.marche.id)
-
-    instance.libelle = instance.libelle.lower()
-
-
-
-"""
-@receiver(pre_create_historical_record,sender=Marche)
-def pre_create_historical_record_callback(sender, **kwargs):
-    instance = kwargs['instance']
-    sender_model_name = sender.__name__
-    if(sender_model_name == "HistoricalMarche"):
-        try:
-            latest_history_record = instance.history.latest()
-            print(latest_history_record.date_signature,instance.date_signature)
-            if latest_history_record.date_signature == instance.date_signature:
-                raise IntegrityError("Data is already present in the historical records.")
-            else:
-                print(instance.history.num_avenant)
-        except Marche.history.model.DoesNotExist:
-            pass
-    else:
-        pass
-"""
 
 
 @receiver(pre_save, sender=Attachements)

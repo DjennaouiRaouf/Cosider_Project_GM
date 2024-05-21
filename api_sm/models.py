@@ -140,29 +140,30 @@ class Marche(CPkModel):
     id = models.CharField(db_column='Num_Contrat', primary_key=True,verbose_name='Contrat N°',
                                    max_length=500)
     num_avenant = models.IntegerField(db_column='Num_Avenant',editable=False,verbose_name='Avenant N°',default=0)
-    code_site = models.CharField(db_column='Code_site', max_length=10,
+    code_site = models.CharField(db_column='Code_Site', max_length=10,
                                  verbose_name='Code du Site')
     nt = models.CharField(db_column='NT', max_length=20, null=False, verbose_name='NT')
 
-    libelle = models.TextField(null=False,verbose_name='Libellé')
-    ods_depart = models.DateField(null=False
+    libelle = models.TextField(db_column='Libelle',null=False,verbose_name='Libellé')
+    ods_depart = models.DateField(db_column='Ods_Depart',null=False
                                   , verbose_name='ODS de démarrage')
-    delais = models.IntegerField(default=0, null=True
+    delais = models.IntegerField(db_column='Delais',default=0, null=True
                                          , verbose_name='Délai des travaux')
-    revisable = models.BooleanField(default=True, null=False
+    revisable = models.BooleanField(db_column='Revisable',default=True, null=False
                                     , verbose_name='Est-il révisable ?')
-    delai_paiement_f=models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)],
-                                         null=True
-                                                 , verbose_name='Délai de paiement')
-    rabais =  models.FloatField(default=0,  verbose_name='Taux de rabais',
+    actualisable = models.BooleanField(db_column='Actualisable',default=True, null=False
+                                    , verbose_name='Est-il révisable ?')
+    delai_paiement_f=models.IntegerField(db_column='Delai_Paiement_F',default=0, validators=[MinValueValidator(0), MaxValueValidator(100)],
+                                         null=True, verbose_name='Délai de paiement')
+    rabais =  models.FloatField(db_column='Rabais',default=0,  verbose_name='Taux de rabais',
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    tva = models.FloatField(default=0,  verbose_name='TVA',
+    tva = models.FloatField(db_column='Tva',default=0,  verbose_name='TVA',
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    rg = models.FloatField(default=0,
+    rg = models.FloatField(db_column='Rg',default=0,
                              validators=[MinValueValidator(0), MaxValueValidator(100)], null=False
                              , verbose_name='Taux de retenue de garantie')
 
-    date_signature = models.DateField(null=False, verbose_name='Date de signature')
+    date_signature = models.DateField(db_column='Date_Signature',null=False, verbose_name='Date de signature')
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
@@ -222,28 +223,31 @@ class MarcheAvenant(CPkModel):
     id = models.CharField(db_column='Num_Contrat', primary_key=True,verbose_name='Contrat N°',
                                    max_length=500)
     num_avenant = models.IntegerField(db_column='Num_Avenant',primary_key=True,editable=False,verbose_name='Avenant N°',default=0)
-    code_site = models.CharField(db_column='Code_site', max_length=10,
+    code_site = models.CharField(db_column='Code_Site', max_length=10,
                                  verbose_name='Code du Site')
     nt = models.CharField(db_column='NT', max_length=20, null=False, verbose_name='NT')
 
-    libelle = models.TextField(null=False,verbose_name='Libellé')
-    ods_depart = models.DateField(null=False
+    libelle = models.TextField(db_column='Libelle',null=False,verbose_name='Libellé')
+    ods_depart = models.DateField(db_column='Ods_Depart',null=False
                                   , verbose_name='ODS de démarrage')
-    delais = models.IntegerField(default=0, null=True
+    delais = models.IntegerField(db_column='Delais',default=0, null=True
                                          , verbose_name='Délai des travaux')
-    revisable = models.BooleanField(default=True, null=False
+    revisable = models.BooleanField(db_column='Revisable',default=True, null=False
                                     , verbose_name='Est-il révisable ?')
-    delai_paiement_f=models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)],
+    actualisable = models.BooleanField(db_column='Actualisable', default=True, null=False
+                                       , verbose_name='Est-il révisable ?')
+
+    delai_paiement_f=models.IntegerField(db_column='Delai_Paiement_F',default=0, validators=[MinValueValidator(0), MaxValueValidator(100)],
                                          null=True
                                                  , verbose_name='Délai de paiement')
-    rabais =  models.FloatField(default=0,  verbose_name='Taux de rabais',
+    rabais =  models.FloatField(db_column='Rabais',default=0,  verbose_name='Taux de rabais',
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    tva = models.FloatField(default=0,  verbose_name='TVA',
+    tva = models.FloatField(db_column='Tva',default=0,  verbose_name='TVA',
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    rg = models.FloatField(default=0,
+    rg = models.FloatField(db_column='Rg',default=0,
                              validators=[MinValueValidator(0), MaxValueValidator(100)], null=False
                              , verbose_name='Taux de retenue de garantie')
-    date_signature = models.DateField(null=False, verbose_name='Date de signature')
+    date_signature = models.DateField(db_column='Date_Signature',null=False, verbose_name='Date de signature')
 
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
@@ -322,7 +326,7 @@ class DQE(CPkModel):
 
 
 class DQEAvenant(CPkModel):
-    code_site = models.CharField(db_column='Code_site', primary_key=True, max_length=10,
+    code_site = models.CharField(db_column='Code_Site', primary_key=True, max_length=10,
                                  verbose_name='Code du Site')
     nt = models.CharField(db_column='NT', max_length=20, primary_key=True, null=False, verbose_name='NT')
     code_tache = models.CharField(db_column='Code_Tache', null=False, max_length=30
@@ -380,28 +384,30 @@ class TypeAvance(models.Model):
 
 
 class Avance(models.Model):
-    type = models.ForeignKey(TypeAvance, on_delete=models.DO_NOTHING, null=False, to_field='id',
+    id = models.AutoField(db_column='Id_Avance', primary_key=True)
+    type = models.ForeignKey(TypeAvance, on_delete=models.DO_NOTHING,db_column='Type_Avance', null=False, to_field='id',
                              verbose_name="Type d'avance")
-    num_avance = models.PositiveIntegerField(default=0, null=False, blank=True, editable=False,
+    num_avance = models.PositiveIntegerField(db_column='Num_Avance',default=0, null=False, blank=True, editable=False,
                                                 verbose_name="Numero d'avance")
     marche = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=False, related_name="Avance_Marche",to_field='id')
 
-    taux_avance = models.FloatField(default=0,  verbose_name="Taux d'avance", editable=False,
+    taux_avance = models.FloatField(db_column='Taux_Avance',default=0,  verbose_name="Taux d'avance", editable=False,
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
 
-    montant = models.FloatField( validators=[MinValueValidator(0)], default=0,null=False,verbose_name='Montant d\'avance')
+    montant = models.FloatField(db_column='Montant' ,validators=[MinValueValidator(0)], default=0,null=False,verbose_name='Montant d\'avance')
 
-    debut = models.FloatField(default=0,  verbose_name="Debut",
+    debut = models.FloatField(db_column='Debut',default=0,  verbose_name="Debut",
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    fin=models.FloatField(default=80,  verbose_name="Fin",
+    fin=models.FloatField(db_column='Fin',default=80,  verbose_name="Fin",
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
+
+    date = models.DateField(db_column='Date_Avance', null=False, verbose_name="Date d'avance")
+    remboursee = models.BooleanField(db_column='Remboursee', default=False, null=False, verbose_name='Est Remboursée')
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
-    date=models.DateField(null=False,verbose_name="Date d'avance")
-    remboursee = models.BooleanField(default=False, null=False,verbose_name='Est Remboursée')
 
 
     class Meta:
@@ -419,15 +425,15 @@ class Attachements(models.Model):
     id = models.AutoField(db_column='Id_Attachement', primary_key=True)
     marche = models.ForeignKey('Marche', models.DO_NOTHING, db_column='Num_Marche', blank=True,
                                    null=True)
-    code_site = models.CharField(db_column='Code_site', max_length=10,
+    code_site = models.CharField(db_column='Code_Site', max_length=10,
                                  verbose_name='Code du Site')
     nt = models.CharField(db_column='NT', max_length=20, null=False, verbose_name='NT')
     code_tache = models.CharField(db_column='Code_Tache', null=False, max_length=30
                                   , verbose_name="Code Tache")
-    qte = models.FloatField( validators=[MinValueValidator(0)], default=0,verbose_name='Quantité Mois')
-    prix_u = models.FloatField( validators=[MinValueValidator(0)], default=0,
+    qte = models.FloatField(db_column='Quantite', validators=[MinValueValidator(0)], default=0,verbose_name='Quantité Mois')
+    prix_u = models.FloatField( db_column='Prix_Unitaire',validators=[MinValueValidator(0)], default=0,
                                      editable=False,verbose_name='Prix unitaire')
-    montant= models.FloatField( validators=[MinValueValidator(0)], default=0,verbose_name='Montant du Mois',editable=False)
+    montant= models.FloatField(db_column='Montant', validators=[MinValueValidator(0)], default=0,verbose_name='Montant du Mois',editable=False)
     date=models.DateField(null=False,db_column='Mmaa',verbose_name='Date')
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
@@ -508,13 +514,13 @@ class Attachements(models.Model):
 
 
 class Factures(models.Model):
-    numero_facture=models.CharField(max_length=800,db_column='Num_facture',primary_key=True,verbose_name='Numero de facture')
+    numero_facture=models.CharField(max_length=800,db_column='Num_Facture',primary_key=True,verbose_name='Numero de facture')
     num_situation=models.IntegerField(null=False,db_column='Num_Situation',verbose_name='Numero de situation')
     marche=models.ForeignKey(Marche,db_column='Num_Marche',on_delete=models.DO_NOTHING,null=False,verbose_name='Marche',to_field="id")
     du = models.DateField(db_column='Date_Debut',null=False,verbose_name='Du')
     au = models.DateField(db_column='Date_Fin',null=False,verbose_name='Au')
     paye = models.BooleanField(default=False,db_column='Paye', null=False,editable=False)
-    date = models.DateField(auto_now=True, editable=False)
+    date = models.DateField(db_column='Date_Facture',auto_now=True, editable=False)
     montant= models.FloatField( db_column='Montant_Mois',validators=[MinValueValidator(0)], default=0,
                                       verbose_name="Montant du Mois"
                                       ,editable=False)
@@ -606,6 +612,7 @@ class Factures(models.Model):
         app_label = 'api_sm'
 
 class Remboursement(models.Model):
+    id = models.AutoField(db_column='Id_Remb', primary_key=True)
     facture = models.ForeignKey(Factures,db_column='Num_Facture', on_delete=models.DO_NOTHING, null=True, blank=True, to_field="numero_facture")
     avance=models.ForeignKey(Avance,db_column='Avance', on_delete=models.DO_NOTHING, null=True, blank=True)
 
@@ -654,6 +661,7 @@ class Remboursement(models.Model):
 
 
 class DetailFacture(models.Model):
+    id = models.AutoField(db_column='Id_Df', primary_key=True)
     facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,null=True,blank=True,to_field="numero_facture",db_column='Num_Facture')
     detail=models.ForeignKey(Attachements,on_delete=models.DO_NOTHING,db_column='Detail')
 
@@ -773,17 +781,18 @@ class TypeCaution(models.Model):
 
 
 class Cautions(models.Model):
+    id = models.AutoField(db_column='Id_Caution', primary_key=True)  # Field name made lowercase.
 
     marche = models.ForeignKey(Marche,db_column='Num_Marche', on_delete=models.DO_NOTHING, null=True, related_name="Caution_Marche",to_field='id')
     type = models.ForeignKey(TypeCaution,db_column='Type_Caution', on_delete=models.DO_NOTHING, null=False,verbose_name="Libelle",to_field='')
     avance = models.ForeignKey(Avance,db_column='Avance', on_delete=models.DO_NOTHING, null=True, blank=True,verbose_name='Avance')
-    date_soumission = models.DateField(null=False,verbose_name="Date dépot")
+    date_soumission = models.DateField(db_column='Date_Soumission',null=False,verbose_name="Date dépot")
     agence = models.ForeignKey('api_sch.TabAgence',db_column='Agence', on_delete=models.CASCADE,verbose_name="Agence")
     montant = models.FloatField(
         verbose_name="Montant",
         validators=[MinValueValidator(0)], default=0,
     )
-    est_recupere = models.BooleanField(default=False,db_column='Est_Recupere', null=False,verbose_name='Est Recuperée')
+    est_recupere = models.BooleanField(db_column='Est_Recupere',default=False, null=False,verbose_name='Est Recuperée')
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
