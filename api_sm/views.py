@@ -1235,7 +1235,7 @@ class GetDQEAvenent(generics.ListAPIView):
         response_data = super().list(request, *args, **kwargs).data
         for q in queryset:
             mt = mt + q.prix_q
-
+            print(q.prix_q)
         return Response({'dqe': response_data,
                          'extra': {
                              'mt': mt,
