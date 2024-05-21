@@ -433,7 +433,7 @@ class Attachements(models.Model):
     qte = models.FloatField(db_column='Quantite', validators=[MinValueValidator(0)], default=0,verbose_name='Quantité Mois')
     prix_u = models.FloatField( db_column='Prix_Unitaire',validators=[MinValueValidator(0)], default=0,
                                      editable=False,verbose_name='Prix unitaire')
-    montant= models.FloatField(db_column='Montant', validators=[MinValueValidator(0)], default=0,verbose_name='Montant du Mois',editable=False)
+    montant= models.FloatField(db_column='Montant', validators=[MinValueValidator(0)], default=0,verbose_name='Montant du Mois')
     date=models.DateField(null=False,db_column='Mmaa',verbose_name='Date')
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
