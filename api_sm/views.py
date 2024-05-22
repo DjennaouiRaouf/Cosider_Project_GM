@@ -380,6 +380,11 @@ class GetFacture(generics.ListAPIView):
         for q in queryset:
             rg_total += q.montant_rg
             mgf += q.montant_factureTTC
+            try:
+                enc += (Encaissement.objects.filter(facture=q).distinct().aggregate(total=Sum('montant_encaisse'))[
+                            'total'] or 0)
+            except Encaissement.DoesNotExist:
+                pass
 
 
         creance = mgf - enc
@@ -396,11 +401,12 @@ class GetFacture(generics.ListAPIView):
                              'projet': m.libelle,
                              'montant_marche': m.ht,
                              'client': n.code_client,
-                             'nt': m.nt,
+                             'nt': n.nt,
                              'lib_nt': n.libelle,
                              'pole': n.code_site,
                              'rg_total': rg_total,
-                             'rg_total_ttc':round(rg_total+(rg_total*m.tva/100),2),
+                             'rg_total_ttc': round(rg_total + (rg_total * m.tva / 100), 2),
+                             'mgenc':enc,
                              'creance': creance,
 
                          }}, status=status.HTTP_200_OK)

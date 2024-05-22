@@ -702,14 +702,15 @@ class ModePaiement(models.Model):
 
 
 class Encaissement(models.Model):
-    facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,null=True,blank=True,verbose_name="Facture")
-    date_encaissement=models.DateField(null=False,verbose_name="Date d'encaissement")
-    mode_paiement=models.ForeignKey(ModePaiement,on_delete=models.DO_NOTHING,null=False,verbose_name="Mode de paiement")
-    montant_encaisse=models.FloatField( blank=True,verbose_name="Montant encaissé",
+    id = models.AutoField(db_column='Id_Enc', primary_key=True)
+    facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,db_column='Facture',null=True,blank=True,verbose_name="Facture")
+    date_encaissement=models.DateField(null=False,db_column='Date_Encaissement',verbose_name="Date d'encaissement")
+    mode_paiement=models.ForeignKey(ModePaiement,on_delete=models.DO_NOTHING,db_column='Mode_Paiement',null=False,verbose_name="Mode de paiement")
+    montant_encaisse=models.FloatField( db_column='Montant_Encaisse',blank=True,verbose_name="Montant encaissé",
                                      validators=[MinValueValidator(0)], default=0)
-    agence = models.ForeignKey('api_sch.TabAgence',on_delete=models.DO_NOTHING,db_constraint=False , null=True, verbose_name='Agence')
+    agence = models.ForeignKey('api_sch.TabAgence',on_delete=models.DO_NOTHING,db_column='Agence' , null=True, verbose_name='Agence')
 
-    numero_piece = models.CharField(max_length=300,null=False,verbose_name="Numero de piéce")
+    numero_piece = models.CharField(db_column='Numero_Piece',max_length=300,null=False,verbose_name="Numero de piéce")
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
