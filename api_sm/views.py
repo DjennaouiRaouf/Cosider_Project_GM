@@ -409,6 +409,7 @@ class GetFacture(generics.ListAPIView):
                              'mgenc':enc,
                              'creance': creance,
 
+
                          }}, status=status.HTTP_200_OK)
 
 
