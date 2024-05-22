@@ -1,5 +1,5 @@
 import django_filters
-from django.db.models import Q
+from django.db.models import Q, Max
 
 from api_sm.models import *
 
@@ -147,6 +147,7 @@ class MarcheAvenantFilter(django_filters.FilterSet):
     has_rg = django_filters.BooleanFilter(field_name='rg', label='Avec retenue de garantie ?', method='filter_has_rg', )
     has_tva = django_filters.BooleanFilter(field_name='tva', label='Avec TVA ?', method='filter_has_tva', )
     has_rabais = django_filters.BooleanFilter(field_name='rabais', label='Avec Rabais ? ', method='filter_has_rabais', )
+    last_avenant = django_filters.BooleanFilter(field_name='num_avenant', label='Dérnier Avenant ', method='filter_last_avenant', )
 
     def filter_has_rabais(self, queryset, name, value):
         if value is False:
@@ -168,10 +169,19 @@ class MarcheAvenantFilter(django_filters.FilterSet):
         elif value is True:
             return queryset.exclude(**{f"{name}__exact": 0})
         return queryset
+    def filter_last_avenant(self, queryset, name, value):
+        max_number = queryset.aggregate(Max(name))[f'{name}__max']
+        print(max_number)
+        if value is False:
+            return queryset.exclude(**{f"{name}__exact": max_number})
+        elif value is True:
+            return queryset.filter(**{f"{name}__exact": max_number})
+        return queryset
+
 
     class Meta:
         model = MarcheAvenant
-        fields = ['code_contrat', 'date_signature', 'code_site', 'nt', 'has_rg', 'has_tva', ]
+        fields = ['code_contrat', 'date_signature', 'code_site', 'nt', 'has_rg', 'has_tva','num_avenant','last_avenant' ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
