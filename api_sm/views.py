@@ -1365,3 +1365,32 @@ class ImportDQEAvenantAPIView(APIView):
         except Exception as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
+
+
+
+class UpdateAttachementApiVew(generics.UpdateAPIView):
+    queryset = Attachements.objects.all()
+    serializer_class = AttachementsSerializer
+
+    def get_object(self):
+        id = self.request.data.get('id')
+
+        try:
+            obj = Attachements.objects.get(id=id)
+        except Attachements.DoesNotExist:
+            raise NotFound("Object n'éxiste pas")
+        self.check_object_permissions(self.request, obj)
+
+        return obj
+
+    def update(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.montant=request.data['montant']
+            instance.qte=request.data['qte']
+            instance.save(force_update=True)
+            return Response('Attachement mis à jour', status=status.HTTP_200_OK)
+        except IntegrityError as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+
+

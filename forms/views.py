@@ -1462,7 +1462,7 @@ class AttachementsFieldsApiView(APIView):
 
                         field_info.append(obj)
                 return Response({'fields': field_info,
-                             'models': model_name, 'pk': Ordre_De_Service._meta.pk.name}, status=status.HTTP_200_OK)
+                             'models': model_name, }, status=status.HTTP_200_OK)
 
             if (flag == 'l'):  # data grid list (react ag-grid)
                 field_info = []
@@ -1491,7 +1491,8 @@ class AttachementsFieldsApiView(APIView):
                         if(field_name =='code_tache'):
                             obj['checkboxSelection']= True
                             obj['headerCheckboxSelection']= True
-
+                        if(field_name in ['qte','montant']):
+                            obj['editable']= True
                         if(field_name in ['id','code_site','nt']):
                             obj['hide'] = True
                         if(field_name in ['prix_u']):

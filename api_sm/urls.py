@@ -12,6 +12,7 @@ urlpatterns = [
     path('addmarche/', AjoutMarcheApiView.as_view()),
     path('addsite/',AjoutSiteApiView.as_view()),
     path('addnt/',AjoutNTApiView.as_view()),
+    path('updateatt/',UpdateAttachementApiVew.as_view()),
 
     path('getatt/',GetAttachements.as_view()),
     path('workstate/', WorkState.as_view()),
