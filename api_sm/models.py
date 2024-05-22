@@ -385,11 +385,11 @@ class TypeAvance(models.Model):
 
 class Avance(models.Model):
     id = models.AutoField(db_column='Id_Avance', primary_key=True)
-    type = models.ForeignKey(TypeAvance, on_delete=models.DO_NOTHING,db_column='Type_Avance', null=False, to_field='id',
+    type = models.ForeignKey(TypeAvance, on_delete=models.DO_NOTHING,db_column='Id_Type_Avance', null=False,
                              verbose_name="Type d'avance")
     num_avance = models.PositiveIntegerField(db_column='Num_Avance',default=0, null=False, blank=True, editable=False,
                                                 verbose_name="Numero d'avance")
-    marche = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=False, related_name="Avance_Marche",to_field='id')
+    marche = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=False, related_name="Avance_Marche",db_column='Num_Marche')
 
     taux_avance = models.FloatField(db_column='Taux_Avance',default=0,  verbose_name="Taux d'avance", editable=False,
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
@@ -751,7 +751,7 @@ class TypeCaution(models.Model):
 
     libelle = models.CharField(max_length=500,null=True,blank=True)
     type_avance = models.ForeignKey(TypeAvance, on_delete=models.DO_NOTHING, null=True,blank=True, to_field='id',
-                             verbose_name="Type d'avance",db_column='Type_Avance',)
+                             verbose_name="Type d'avance",db_column='Id_Type_Avance',)
     taux_exact= models.FloatField(db_column='Taux_Exact',
                                    validators=[MinValueValidator(0), MaxValueValidator(100)], null=True,blank=True)
     taux_min = models.FloatField(db_column='Taux_Min',
