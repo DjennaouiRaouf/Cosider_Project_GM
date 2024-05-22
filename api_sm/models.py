@@ -385,7 +385,7 @@ class TypeAvance(models.Model):
 
 class Avance(models.Model):
     id = models.AutoField(db_column='Id_Avance', primary_key=True)
-    type = models.ForeignKey(TypeAvance, on_delete=models.DO_NOTHING, null=False, to_field='id',
+    type = models.ForeignKey(TypeAvance, on_delete=models.DO_NOTHING, null=False, db_column='Type_Avance',
                              verbose_name="Type d'avance")
     num_avance = models.PositiveIntegerField(db_column='Num_Avance',default=0, null=False, blank=True, editable=False,
                                                 verbose_name="Numero d'avance")
