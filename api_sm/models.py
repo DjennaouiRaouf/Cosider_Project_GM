@@ -55,16 +55,16 @@ class Sites(models.Model):
     id = models.CharField(db_column='Code_site', primary_key=True, max_length=10 ,
                                  verbose_name='Code Pole')
     code_filiale = models.ForeignKey(TabFiliale, models.DO_NOTHING,
-                                     db_column='Code_Filiale',verbose_name='Code Filiale')
+                                     db_column='Code_Filiale',verbose_name='Filiale')
     code_region = models.CharField(db_column='Code_Region', max_length=1, blank=True,
                                    null=True,verbose_name='Région',choices=RG)
     libelle = models.CharField(db_column='Libelle_Site', max_length=150, blank=True,
                                     null=True,verbose_name='Libellé')
     code_agence = models.ForeignKey(TabAgence, models.DO_NOTHING, db_column='Code_Agence', blank=True,
-                                    null=True,verbose_name='Code Agence')
+                                    null=True,verbose_name='Agence')
     type_site = models.SmallIntegerField(db_column='Type_Site', blank=True, null=True,verbose_name='Type du Site')
     code_division = models.ForeignKey(TabDivision, models.DO_NOTHING, db_column='Code_Division', blank=True,
-                                      null=True,verbose_name='Code Division')
+                                      null=True,verbose_name='Division')
     code_commune_site = models.CharField(db_column='Code_Commune_Site', max_length=10, blank=True,
                                          null=True,verbose_name='Code Commune')
     jour_cloture_mouv_rh_paie = models.CharField(db_column='Jour_Cloture_Mouv_RH_Paie', max_length=2, blank=True,

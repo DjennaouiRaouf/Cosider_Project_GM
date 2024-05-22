@@ -18,6 +18,8 @@ urlpatterns = [
     path('sitefields/', SiteFieldsApiView.as_view()),
     path('sitefieldsstate/',SiteFieldsStateApiView.as_view()),
 
+
+    path('marcheavfilterfields/',MarcheAVFieldsFilterApiView.as_view()),
     path('avenantstate/',AvenantFieldsStateApiView.as_view()),
 
     path('mavfields/',AvenantFieldsApiView.as_view()),

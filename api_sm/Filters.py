@@ -136,6 +136,54 @@ class DQEAvenantFilter(django_filters.FilterSet):
 
 
 
+
+
+class MarcheAvenantFilter(django_filters.FilterSet):
+    code_site = django_filters.ModelChoiceFilter(field_name='code_site', label='Pole',
+                                                 queryset=Sites.objects.all(), )
+    code_contrat = django_filters.CharFilter(field_name='id', label='Contrat N°')
+    date_signature = django_filters.DateFilter(field_name="date_signature", label='Date de signature')
+    nt = django_filters.CharFilter(field_name='nt', label='NT')
+    has_rg = django_filters.BooleanFilter(field_name='rg', label='Avec retenue de garantie ?', method='filter_has_rg', )
+    has_tva = django_filters.BooleanFilter(field_name='tva', label='Avec TVA ?', method='filter_has_tva', )
+    has_rabais = django_filters.BooleanFilter(field_name='rabais', label='Avec Rabais ? ', method='filter_has_rabais', )
+
+    def filter_has_rabais(self, queryset, name, value):
+        if value is False:
+            return queryset.filter(**{f"{name}__exact": 0})
+        elif value is True:
+            return queryset.exclude(**{f"{name}__exact": 0})
+        return queryset
+
+    def filter_has_tva(self, queryset, name, value):
+        if value is False:
+            return queryset.filter(**{f"{name}__exact": 0})
+        elif value is True:
+            return queryset.exclude(**{f"{name}__exact": 0})
+        return queryset
+
+    def filter_has_rg(self, queryset, name, value):
+        if value is False:
+            return queryset.filter(**{f"{name}__exact": 0})
+        elif value is True:
+            return queryset.exclude(**{f"{name}__exact": 0})
+        return queryset
+
+    class Meta:
+        model = Marche
+        fields = ['code_contrat', 'date_signature', 'code_site', 'nt', 'has_rg', 'has_tva', ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field_instance in self.base_filters.items():
+            try:
+                model_field = self.Meta.model._meta.get_field(field_name)
+                field_instance.label = model_field.verbose_name
+            except:
+                pass
+
+
+
 class FactureFilter(django_filters.FilterSet):
     code_site=django_filters.CharFilter(field_name='marche__code_site',label='Pole')
     nt = django_filters.CharFilter(field_name='marche__nt' ,label='NT')

@@ -525,6 +525,7 @@ class SiteFieldsStateApiView(APIView):
         fields = serializer.get_fields()
         field_info = []
         for field_name, field_instance in fields.items():
+
             default_value = None
             if str(field_instance.__class__.__name__) == 'ChoiceField':
                 default_value= ''
@@ -544,6 +545,8 @@ class SiteFieldsStateApiView(APIView):
 
             for d in field_info:
                 state.update(d)
+
+        state['code_filiale']=TabFiliale.objects.first().id
         return Response({'state': state}, status=status.HTTP_200_OK)
 
 
@@ -574,36 +577,35 @@ class SiteFieldsApiView(APIView):
                 field_info = []
                 obj = {}
                 for field_name, field_instance in fields.items():
+                    if(field_name not in ['code_filiale']):
+                        obj={
+                            'name': field_name,
+                            'type': str(field_instance.__class__.__name__),
+                            "required": field_instance.required,
+                            'label': field_instance.label or field_name,
+                        }
+                        try:
 
-                    obj={
-                        'name': field_name,
-                        'type': str(field_instance.__class__.__name__),
-                        "required": field_instance.required,
-                        'label': field_instance.label or field_name,
-                    }
-                    try:
+                            if field_instance.choices:
+                                obj['choices']= [{'key': key, 'value': value} for key, value in dict(field_instance.choices).items()]
+                        except:
+                            pass
 
-                        if field_instance.choices:
+                        if (str(field_instance.style.get("base_template")).find('textarea') != -1):
+                            obj['textarea'] = True
+                        if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
+                            anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
+                            serialized_data = anySerilizer(field_instance.queryset, many=True).data
+                            filtered_data = []
+                            for item in serialized_data:
+                                filtered_item = {
+                                    'value': item['id'],
+                                    'label': item['libelle']
+                                }
+                                filtered_data.append(filtered_item)
 
-                            obj['choices']= [{'key': key, 'value': value} for key, value in dict(field_instance.choices).items()]
-                    except:
-                        pass
-
-                    if (str(field_instance.style.get("base_template")).find('textarea') != -1):
-                        obj['textarea'] = True
-                    if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
-                        anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
-                        serialized_data = anySerilizer(field_instance.queryset, many=True).data
-                        filtered_data = []
-                        for item in serialized_data:
-                            filtered_item = {
-                                'value': item['id'],
-                                'label': item['libelle']
-                            }
-                            filtered_data.append(filtered_item)
-
-                        obj['queryset'] = filtered_data
-                    field_info.append(obj)
+                            obj['queryset'] = filtered_data
+                        field_info.append(obj)
             if (flag == 'l'):  # data grid list (react ag-grid)
                 field_info = []
                 for field_name, field_instance in fields.items():
@@ -1916,4 +1918,43 @@ class DQEAVFieldsApiView(APIView):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+
+
+class MarcheAVFieldsFilterApiView(APIView):
+    def get(self,request):
+        field_info = []
+
+        for field_name, field_instance  in MarcheAvenantFilter.base_filters.items():
+
+
+            obj = {
+                'name': field_name,
+                'type': str(field_instance.__class__.__name__),
+                'label': field_instance.label or field_name,
+
+            }
+            if str(field_instance.__class__.__name__) == 'ModelChoiceFilter':
+                anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
+                serialized_data = anySerilizer(field_instance.queryset, many=True).data
+                filtered_data = []
+                for item in serialized_data:
+                    if(field_name in ['code_site']):
+                        filtered_item = {
+                            'value': item['id'],
+                            'label': item['id']
+                        }
+                    else:
+                        filtered_item = {
+                            'value': item['id'],
+                            'label': item['libelle'] or item['id']
+                        }
+                    filtered_data.append(filtered_item)
+
+                obj['queryset'] = filtered_data
+
+
+
+            field_info.append(obj)
+
+        return Response({'fields': field_info},status=status.HTTP_200_OK)
 

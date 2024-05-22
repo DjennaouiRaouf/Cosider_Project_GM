@@ -66,6 +66,24 @@ class SiteSerializer(serializers.ModelSerializer):
 
         return fields
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if instance.code_filiale:
+            representation['code_filiale'] = instance.code_filiale.libelle
+        else:
+            representation['code_filiale'] = None
+
+        if instance.code_agence:
+            representation['code_agence'] = instance.code_agence.libelle
+        else:
+            representation['code_agence'] = None
+
+        if instance.code_division:
+            representation['code_division'] = instance.code_division.libelle
+        else:
+            representation['code_division'] = None
+
+        return representation
 
     class Meta:
         model = Sites

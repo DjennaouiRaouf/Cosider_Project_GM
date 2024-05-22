@@ -1176,6 +1176,8 @@ class GetRemb(generics.ListAPIView):
 class GetMarcheAvenent(generics.ListAPIView):
     queryset = MarcheAvenant.objects.all()
     serializer_class = MarcheAvenantSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = MarcheAvenantFilter
 
 
 class AjoutAvenantMarcheApiView(generics.CreateAPIView):
