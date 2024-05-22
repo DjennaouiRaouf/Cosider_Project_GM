@@ -171,7 +171,7 @@ class MarcheAvenantFilter(django_filters.FilterSet):
         return queryset
     def filter_last_avenant(self, queryset, name, value):
         max_number = queryset.aggregate(Max(name))[f'{name}__max']
-        print(max_number)
+
         if value is False:
             return queryset.exclude(**{f"{name}__exact": max_number})
         elif value is True:
