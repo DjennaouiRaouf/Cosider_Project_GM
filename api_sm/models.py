@@ -224,7 +224,7 @@ class MarcheAvenant(CPkModel):
                                    max_length=500)
     num_avenant = models.IntegerField(db_column='Num_Avenant',primary_key=True,editable=False,verbose_name='Avenant N°',default=0)
     code_site = models.CharField(db_column='Code_Site', max_length=10,
-                                 verbose_name='Code du Site')
+                                 verbose_name='Pole')
     nt = models.CharField(db_column='NT', max_length=20, null=False, verbose_name='NT')
 
     libelle = models.TextField(db_column='Libelle',null=False,verbose_name='Libellé')

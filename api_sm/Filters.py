@@ -170,7 +170,7 @@ class MarcheAvenantFilter(django_filters.FilterSet):
         return queryset
 
     class Meta:
-        model = Marche
+        model = MarcheAvenant
         fields = ['code_contrat', 'date_signature', 'code_site', 'nt', 'has_rg', 'has_tva', ]
 
     def __init__(self, *args, **kwargs):

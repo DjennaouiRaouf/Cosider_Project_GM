@@ -256,7 +256,7 @@ class MarcheSerializer(serializers.ModelSerializer):
 class MarcheAvenantSerializer(serializers.ModelSerializer):
     id=serializers.CharField(label='Contrat N°')
     num_avenant = serializers.CharField(label='Avenant N°')
-    code_site=serializers.PrimaryKeyRelatedField(queryset=Sites.objects.all().distinct(),label='Site')
+    code_site=serializers.PrimaryKeyRelatedField(queryset=Sites.objects.all().distinct(),label='Pole')
     nt=serializers.CharField(label='NT')
     montant_ht = serializers.SerializerMethodField(label='Montant en HT')
     montant_ttc = serializers.SerializerMethodField(label='Montant en TTC')
