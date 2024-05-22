@@ -17,7 +17,7 @@ class Clients(models.Model):
     est_client_cosider = models.BooleanField(db_column='Est_Client_Cosider', blank=True,
                                              null=True,verbose_name="Est Client Cosider ?")  
     libelle = models.CharField(db_column='Libelle_Client', max_length=300, blank=True,
-                                      null=True,verbose_name="Libelle")  
+                                      null=True,verbose_name="Libellé")  
     nif = models.CharField(db_column='NIF', unique=True, max_length=50, blank=True,
                            null=True,verbose_name="NIF")  
     raison_social = models.CharField(db_column='Raison_Social', max_length=50, blank=True,
@@ -282,7 +282,7 @@ class DQE(CPkModel):
     nt = models.CharField(db_column='NT', max_length=20,primary_key=True, null=False, verbose_name='NT')
     code_tache = models.CharField(db_column='Code_Tache',null=False, max_length=30
                                   ,verbose_name="Code Tache",primary_key=True)
-    libelle = models.TextField(db_column='Libelle_Tache',verbose_name="Libelle")
+    libelle = models.TextField(db_column='Libelle_Tache',verbose_name="Libellé")
     unite =models.ForeignKey('api_sch.TabUniteDeMesure',on_delete=models.DO_NOTHING, null=False,db_column='Code_Unite_Mesure', verbose_name='Unité')
     prix_u = models.FloatField(
         db_column='Prix_Unitaire',
@@ -784,7 +784,7 @@ class Cautions(models.Model):
     id = models.AutoField(db_column='Id_Caution', primary_key=True)  # Field name made lowercase.
 
     marche = models.ForeignKey(Marche,db_column='Num_Marche', on_delete=models.DO_NOTHING, null=True, related_name="Caution_Marche",to_field='id')
-    type = models.ForeignKey(TypeCaution,db_column='Type_Caution', on_delete=models.DO_NOTHING, null=False,verbose_name="Libelle",to_field='')
+    type = models.ForeignKey(TypeCaution,db_column='Type_Caution', on_delete=models.DO_NOTHING, null=False,verbose_name="Libellé",to_field='')
     avance = models.ForeignKey(Avance,db_column='Avance', on_delete=models.DO_NOTHING, null=True, blank=True,verbose_name='Avance')
     date_soumission = models.DateField(db_column='Date_Soumission',null=False,verbose_name="Date dépot")
     agence = models.ForeignKey('api_sch.TabAgence',db_column='Agence', on_delete=models.CASCADE,verbose_name="Agence")
