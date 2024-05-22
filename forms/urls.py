@@ -22,6 +22,8 @@ urlpatterns = [
     path('marcheavfilterfields/',MarcheAVFieldsFilterApiView.as_view()),
     path('avenantstate/',AvenantFieldsStateApiView.as_view()),
 
+    path('dqeavfilterfields/',DQEAVFieldsFilterApiView.as_view()),
+
     path('mavfields/',AvenantFieldsApiView.as_view()),
 
     path('dqeavfields/',DQEAVFieldsApiView.as_view()),

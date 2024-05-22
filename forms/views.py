@@ -1958,3 +1958,18 @@ class MarcheAVFieldsFilterApiView(APIView):
 
         return Response({'fields': field_info},status=status.HTTP_200_OK)
 
+
+class DQEAVFieldsFilterApiView(APIView):
+    def get(self,request):
+        field_info=[]
+        for field_name, field_instance in DQEAvenantFilter.base_filters.items():
+            if(field_name not in ['marche','nt','code_site','num_avenant']):
+                obj = {
+                            'name': field_name,
+                            'type': str(field_instance.__class__.__name__),
+                            'label': field_instance.label or field_name,
+                }
+                field_info.append(obj)
+
+        return Response({'fields': field_info},status=status.HTTP_200_OK)
+

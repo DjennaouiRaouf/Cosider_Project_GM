@@ -119,6 +119,7 @@ class DQEAvenantFilter(django_filters.FilterSet):
     nt = django_filters.CharFilter(field_name='nt', label='NT')
     code_site = django_filters.ModelChoiceFilter(field_name="code_site", queryset=Sites.objects.all(), label='Site')
     code_tache= django_filters.CharFilter(field_name='code_tache', label='Code Tache')
+    libelle = django_filters.CharFilter(field_name='libelle',label='libelle',lookup_expr='icontains')
     num_avenant = django_filters.NumberFilter(field_name='num_avenant', label='NT')
     class Meta:
         model = DQEAvenant
