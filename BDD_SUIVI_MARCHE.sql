@@ -110,7 +110,7 @@ go
 /******************************************************************/
 create table [Mode_Paiement]
 (
-    [Id_Mode]          varchar(3)
+    [Id_Mode]          varchar(3) /* v : virement  ou c :chéque */
         constraint PK_Cle_Id_Mode
             primary key,
 
@@ -639,7 +639,6 @@ ALTER TABLE [Remboursement] ADD CONSTRAINT FK_Cle_Avance_Remboursement FOREIGN K
 ALTER TABLE [Encaissements] ADD CONSTRAINT FK_Cle_Facture_Encaissements FOREIGN KEY  ([Facture]) REFERENCES [Factures] ([Num_Facture]);
 ALTER TABLE [Encaissements] ADD CONSTRAINT FK_Cle_Agence_Encaissements FOREIGN KEY  ([Agence]) REFERENCES [Tab_Agence] ([Code_Agence] );
 ALTER TABLE [Encaissements] ADD CONSTRAINT FK_Cle_Mode_Paiement_Encaissements FOREIGN KEY  ([Mode_Paiement]) REFERENCES [Mode_Paiement] ([Id_Mode] );
-
 
 
 
