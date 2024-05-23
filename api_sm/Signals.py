@@ -137,7 +137,8 @@ def post_save_facture(sender, instance, created, **kwargs):
 def pre_save_avance(sender, instance, **kwargs):
     if not instance.pk:
         try:
-            instance.taux_avance = round((float(instance.montant) / float(instance.marche.ttc))*100)
+            mav=MarcheAvenant.objects.get(id=instance.marche.id,num_avenant=0)
+            instance.taux_avance = round((float(instance.montant) / float(mav.ttc))*100)
         except Exception as e :
             instance.taux_avance = 0
         instance.num_avance = Avance.objects.filter(marche=instance.marche).count()

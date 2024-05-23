@@ -378,7 +378,7 @@ class TypeAvance(models.Model):
         managed=False
         verbose_name = 'Type Avance'
         verbose_name_plural = 'Type Avance'
-        db_table = 'TypeAvance'
+        db_table = 'Type_Avance'
         app_label = 'api_sm'
 
 
