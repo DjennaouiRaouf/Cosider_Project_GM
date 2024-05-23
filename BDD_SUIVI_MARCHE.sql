@@ -114,7 +114,7 @@ create table [Mode_Paiement]
         constraint PK_Cle_Id_Mode
             primary key,
 
-    [libelle]           varchar(15) not null,
+    [libelle]           varchar(50) not null,
     [Est_Bloquer] BIT DEFAULT 0,
      [User_ID]           varchar(15),
     [Date_Modification] DATETIME2 (7)DEFAULT CURRENT_TIMESTAMP
@@ -141,7 +141,7 @@ create table [Type_Avance]
     [Id_Type_Avance]    varchar(3) /* A : appro , F: forf  E: Except (autres)*/
         constraint PK__Cle_Id_Type_Avance
             primary key,
-    [Libelle]           varchar(15) not null,
+    [Libelle]           varchar(50) not null,
     [Taux]              float        default 0 ,
 	[Est_Bloquer] BIT DEFAULT 0,
     [User_ID]           varchar(15),
@@ -172,7 +172,7 @@ create table [Type_Caution]
     [Id_Type_Caution]   varchar(5) /* CS : Caution Soumission , CBE : Caution bonne exec, CAF : Caution Avance Forf , CAA: Caution Avance Appro, CAE :Caution Avance Except ... */
         constraint PK__Cle_Id_Type_Caution
             primary key,
-    [libelle]           varchar(15) not null,
+    [libelle]           varchar(50) not null,
     [Taux_Exact]        float null,
     [Taux_Min]          float null,
     [Taux_Max]          float null,
