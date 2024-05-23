@@ -354,8 +354,8 @@ create table [Factures]
         constraint PK_Cle_Num_Facture
             primary key,
     [Num_Situation]     int          not null,
-    [Date_Debut]        date         not null,
-    [Date_Fin]         date         not null,
+    [Date_Debut]        date         not null, /*du*/
+    [Date_Fin]         date         not null, /*au*/
     [Date_Facture]      date         not null,
     [Montant_Mois]      float     default 0,
     [Montant_RB]        float     default 0,
