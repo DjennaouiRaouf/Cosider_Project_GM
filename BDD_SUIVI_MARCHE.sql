@@ -642,3 +642,4 @@ ALTER TABLE [Encaissements] ADD CONSTRAINT FK_Cle_Mode_Paiement_Encaissements FO
 
 
 
+
