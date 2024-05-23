@@ -250,7 +250,7 @@ create table [Cautions]
     [Date_Soumission]   date        not null,
     [Montant]           float       not null,
     [Est_Recupere]      bit         default 0,
-    [Agence]            varchar(15) not null,
+    [Code_Agence]            varchar(25) not null,
     [Avance]            varchar(30) null,
     [Num_Marche]        varchar(25),
     [Type_Caution]      varchar(5)         not null,
@@ -549,7 +549,7 @@ create table [Encaissements]
     [Date_Encaissement] date          not null,
     [Montant_Encaisse]  float         not null,
     [Numero_Piece]      varchar(30) not null,
-    [Agence]         varchar(15),
+    [Code_Agence]         varchar(25),
     [Facture]        varchar(30) not null,
     [Mode_Paiement]  varchar(3) ,
 	[Est_Bloquer] BIT DEFAULT 0,
@@ -604,7 +604,7 @@ ALTER TABLE [Avances] ADD CONSTRAINT FK_Cle_Type_Avance_Avances FOREIGN KEY  ([T
 
 /*Cautions*/
 ALTER TABLE [Cautions] ADD CONSTRAINT FK_Cle_Num_Marche_Cautions FOREIGN KEY  ([Num_Marche]) REFERENCES [Marche] ([Num_Contrat] );
-ALTER TABLE [Cautions] ADD CONSTRAINT FK_Cle_Agence_Cautions FOREIGN KEY  ([Agence]) REFERENCES [Tab_Agence] ([Code_Agence] );
+ALTER TABLE [Cautions] ADD CONSTRAINT FK_Cle_Code_Agence_Cautions FOREIGN KEY  ([Code_Agence]) REFERENCES [Tab_Agence] ([Code_Agence] );
 ALTER TABLE [Cautions] ADD CONSTRAINT FK_Cle_Type_Caution_Cautions FOREIGN KEY  ([Type_Caution]) REFERENCES [Type_Caution] ([Id_Type_Caution]);
 ALTER TABLE [Cautions] ADD CONSTRAINT FK_Cle_Avance_Cautions FOREIGN KEY  ([Avance]) REFERENCES [Avances] ([Id_Avance]);
 
@@ -637,7 +637,7 @@ ALTER TABLE [Remboursement] ADD CONSTRAINT FK_Cle_Avance_Remboursement FOREIGN K
 /*Encaissement*/
 
 ALTER TABLE [Encaissements] ADD CONSTRAINT FK_Cle_Facture_Encaissements FOREIGN KEY  ([Facture]) REFERENCES [Factures] ([Num_Facture]);
-ALTER TABLE [Encaissements] ADD CONSTRAINT FK_Cle_Agence_Encaissements FOREIGN KEY  ([Agence]) REFERENCES [Tab_Agence] ([Code_Agence] );
+ALTER TABLE [Encaissements] ADD CONSTRAINT FK_Cle_Code_Agence_Encaissements FOREIGN KEY  ([Code_Agence]) REFERENCES [Tab_Agence] ([Code_Agence] );
 ALTER TABLE [Encaissements] ADD CONSTRAINT FK_Cle_Mode_Paiement_Encaissements FOREIGN KEY  ([Mode_Paiement]) REFERENCES [Mode_Paiement] ([Id_Mode] );
 
 
