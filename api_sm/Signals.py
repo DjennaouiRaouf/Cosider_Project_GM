@@ -35,6 +35,8 @@ def post_save_nt(sender, instance, created, **kwargs):
 
 @receiver(pre_save, sender=Attachements)
 def pre_save_attachement(sender, instance, **kwargs):
+
+    instance.id=Attachements.objects.filter(marche=instance.marche).count()
     dqe=DQE.objects.get(nt=instance.nt,code_site=instance.code_site,code_tache=instance.code_tache)
     instance.prix_u=dqe.prix_u
 
