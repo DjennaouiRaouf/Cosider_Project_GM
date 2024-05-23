@@ -367,6 +367,7 @@ class MarcheFieldsApiView(APIView):
                         'field': field_name,
                         'headerName': field_instance.label or field_name,
                         'info': str(field_instance.__class__.__name__),
+
                     }
 
 

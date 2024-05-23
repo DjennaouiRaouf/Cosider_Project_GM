@@ -362,7 +362,9 @@ class DQEAvenant(CPkModel):
 
 
 class TypeAvance(models.Model):
-    id = models.AutoField(db_column='Id_Type_Avance', primary_key=True)
+    id = models.CharField(db_column='Id_Type_Avance', primary_key=True,
+                                      max_length=3)  # Field name made lowercase.
+
     libelle = models.CharField(db_column='Libelle',max_length=500, null=False, unique=True)
     taux_max = models.FloatField(db_column='Taux',default=0,validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
 
@@ -422,7 +424,8 @@ class Avance(models.Model):
 
 
 class Attachements(models.Model):
-    id = models.AutoField(db_column='Id_Attachement', primary_key=True)
+    id = models.CharField(db_column='Id_Attachement', primary_key=True, max_length=30)  # Field name made lowercase.
+
     marche = models.ForeignKey('Marche', models.DO_NOTHING, db_column='Num_Marche', blank=True,
                                    null=True)
     code_site = models.CharField(db_column='Code_Site', max_length=10,
@@ -548,7 +551,7 @@ class Factures(models.Model):
     @property
     def montant_ava_remb(self):
         try:
-            remb=Remboursement.objects.get(facture=self.numero_facture,avance__type=2)
+            remb=Remboursement.objects.get(facture=self.numero_facture,avance__type__id='A')
             if(remb):
                 return remb.montant
             else:
@@ -558,7 +561,7 @@ class Factures(models.Model):
     @property
     def montant_avf_remb(self):
         try:
-            remb=Remboursement.objects.get(facture=self.numero_facture,avance__type=1)
+            remb=Remboursement.objects.get(facture=self.numero_facture,avance__type__id='F')
             if(remb):
                 return remb.montant
             else:
@@ -747,7 +750,8 @@ class Encaissement(models.Model):
 
 
 class TypeCaution(models.Model):
-    id = models.AutoField(db_column='Id_Type_Caution', primary_key=True)  # Field name made lowercase.
+    id= models.CharField(db_column='Id_Type_Caution', primary_key=True, max_length=5)  # Field name made lowercase.
+
 
     libelle = models.CharField(max_length=500,null=True,blank=True)
     type_avance = models.ForeignKey(TypeAvance, on_delete=models.DO_NOTHING, null=True,blank=True, to_field='id',
@@ -782,7 +786,7 @@ class TypeCaution(models.Model):
 
 
 class Cautions(models.Model):
-    id = models.AutoField(db_column='Id_Caution', primary_key=True)  # Field name made lowercase.
+    id = models.CharField(db_column='Id_Caution', primary_key=True, max_length=30)
 
     marche = models.ForeignKey(Marche,db_column='Num_Marche', on_delete=models.DO_NOTHING, null=True, related_name="Caution_Marche",to_field='id')
     type = models.ForeignKey(TypeCaution,db_column='Type_Caution', on_delete=models.DO_NOTHING, null=False,verbose_name="Libellé",to_field='')
