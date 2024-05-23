@@ -141,7 +141,7 @@ create table [Type_Avance]
     [Id_Type_Avance]    varchar(3) /* A : appro , F: forf  E: Except (autres)*/
         constraint PK__Cle_Id_Type_Avance
             primary key,
-    [Libelle]           varchar(500) not null,
+    [Libelle]           varchar(50) not null,
     [Taux]              float        default 0 ,
 	[Est_Bloquer] BIT DEFAULT 0,
     [User_ID]           varchar(15),
@@ -172,7 +172,7 @@ create table [Type_Caution]
     [Id_Type_Caution]   varchar(5) /* CS : Caution Soumission , CBE : Caution bonne exec, CAF : Caution Avance Forf , CAA: Caution Avance Appro, CAE :Caution Avance Except ... */
         constraint PK__Cle_Id_Type_Caution
             primary key,
-    [libelle]           varchar(500),
+    [libelle]           varchar(50) not null,
     [Taux_Exact]        float null,
     [Taux_Min]          float null,
     [Taux_Max]          float null,
