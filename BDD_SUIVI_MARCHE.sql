@@ -1,12 +1,12 @@
 create table [Marche]
 (
-    [Num_Contrat]       varchar(500)        not null
+    [Num_Contrat]       varchar(25)        not null
         constraint PK_Cle_Num_Contrat
             primary key,
-    [Num_Avenant]       int       default 0 not null,
+    [Num_Avenant]       int       default 0 ,
     [Code_Site]         varchar(10)         not null,
     [NT]                varchar(20)         not null,
-    [Libelle]           varchar(max)        not null,
+    [Libelle]           varchar(max) 				,
     [Ods_Depart]        date                not null,
     [Delais]            int,
     [Revisable]         bit       default 0,
@@ -16,9 +16,9 @@ create table [Marche]
     [Tva]               float     default 0,
     [Rg]                float     default 0,
     [Date_Signature]    date                not null,
-	[Est_Bloquer]       bit          not null,
+	[Est_Bloquer] BIT DEFAULT 0,
     [User_ID]           varchar(15),
-    [Date_Modification] datetime2 default getdate(),
+    [Date_Modification] DATETIME2 (7)DEFAULT CURRENT_TIMESTAMP,
 )
 go
 
@@ -34,16 +34,29 @@ create index [INDEX_Marche_Num_Avenant]
     on [Marche] ([Num_Avenant])
 go
 
+create index [INDEX_Marche_Est_Bloquer]
+    on [Marche] ([Est_Bloquer])
+go
+
+
+create index [INDEX_Marche_User_ID]
+    on [Marche] ([User_ID])
+go
+
+create index [INDEX_Marche_Date_Modification]
+    on [Marche] ([Date_Modification])
+go
+
 
 /******************************************************************/
 
 create table [Marche_Avenant]
 (
-    [Num_Contrat]       varchar(500)        not null,
-    [Num_Avenant]       int       default 0 not null,
+    [Num_Contrat]       varchar(25)        not null,
+    [Num_Avenant]       int       default 0 ,
     [Code_Site]         varchar(10)         not null,
     [NT]                varchar(20)         not null,
-    [Libelle]           varchar(max)        not null,
+    [Libelle]           varchar(max)        ,
     [Ods_Depart]        date                not null,
     [Delais]            int,
     [Revisable]         bit       default 0,
@@ -53,9 +66,9 @@ create table [Marche_Avenant]
     [Tva]               float     default 0,
     [Rg]                float     default 0,
     [Date_Signature]    date                not null,
-	[Est_Bloquer]       bit          not null,
+	[Est_Bloquer] BIT DEFAULT 0,
     [User_ID]           varchar(15),
-    [Date_Modification] datetime2 default getdate(),
+    [Date_Modification] DATETIME2 (7)DEFAULT CURRENT_TIMESTAMP,
 
 	CONSTRAINT PK_Cle_Num_Contrat_Num_Avenant PRIMARY KEY  ([Num_Contrat],[Num_Avenant])
 
@@ -79,91 +92,151 @@ create index [INDEX_Marche_Avenant_Num_Contrat]
 go
 
 
+create index [INDEX_Marche_Avenant_Est_Bloquer]
+    on [Marche_Avenant] ([Est_Bloquer])
+go
+
+
+create index [INDEX_Marche_Avenant_User_ID]
+    on [Marche_Avenant] ([User_ID])
+go
+
+create index [INDEX_Marche_Avenant_Date_Modification]
+    on [Marche_Avenant] ([Date_Modification])
+go
+
+
 
 /******************************************************************/
 create table [Mode_Paiement]
 (
-    [Id_Mode]           int identity
+    [Id_Mode]          varchar(3)
         constraint PK_Cle_Id_Mode
             primary key,
 
-    [libelle]           varchar(500) not null,
-    [Est_Bloquer]       bit          not null,
+    [libelle]           varchar(15) not null,
+    [Est_Bloquer] BIT DEFAULT 0,
     [User_ID]           varchar(15)  not null,
-    [Date_Modification] datetime2 default getdate()
+    [Date_Modification] DATETIME2 (7)DEFAULT CURRENT_TIMESTAMP
 )
 go
-create index [INDEX_Mode_Paiement_Id_Mode]
-    on [Mode_Paiement] ([Id_Mode])
+
+create index [INDEX_Mode_Paiement_Est_Bloquer]
+    on [Mode_Paiement] ([Est_Bloquer])
 go
 
+
+create index [INDEX_Mode_Paiement_User_ID]
+    on [Mode_Paiement] ([User_ID])
+go
+
+create index [INDEX_Mode_Paiement_Date_Modification]
+    on [Mode_Paiement] ([Date_Modification])
+go
 
 /******************************************************************/
 
 create table [Type_Avance]
 (
-    [Id_Type_Avance]    int identity
+    [Id_Type_Avance]    varchar(3) /* A : appro , F: forf  E: Except (autres)*/
         constraint PK__Cle_Id_Type_Avance
             primary key,
     [Libelle]           varchar(500) not null,
-    [Taux]              float        not null,
-	[Est_Bloquer]       bit          not null,
+    [Taux]              float        default 0 ,
+	[Est_Bloquer] BIT DEFAULT 0,
     [User_ID]           varchar(15),
-    [Date_Modification] datetime2 default getdate()
+    [Date_Modification] DATETIME2 (7)DEFAULT CURRENT_TIMESTAMP
 )
 go
 
-create index [INDEX_Type_Avance_Id_Type_Avance]
-    on [Type_Avance]([Id_Type_Avance])
+create index [INDEX_Type_Avance_Est_Bloquer]
+    on [Type_Avance] ([Est_Bloquer])
 go
+
+
+create index [INDEX_Type_Avance_User_ID]
+    on [Type_Avance] ([User_ID])
+go
+
+create index [INDEX_Type_Avance_Date_Modification]
+    on [Type_Avance] ([Date_Modification])
+go
+
+
+
 
 /******************************************************************/
 
 create table [Type_Caution]
 (
-    [Id_Type_Caution]   int identity
+    [Id_Type_Caution]   varchar(5) /* CS : Caution Soumission , CBE : Caution bonne exec, CAF : Caution Avance Forf , CAA: Caution Avance Appro, CAE :Caution Avance Except ... */
         constraint PK__Cle_Id_Type_Caution
             primary key,
     [libelle]           varchar(500),
-    [Taux_Exact]        float,
-    [Taux_Min]          float,
-    [Taux_Max]          float,
-    [Type_Avance]       int,
-	[Est_Bloquer]       bit          not null,
+    [Taux_Exact]        float null,
+    [Taux_Min]          float null,
+    [Taux_Max]          float null,
+    [Type_Avance]       varchar(3),
+	[Est_Bloquer] BIT DEFAULT 0,
     [User_ID]           varchar(15),
-    [Date_Modification] datetime2 default getdate()
+    [Date_Modification] DATETIME2 (7)DEFAULT CURRENT_TIMESTAMP
 )
 go
-
-create index [INDEX_Type_Caution_Id_Type_Caution]
-    on [Type_Caution]([Id_Type_Caution])
+create index [INDEX_Type_Caution_Est_Bloquer]
+    on [Type_Caution] ([Est_Bloquer])
 go
+
+
+create index [INDEX_Type_Caution_User_ID]
+    on [Type_Caution] ([User_ID])
+go
+
+create index [INDEX_Type_Caution_Date_Modification]
+    on [Type_Caution] ([Date_Modification])
+go
+
 
 
 /******************************************************************/
 
 create table [Avances]
 (
-    [Id_Avance]         int identity
+    [Id_Avance]         varchar(30) /*AA:Avance Appro    AF:Avance Frof  AE :Avance Excep + numero_avance   AA0 AA1 AA2...  */
         constraint PK_Cle_Id_avance
             primary key,
-    [Num_Avance]        int                  not null,
-    [Taux_Avance]       float     default 0  not null,
-    [Montant]           float     default 0  not null,
-    [Debut]             float     default 0  not null,
-    [Fin]               float     default 80 not null,
+    [Num_Avance]        int       not null,
+    [Taux_Avance]       float     default 0 ,
+    [Montant]           float     not null,
+    [Taux_Debut_Remb]             float     default 0  ,
+    [Taux_Fin_Remb]               float     default 80 ,
     [Date_Avance]              date                 not null,
-    [Remboursee]        bit       default 0  not null,
-    [Num_Marche ]     varchar(500)         not null,
-    [Type_Avance]       int                  not null,
-	[Est_Bloquer]       bit          not null,
+    [Remboursee]        bit       default 0 ,
+    [Num_Marche ]     varchar(25)         not null,
+    [Type_Avance]       varchar(3)        not null,
+	[Est_Bloquer] BIT DEFAULT 0,
     [User_ID]           varchar(15),
-    [Date_Modification] datetime2 default getdate()
+    [Date_Modification] DATETIME2 (7)DEFAULT CURRENT_TIMESTAMP
 )
 go
 
 create index [INDEX_Avances_Type_Avance]
     on [Avances] ([Type_Avance])
+go
+create index [INDEX_Avances_Remboursee]
+    on [Avances] ([Remboursee])
+go
+
+create index [INDEX_Avances_Est_Bloquer]
+    on [Avances] ([Est_Bloquer])
+go
+
+
+create index [INDEX_Avances_User_ID]
+    on [Avances] ([User_ID])
+go
+
+create index [INDEX_Avances_Date_Modification]
+    on [Avances] ([Date_Modification])
 go
 
 
@@ -171,19 +244,19 @@ go
 
 create table [Cautions]
 (
-    [Id_Caution]        int identity
+    [Id_Caution]        varchar(30) /*AA:Avance Appro    AF:Avance Frof  AE :Avance Excep + numero_avance   AA0 AA1 AA2...  */
         constraint PK_Cle_Id_Caution
             primary key,
     [Date_Soumission]   date        not null,
     [Montant]           float       not null,
     [Est_Recupere]      bit         not null,
     [Agence]            varchar(15) not null,
-    [Avance]            int,
-    [Num_Marche]        varchar(500),
-    [Type_Caution]      int         not null,
-	[Est_Bloquer]       bit          not null,
+    [Avance]            varchar(30) null,
+    [Num_Marche]        varchar(25),
+    [Type_Caution]      varchar(5)         not null,
+	[Est_Bloquer] BIT DEFAULT 0,
     [User_ID]           varchar(15),
-    [Date_Modification] datetime2 default getdate()
+    [Date_Modification] DATETIME2 (7)DEFAULT CURRENT_TIMESTAMP
 )
 go
 
@@ -198,6 +271,21 @@ go
 create index [INDEX_Cautions_Avance]
     on [Cautions] ([Avance])
 go
+create index [INDEX_Cautions_Est_Recupere]
+    on [Cautions] ([Est_Recupere])
+go
+create index [INDEX_Cautions_Est_Bloquer]
+    on [Cautions] ([Est_Bloquer])
+go
+
+
+create index [INDEX_Cautions_User_ID]
+    on [Cautions] ([User_ID])
+go
+
+create index [INDEX_Cautions_Date_Modification]
+    on [Cautions] ([Date_Modification])
+go
 
 
 
@@ -210,16 +298,16 @@ create table [Tab_NT_Taches_Avenant]
     [Code_Site]                varchar(10) not null,
     [NT]                     varchar(20) not null,
     [Code_Tache]               varchar(30) not null,
-    [Num_Avenant]              int          default 0 not null,
+    [Num_Avenant]              int          default 0,
     [Est_Tache_Composite]      bit          default 0,
     [Est_Tache_Complementaire] bit          default 0,
     [Libelle_Tache]            varchar(max) default NULL,
     [Code_Unite_Mesure]        varchar(4)   default NULL,
     [Quantite]                 real         default 0,
     [Prix_Unitaire]            money        default 0,
-    [Est_Bloquer]              bit          default 0,
-    [User_ID]                  varchar(15)  default NULL,
-    [Date_Modification]        datetime2    default getdate(),
+    [Est_Bloquer] BIT DEFAULT 0,
+    [User_ID]           varchar(15),
+    [Date_Modification] DATETIME2 (7)DEFAULT CURRENT_TIMESTAMP
 	CONSTRAINT PK_Cle_Code_Site_NT_Code_Tache_Num_Avenant PRIMARY KEY  ([Code_site], [NT], [Code_Tache],[Num_Avenant])
 
 )
@@ -240,6 +328,19 @@ go
 create index [INDEX_Tab_NT_Taches_Avenant_Num_Avenant]
     on [Tab_NT_Taches_Avenant] ([Num_Avenant])
 go
+create index [INDEX_Tab_NT_Taches_Avenant_Est_Bloquer]
+    on [Tab_NT_Taches_Avenant] ([Est_Bloquer])
+go
+
+
+create index [INDEX_Tab_NT_Taches_Avenant_User_ID]
+    on [Tab_NT_Taches_Avenant] ([User_ID])
+go
+
+create index [INDEX_Tab_NT_Taches_Avenant_Date_Modification]
+    on [Tab_NT_Taches_Avenant] ([Date_Modification])
+go
+
 
 
 
@@ -249,7 +350,7 @@ go
 
 create table [Factures]
 (
-    [Num_Facture]       varchar(800) not null
+    [Num_Facture]       varchar(30) not null
         constraint PK_Cle_Num_Facture
             primary key,
     [Num_Situation]     int          not null,
@@ -260,10 +361,10 @@ create table [Factures]
     [Montant_RB]        float     default 0,
     [Montant_RG]        float     default 0,
     [Paye]              bit       default 0,
-    [Num_Marche]        varchar(500) not null,
-	[Est_Bloquer]       bit          not null,
+    [Num_Marche]        varchar(25) not null,
+	[Est_Bloquer] BIT DEFAULT 0,
     [User_ID]           varchar(15)  not null,
-    [Date_Modification] datetime2 default getdate(),
+    [Date_Modification] DATETIME2 (7)DEFAULT CURRENT_TIMESTAMP,
 
 )
 go
@@ -276,6 +377,23 @@ create index [INDEX_Factures_Num_Situation]
     on [Factures] ([Num_Situation])
 go
 
+create index [INDEX_Factures_Paye]
+    on [Factures] ([Paye])
+go
+
+
+create index [INDEX_Factures_Est_Bloquer]
+    on [Factures] ([Est_Bloquer])
+go
+
+
+create index [INDEX_Factures_User_ID]
+    on [Factures] ([User_ID])
+go
+
+create index [INDEX_Factures_Date_Modification]
+    on [Factures] ([Date_Modification])
+go
 
 
 
@@ -287,10 +405,10 @@ go
 
 create table [Attachements]
 (
-    [Id_Attachement]    int identity
+    [Id_Attachement]    varchar(30)
         constraint Attachements_pk
             primary key,
-    [Num_Marche]        varchar(500),
+    [Num_Marche]        varchar(25),
     [Code_Site]         varchar(10) not null,
     [NT]                varchar(20) not null,
     [Code_Tache]        varchar(30) not null,
@@ -298,9 +416,9 @@ create table [Attachements]
     [Prix_Unitaire]            float     default 0,
     [Montant]           float     default 0,
     [Mmaa]              date        not null,
-	[Est_Bloquer]       bit  default 0  not null,
+	[Est_Bloquer] BIT DEFAULT 0,
     [User_ID]           varchar(15),
-    [Date_Modification] datetime2 default getdate(),
+    [Date_Modification] DATETIME2 (7)DEFAULT CURRENT_TIMESTAMP,
 
 )
 go
@@ -326,6 +444,20 @@ create index [INDEX_Attachements_Mmaa]
 go
 
 
+create index [INDEX_Attachements_Est_Bloquer]
+    on [Attachements] ([Est_Bloquer])
+go
+
+
+create index [INDEX_Attachements_User_ID]
+    on [Attachements] ([User_ID])
+go
+
+create index [INDEX_Attachements_Date_Modification]
+    on [Attachements] ([Date_Modification])
+go
+
+
 /**********************************************/
 
 
@@ -335,11 +467,11 @@ create table [Detail_Facture]
         constraint PK_Cle_Id_Df
             primary key,
 
-	 [Num_Facture]       varchar(800),
-    [Detail]            int       not null,
+	[Num_Facture]       varchar(30) not null,
+    [Detail]            varchar(30)  not null,
 
 
-	[Est_Bloquer]       bit  default 0  not null,
+	[Est_Bloquer] BIT DEFAULT 0,
 	[User_ID]           varchar(15) ,
     [Date_Modification] datetime2  DEFAULT CURRENT_TIMESTAMP   ,
 
@@ -353,6 +485,20 @@ create index [INDEX_Detail_Facture_Detail]
     on [Detail_Facture] ([Detail])
 go
 
+create index [INDEX_Detail_Facture_Est_Bloquer]
+    on [Detail_Facture] ([Est_Bloquer])
+go
+
+
+create index [INDEX_Detail_Facture_User_ID]
+    on [Detail_Facture] ([User_ID])
+go
+
+create index [INDEX_Detail_Facture_Date_Modification]
+    on [Detail_Facture] ([Date_Modification])
+go
+
+
 
 /************************************************/
 
@@ -363,11 +509,11 @@ create table [Remboursement]
         constraint PK_Cle_Id_Remb
             primary key,
     [Montant]           float     default 0 not null,
-    [Avance]            int,
-    [Num_Facture]       varchar(800),
-	[Est_Bloquer]       bit  default 0  not null,
+    [Avance]            varchar(30),
+    [Num_Facture]       varchar(30),
+	[Est_Bloquer] BIT DEFAULT 0,
     [User_ID]           varchar(15),
-    [Date_Modification] datetime2 default getdate()
+    [Date_Modification] DATETIME2 (7)DEFAULT CURRENT_TIMESTAMP
 )
 go
 
@@ -379,6 +525,20 @@ create index [INDEX_Rembourcement_Avance_id]
     on [Remboursement] ([Avance])
 go
 
+create index [INDEX_Remboursement_Est_Bloquer]
+    on [Remboursement] ([Est_Bloquer])
+go
+
+
+create index [INDEX_Remboursement_User_ID]
+    on [Remboursement] ([User_ID])
+go
+
+create index [INDEX_Remboursement_Date_Modification]
+    on [Remboursement] ([Date_Modification])
+go
+
+
 /***************************************************************************/
 
 create table [Encaissements]
@@ -388,13 +548,13 @@ create table [Encaissements]
             primary key,
     [Date_Encaissement] date          not null,
     [Montant_Encaisse]  float         not null,
-    [Numero_Piece]      nvarchar(300) not null,
+    [Numero_Piece]      varchar(30) not null,
     [Agence]         varchar(15),
-    [Facture]        varchar(800),
-    [Mode_Paiement]  int        not null,
-	[Est_Bloquer]       bit           not null,
-    [User_ID]           nvarchar(15)  not null,
-    [Date_Modification] datetime      not null,
+    [Facture]        varchar(30) not null,
+    [Mode_Paiement]  varchar(3) ,
+	[Est_Bloquer] BIT DEFAULT 0,
+    [User_ID]           varchar(15),
+    [Date_Modification] DATETIME2 (7)DEFAULT CURRENT_TIMESTAMP
 
 )
 go
@@ -409,6 +569,19 @@ create index [INDEX_Encaissements_Mode_Paiement]
 go
 create index [INDEX_Encaissements_Date_Encaissement]
     on [Encaissements] ([Date_Encaissement])
+go
+
+create index [INDEX_Encaissements_Est_Bloquer]
+    on [Remboursement] ([Est_Bloquer])
+go
+
+
+create index [INDEX_Encaissements_User_ID]
+    on [Remboursement] ([User_ID])
+go
+
+create index [INDEX_Encaissements_Date_Modification]
+    on [Remboursement] ([Date_Modification])
 go
 
 

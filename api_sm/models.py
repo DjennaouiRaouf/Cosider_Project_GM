@@ -396,9 +396,9 @@ class Avance(models.Model):
 
     montant = models.FloatField(db_column='Montant' ,validators=[MinValueValidator(0)], default=0,null=False,verbose_name='Montant d\'avance')
 
-    debut = models.FloatField(db_column='Debut',default=0,  verbose_name="Debut",
+    debut = models.FloatField(db_column='Taux_Debut_Remb',default=0,  verbose_name="Debut",
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    fin=models.FloatField(db_column='Fin',default=80,  verbose_name="Fin",
+    fin=models.FloatField(db_column='Taux_Fin_Remb',default=80,  verbose_name="Fin",
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
 
     date = models.DateField(db_column='Date_Avance', null=False, verbose_name="Date d'avance")
