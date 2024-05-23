@@ -116,7 +116,7 @@ create table [Mode_Paiement]
 
     [libelle]           varchar(15) not null,
     [Est_Bloquer] BIT DEFAULT 0,
-    [User_ID]           varchar(15)  not null,
+     [User_ID]           varchar(15),
     [Date_Modification] DATETIME2 (7)DEFAULT CURRENT_TIMESTAMP
 )
 go
@@ -249,7 +249,7 @@ create table [Cautions]
             primary key,
     [Date_Soumission]   date        not null,
     [Montant]           float       not null,
-    [Est_Recupere]      bit         not null,
+    [Est_Recupere]      bit         default 0,
     [Agence]            varchar(15) not null,
     [Avance]            varchar(30) null,
     [Num_Marche]        varchar(25),
@@ -363,7 +363,7 @@ create table [Factures]
     [Paye]              bit       default 0,
     [Num_Marche]        varchar(25) not null,
 	[Est_Bloquer] BIT DEFAULT 0,
-    [User_ID]           varchar(15)  not null,
+     [User_ID]           varchar(15),
     [Date_Modification] DATETIME2 (7)DEFAULT CURRENT_TIMESTAMP,
 
 )
