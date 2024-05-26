@@ -99,8 +99,8 @@ DATABASES = {
         "NAME": "ca_ch",
         "USER": "",
         "PASSWORD": "",
-        "HOST": "localhost\MSSQLSERVER",
-        "PORT": "1433",
+        "HOST": "localhost\MSSQLSERVER1",
+        "PORT": "2448",
         "OPTIONS": {"driver": "ODBC Driver 18 for SQL Server",
                     'extra_params': "Encrypt=no;TrustServerCertificate=yes",
                     'MARS_Connection': 'True',  # Enable Multiple Active Result Sets

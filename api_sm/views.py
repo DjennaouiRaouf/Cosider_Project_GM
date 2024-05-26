@@ -397,6 +397,8 @@ class GetFacture(generics.ListAPIView):
                          'extra': {
 
                              'contrat': m.id,
+                             'tva':m.tva,
+                             'rg':m.rg,
                              'signature': m.date_signature,
                              'projet': m.libelle,
                              'montant_marche': m.ht,

@@ -614,6 +614,12 @@ class Factures(models.Model):
         verbose_name_plural = 'Factures'
         app_label = 'api_sm'
 
+
+
+
+
+
+
 class Remboursement(models.Model):
     id = models.AutoField(db_column='Id_Remb', primary_key=True)
     facture = models.ForeignKey(Factures,db_column='Num_Facture', on_delete=models.DO_NOTHING, null=True, blank=True, to_field="numero_facture")
