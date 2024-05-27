@@ -144,7 +144,8 @@ def pre_save_avance(sender, instance, **kwargs):
             instance.taux_avance = round((float(instance.montant) / float(mav.ttc))*100)
         except Exception as e :
             instance.taux_avance = 0
-        instance.num_avance = (instance.type.id)+str(Avance.objects.filter(marche=instance.marche).count())
+        instance.id = (instance.type.id) + str(Avance.objects.filter(marche=instance.marche).count())
+        instance.num_avance = Avance.objects.filter(marche=instance.marche).count())
 
 
 
