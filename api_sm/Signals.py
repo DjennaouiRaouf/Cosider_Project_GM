@@ -91,21 +91,36 @@ def pre_save_encaissement(sender, instance, **kwargs):
 @receiver(pre_save, sender=Remboursement)
 def pre_save_remboursement(sender, instance, **kwargs):
     tr=round(instance.facture.montant_cumule/instance.facture.marche.ht,2)
-
+    print(tr)
+    print(instance.avance.debut)
     if (instance.avance.remboursee):
             raise ValidationError('Cette avance est remboursée')
     elif (instance.avance.debut>=tr):
         print(tr)
         print(instance.avance.debut)
     else:
-        instance.montant = (instance.facture.montant - instance.facture.montant_rb - instance.facture.montant_rg-instance.facture.montant_ava_remb-instance.facture.montant_avf_remb-instance.facture.montant_ave_remb) * (instance.avance.taux_remb / 100)
+        montant = (instance.facture.montant - instance.facture.montant_rb - instance.facture.montant_rg - instance.facture.montant_ava_remb - instance.facture.montant_avf_remb - instance.facture.montant_ave_remb) * (
+                                       instance.avance.taux_remb / 100)
 
-        if (instance.rst_remb < 0):
-            instance.montant = instance.avance.montant
+        previous_cumule =0
+        previous_restant =0
+        try:
+            previous_remboursement=Remboursement.objects.filter(facture__marche=instance.facture.marche,avance=instance.avance, facture__num_situation__lt=instance.facture.num_situation).last()
+            previous_cumule=previous_remboursement.montant_cumule
+            previous_restant=previous_remboursement.rst_remb
+        except Remboursement.DoesNotExist:
+            previous_restant =0
+            previous_cumule = 0
+
+        previous_cumule += montant
+        previous_restant = instance.avance.montant-previous_cumule
+        if(previous_restant< 0):
+            instance.montant=previous_remboursement.rst_remb
+
         if (instance.rst_remb == 0):
             instance.avance.remboursee = True
             instance.avance.save()
-        print(tremb)
+
 
 
 

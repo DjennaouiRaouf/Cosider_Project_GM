@@ -553,10 +553,15 @@ class AttachementsSerializer(serializers.ModelSerializer):
 
 
 class RemboursementSerializer(serializers.ModelSerializer):
-    montant_creance=serializers.SerializerMethodField()
+    montant_cumule=serializers.SerializerMethodField()
+    rest = serializers.SerializerMethodField()
 
-    def get_montant_creance(self, obj):
-        return obj.montant_creance
+    def get_montant_cumule(self, obj):
+        return obj.montant_cumule
+
+    def get_rest(self, obj):
+        return obj.rst_remb
+
     class Meta:
         model = Remboursement
         fields = '__all__'

@@ -364,6 +364,10 @@ class GetDQEbyId(generics.ListAPIView):
     serializer_class = DQESerializer
     lookup_field = 'marche'
 
+class GetRemb(generics.ListAPIView):
+    queryset = Remboursement.objects.all().order_by('facture')
+    serializer_class = FactureSerializer
+
 
 class GetFacture(generics.ListAPIView):
     queryset = Factures.objects.all().order_by('num_situation')
@@ -646,7 +650,7 @@ class AddFactureApiView(generics.CreateAPIView):
                 numero_facture=serializer.initial_data['numero_facture'],
                 num_situation=serializer.initial_data['num_situation'],
             ).save(force_insert=True)
-            avances=Avance.objects.filter(marche=m)
+            avances=Avance.objects.filter(marche=m,remboursee=False)
             for avance in avances:
                 if(avance.remboursee == False):
                     Remboursement(facture=Factures.objects.get(numero_facture=serializer.initial_data['numero_facture']),
