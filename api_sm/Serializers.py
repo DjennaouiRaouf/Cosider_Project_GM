@@ -395,9 +395,33 @@ class EncaissementSerializer(serializers.ModelSerializer):
 
 
 class DetailFactureSerializer(serializers.ModelSerializer):
+    code_tache=serializers.SerializerMethodField(label='Code Tache')
+    libelle=serializers.SerializerMethodField(label='Libelle')
+    qte = serializers.SerializerMethodField(label='Quantite')
+    montant = serializers.SerializerMethodField(label='Montant')
+    date=serializers.SerializerMethodField(label='Date')
+    prix_u = serializers.SerializerMethodField(label='Prix Unitaire')
+
+    def get_code_tache(self, obj):
+        return obj.detail.code_tache
+
+    def get_libelle(self, obj):
+        dqe=DQE.objects.get(code_site=obj.detail.code_site,code_tache=obj.detail.code_tache,nt=obj.detail.nt)
+        return dqe.libelle
+    def get_qte(self, obj):
+        return obj.detail.qte
+    def get_montant(self, obj):
+        return obj.detail.montant
+
+    def get_date(self, obj):
+        return obj.detail.date
+
+    def get_prix_u(self, obj):
+        return obj.detail.prix_u
     class Meta:
             model=DetailFacture
-            fields='__all_'
+            fields=['code_tache','libelle','prix_u','qte','montant','date']
+
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
         fields.pop('est_bloquer', None)
