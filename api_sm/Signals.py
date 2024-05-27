@@ -98,10 +98,7 @@ def pre_save_remboursement(sender, instance, **kwargs):
         print(tr)
         print(instance.avance.debut)
     else:
-        tremb = round(
-                (float(instance.avance.taux_avance) / (float(instance.avance.fin) - float(instance.avance.debut) )) * 100, 2)
-        
-        instance.montant = (instance.facture.montant - instance.facture.montant_rb - instance.facture.montant_rg-instance.facture.montant_ava_remb-instance.facture.montant_avf_remb-instance.facture.montant_ave_remb) * (tremb / 100)
+        instance.montant = (instance.facture.montant - instance.facture.montant_rb - instance.facture.montant_rg-instance.facture.montant_ava_remb-instance.facture.montant_avf_remb-instance.facture.montant_ave_remb) * (instance.avance.taux_remb / 100)
 
         if (instance.rst_remb < 0):
             instance.montant = instance.avance.montant
