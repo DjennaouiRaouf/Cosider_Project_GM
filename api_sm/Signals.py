@@ -145,7 +145,7 @@ def pre_save_avance(sender, instance, **kwargs):
         except Exception as e :
             instance.taux_avance = 0
         instance.id = (instance.type.id) + str(Avance.objects.filter(marche=instance.marche).count())
-        instance.num_avance = Avance.objects.filter(marche=instance.marche).count())
+        instance.num_avance = Avance.objects.filter(marche=instance.marche).count()
 
 
 
