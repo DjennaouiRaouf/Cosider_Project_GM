@@ -415,9 +415,16 @@ class DetailFactureSerializer(serializers.ModelSerializer):
 
 
 class AvanceSerializer(serializers.ModelSerializer):
+    taux_avance=serializers.SerializerMethodField(label='Taux d\'avance')
+    taux_remb = serializers.SerializerMethodField(label='Taux de Remboursement')
+
+    def get_taux_avance(self,obj):
+        return obj.taux_avance
+    def get_taux_remb(self,obj):
+        return obj.taux_remb
     class Meta:
             model=Avance
-            fields=['id','type','num_avance','montant','taux_avance','debut','fin','date','marche']
+            fields=['id','type','num_avance','montant','taux_avance','debut','fin','taux_remb','date','marche']
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)

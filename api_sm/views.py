@@ -646,6 +646,11 @@ class AddFactureApiView(generics.CreateAPIView):
                 numero_facture=serializer.initial_data['numero_facture'],
                 num_situation=serializer.initial_data['num_situation'],
             ).save(force_insert=True)
+            avances=Avance.objects.filter(marche=m)
+            for avance in avances:
+                if(avance.remboursee == False):
+                    Remboursement(facture=Factures.objects.get(numero_facture=serializer.initial_data['numero_facture']),
+                              avance=avance).save(force_insert=True)
 
             return Response('Facture ajoutée', status=status.HTTP_200_OK)
         except IntegrityError as e:
@@ -740,19 +745,23 @@ class GetAvance(generics.ListAPIView):
         queryset = self.filter_queryset(self.get_queryset())
         ava = 0
         avf = 0
+        ave = 0
         response_data = super().list(request, *args, **kwargs).data
         for q in queryset:
-            if (q.type.id == 1):
+            if (q.type.id == 'F'):
                 avf = avf + q.montant
 
-            if (q.type.id == 2):
+            if (q.type.id == 'A'):
                 ava = ava + q.montant
+
+            if (q.type.id == 'E'):
+                ave = ave + q.montant
 
         return Response({'av': response_data,
                          'extra': {
                              'ava': ava,
                              'avf': avf,
-
+                             'ave':ave,
                          }}, status=status.HTTP_200_OK)
 
 

@@ -856,7 +856,7 @@ class FactureFieldsApiView(APIView):
                                       'num_travail','code_contrat']):
                         obj['hide']= True
                     if (field_name in ['montant_cumule','montant','montant_precedent','montant_rg','montant_taxe','montant_rb',"montant_factureHT",'montant_factureTTC',
-                                       "avf","ava",'taux_realise']):
+                                       "avf","ava",'ave','taux_realise']):
                         obj['cellRenderer'] = 'InfoRenderer'
                     field_info.append(obj)
 
@@ -1120,7 +1120,7 @@ class AvanceFieldsFilterApiView(APIView):
         field_info = []
         for field_name, field_instance in fields.items():
             if field_name in filter_fields:
-                if (field_name not in ['marche']):
+                if (field_name not in ['marche',]):
 
                     obj = {
                         'name': field_name,
@@ -1159,7 +1159,7 @@ class AvanceFieldsApiView(APIView):
 
                 for field_name, field_instance in fields.items():
 
-                    if( not field_name in ['taux_avance','remb','heure','marche','id','num_avance','remboursee'] ):
+                    if( not field_name in ['taux_avance','taux_remb','heure','marche','id','num_avance','remboursee'] ):
                         obj = {
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),
@@ -1196,7 +1196,7 @@ class AvanceFieldsApiView(APIView):
                         }
                         if(field_name in ['id','marche']):
                             obj['hide']=True
-                        if(field_name in ['taux_avance','montant','debut','fin','remb']):
+                        if(field_name in ['taux_avance','taux_remb','montant','debut','fin']):
                             obj['cellRenderer']='InfoRenderer'
 
                         field_info.append(obj)
@@ -1220,7 +1220,7 @@ class AvanceFieldsStateApiView(APIView):
         field_info = []
         for field_name, field_instance in fields.items():
             default_value = None
-            if (field_name not in  ['heure','marche','id','taux']):
+            if (field_name not in  ['heure','marche','id','taux_remb','taux_avance']):
                 if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
                     default_value= []
                 if str(field_instance.__class__.__name__) == 'BooleanField':

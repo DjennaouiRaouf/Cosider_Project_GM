@@ -205,7 +205,6 @@ create table [Avances]
         constraint PK_Cle_Id_avance
             primary key,
     [Num_Avance]        int       not null,
-    [Taux_Avance]       float     default 0 ,
     [Montant]           float     not null,
     [Taux_Debut_Remb]             float     default 0  ,
     [Taux_Fin_Remb]               float     default 80 ,

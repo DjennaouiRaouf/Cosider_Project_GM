@@ -386,15 +386,13 @@ class TypeAvance(models.Model):
 
 
 class Avance(models.Model):
-    id = models.AutoField(db_column='Id_Avance', primary_key=True)
+    id = models.CharField(db_column='Id_Avance', primary_key=True,max_length=30)
     type = models.ForeignKey(TypeAvance, on_delete=models.DO_NOTHING, null=False,db_column='Type_Avance',
                              verbose_name="Type d'avance")
     num_avance = models.PositiveIntegerField(db_column='Num_Avance',default=0, null=False, blank=True, editable=False,
                                                 verbose_name="Numero d'avance")
     marche = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=False, related_name="Avance_Marche",to_field='id',db_column='Num_Marche')
 
-    taux_avance = models.FloatField(db_column='Taux_Avance',default=0,  verbose_name="Taux d'avance", editable=False,
-                                      validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
 
     montant = models.FloatField(db_column='Montant' ,validators=[MinValueValidator(0)], default=0,null=False,verbose_name='Montant d\'avance')
 
@@ -411,6 +409,16 @@ class Avance(models.Model):
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
+    @property
+    def taux_avance (self):
+        m=MarcheAvenant.objects.get(id=self.marche.id,num_avenant=0)
+        return (self.montant/m.ht)*100
+
+    @property
+    def taux_remb(self):
+        tremb = round(
+            (float(self.taux_avance) / (float(self.fin) - float(self.debut))) * 100, 4)
+        return tremb
 
     class Meta:
         managed=False
@@ -582,7 +590,7 @@ class Factures(models.Model):
 
     @property
     def montant_factureHT(self):
-        return round(self.montant - self.montant_rb - self.montant_rg-self.montant_ava_remb-self.montant_avf_remb, 2)
+        return round(self.montant - self.montant_rb - self.montant_rg-self.montant_ava_remb-self.montant_avf_remb-self.montant_ave_remb, 2)
     @property
     def montant_factureTTC(self):
         return round(self.montant_factureHT+(self.montant_factureHT*(self.marche.tva / 100)),2)

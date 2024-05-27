@@ -100,14 +100,15 @@ def pre_save_remboursement(sender, instance, **kwargs):
     else:
         tremb = round(
                 (float(instance.avance.taux_avance) / (float(instance.avance.fin) - float(instance.avance.debut) )) * 100, 2)
-        instance.montant = instance.facture.montant_factureHT * (tremb / 100)
+        
+        instance.montant = (instance.facture.montant - instance.facture.montant_rb - instance.facture.montant_rg-instance.facture.montant_ava_remb-instance.facture.montant_avf_remb-instance.facture.montant_ave_remb) * (tremb / 100)
 
         if (instance.rst_remb < 0):
             instance.montant = instance.avance.montant
         if (instance.rst_remb == 0):
             instance.avance.remboursee = True
             instance.avance.save()
-
+        print(tremb)
 
 
 
@@ -139,11 +140,6 @@ def post_save_facture(sender, instance, created, **kwargs):
 def pre_save_avance(sender, instance, **kwargs):
 
     if not instance.pk:
-        try:
-            mav=MarcheAvenant.objects.get(id=instance.marche.id,num_avenant=0)
-            instance.taux_avance = round((float(instance.montant) / float(mav.ttc))*100)
-        except Exception as e :
-            instance.taux_avance = 0
         instance.id = (instance.type.id) + str(Avance.objects.filter(marche=instance.marche).count())
         instance.num_avance = Avance.objects.filter(marche=instance.marche).count()
 
