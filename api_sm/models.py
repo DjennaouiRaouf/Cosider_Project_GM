@@ -570,6 +570,17 @@ class Factures(models.Model):
             return 0
 
     @property
+    def montant_ave_remb(self):
+        try:
+            remb = Remboursement.objects.get(facture=self.numero_facture, avance__type__id='E')
+            if (remb):
+                return remb.montant
+            else:
+                return 0
+        except Remboursement.DoesNotExist:
+            return 0
+
+    @property
     def montant_factureHT(self):
         return round(self.montant - self.montant_rb - self.montant_rg-self.montant_ava_remb-self.montant_avf_remb, 2)
     @property

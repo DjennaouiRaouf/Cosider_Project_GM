@@ -289,6 +289,8 @@ class FactureSerializer(serializers.ModelSerializer):
     somme=serializers.SerializerMethodField(label="Arretée la présenta facture à la somme de")
     ava=serializers.SerializerMethodField(label="Montant AV.A Remb")
     avf=serializers.SerializerMethodField(label="Montant AV.F Remb")
+
+    ave=serializers.SerializerMethodField(label="Montant AV.E Remb")
     montant_precedent=serializers.SerializerMethodField(label="Montant Precedent")
     montant_cumule=serializers.SerializerMethodField(label="Montant Cumule")
 
@@ -298,7 +300,7 @@ class FactureSerializer(serializers.ModelSerializer):
     class Meta:
         model=Factures
         fields=['marche','numero_facture','num_situation','date','du', 'au','montant_precedent'
-            ,'montant','montant_cumule','montant_rb','montant_rg','ava','avf','montant_factureHT','montant_factureTTC','somme','paye']
+            ,'montant','montant_cumule','montant_rb','montant_rg','ava','avf','ave','montant_factureHT','montant_factureTTC','somme','paye']
 
 
 
@@ -318,6 +320,8 @@ class FactureSerializer(serializers.ModelSerializer):
         return obj.montant_ava_remb
     def get_avf(self,obj):
         return obj.montant_avf_remb
+    def get_ave(self,obj):
+        return obj.montant_ave_remb
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
