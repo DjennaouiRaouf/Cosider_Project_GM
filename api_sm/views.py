@@ -652,8 +652,7 @@ class AddFactureApiView(generics.CreateAPIView):
             ).save(force_insert=True)
             avances=Avance.objects.filter(marche=m,remboursee=False)
             for avance in avances:
-                if(avance.remboursee == False):
-                    Remboursement(facture=Factures.objects.get(numero_facture=serializer.initial_data['numero_facture']),
+                Remboursement(facture=Factures.objects.get(numero_facture=serializer.initial_data['numero_facture']),
                               avance=avance).save(force_insert=True)
 
             return Response('Facture ajoutée', status=status.HTTP_200_OK)
