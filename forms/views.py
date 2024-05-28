@@ -382,6 +382,7 @@ class MarcheFieldsApiView(APIView):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+
 class ECFieldsFilterApiView(APIView):
     def get(self,request):
         field_info = []
