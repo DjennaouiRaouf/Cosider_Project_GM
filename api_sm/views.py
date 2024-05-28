@@ -901,6 +901,7 @@ class GetAttachements(generics.ListAPIView):
             qt = (mt / m.ht) * 100
         except Exception as e:
             qt = 0
+
         txmt= (mt + mt * (m.tva / 100))
         txmtc= (mtc + mtc * (m.tva / 100))
         txmtp= (mtp + mtp * (m.tva / 100))
