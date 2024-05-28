@@ -401,7 +401,7 @@ class DetailFactureSerializer(serializers.ModelSerializer):
     montant = serializers.SerializerMethodField(label='Montant')
     date=serializers.SerializerMethodField(label='Date')
     prix_u = serializers.SerializerMethodField(label='Prix Unitaire')
-
+    unite = serializers.SerializerMethodField(label='Unite')
     def get_code_tache(self, obj):
         return obj.detail.code_tache
 
@@ -412,15 +412,19 @@ class DetailFactureSerializer(serializers.ModelSerializer):
         return obj.detail.qte
     def get_montant(self, obj):
         return obj.detail.montant
-
     def get_date(self, obj):
         return obj.detail.date
 
     def get_prix_u(self, obj):
         return obj.detail.prix_u
+
+    def get_unite(self,obj):
+        dqe = DQE.objects.get(code_site=obj.detail.code_site, code_tache=obj.detail.code_tache, nt=obj.detail.nt)
+        return dqe.unite.libelle
+
     class Meta:
             model=DetailFacture
-            fields=['code_tache','libelle','prix_u','qte','montant','date']
+            fields=['code_tache','libelle','prix_u','qte','montant','date','unite']
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
@@ -433,7 +437,6 @@ class DetailFactureSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-
         return representation
 
 

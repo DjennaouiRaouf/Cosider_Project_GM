@@ -23,7 +23,7 @@ urlpatterns = [
     path('avenantstate/',AvenantFieldsStateApiView.as_view()),
 
     path('dqeavfilterfields/',DQEAVFieldsFilterApiView.as_view()),
-
+    path('detail/',DetailFieldsApiView.as_view()),
     path('mavfields/',AvenantFieldsApiView.as_view()),
 
     path('dqeavfields/',DQEAVFieldsApiView.as_view()),
@@ -59,8 +59,6 @@ urlpatterns = [
     path('attstate/',AttFieldsStateApiView.as_view()),
     path('flashfilterfields/',FlashFieldsFilterApiView.as_view()),
     path('attfilterfields/',AttachementFieldsFilterApiView.as_view()),
-
-
 
     path('avancefilterfields/',AvanceFieldsFilterApiView.as_view()),
 

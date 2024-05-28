@@ -888,16 +888,22 @@ class GetAttachements(generics.ListAPIView):
         queryset = self.filter_queryset(self.get_queryset())
         qt = 0
         mt = 0
+        mtp=0
+        mtc=0
         response_data = super().list(request, *args, **kwargs).data
         m = Marche.objects.get(nt=self.request.query_params.get('nt', None),
                                code_site=self.request.query_params.get('code_site', None))
         for q in queryset:
             mt = mt + q.montant
+            mtp = mtp+q.montant_precedent
+            mtc= mtc+q.montant_cumule
         try:
             qt = (mt / m.ht) * 100
         except Exception as e:
             qt = 0
-
+        txmt= (mt + mt * (m.tva / 100))
+        txmtc= (mtc + mtc * (m.tva / 100))
+        txmtp= (mtp + mtp * (m.tva / 100))
         nt = NT.objects.get(nt=self.request.query_params.get('nt', None),
                             code_site=self.request.query_params.get('code_site', None))
         return Response({'att': response_data,
@@ -911,6 +917,13 @@ class GetAttachements(generics.ListAPIView):
                              'client': nt.code_client,
                              'qt': qt,
                              'mt': mt,
+                             'mtc':mtc,
+                             'mtp':mtp,
+
+                             'tva':m.tva,
+                             'txmt': txmt,
+                             'txmtc': txmtc,
+                             'txmtp': txmtp,
 
                          }}, status=status.HTTP_200_OK)
 
