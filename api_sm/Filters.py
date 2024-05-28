@@ -362,6 +362,7 @@ class ECFilter(django_filters.FilterSet):
     has_creance = django_filters.BooleanFilter(field_name='mgc', label='Avec Creances ? ', method='filter_has_creance', )
     has_invoice = django_filters.BooleanFilter(field_name='mgf', label='Ayant facturé ? ', method='filter_has_invoice', )
     client = django_filters.ModelChoiceFilter(field_name='nt__code_client',queryset=Clients.objects.all(),label='Client')
+    signature=django_filters.DateFromToRangeFilter(field_name='date_signature')
     def filter_has_creance(self, queryset, name, value):
 
         if value is False:

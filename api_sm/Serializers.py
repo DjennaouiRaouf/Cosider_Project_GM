@@ -608,7 +608,7 @@ class RemboursementSerializer(serializers.ModelSerializer):
 
 class ECSerializer(serializers.ModelSerializer):
     nt = serializers.SerializerMethodField(label='NT',read_only=True)
-    code_site = serializers.SerializerMethodField(label='Pole', read_only=True)
+    code_site = serializers.SerializerMethodField(label='code_site', read_only=True)
 
     client = serializers.SerializerMethodField(label='Client',read_only=True)
 
