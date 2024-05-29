@@ -380,10 +380,12 @@ class GetFacture(generics.ListAPIView):
         rg_total = 0
         mgf = 0
         enc = 0
+        mgp=0
         response_data = super().list(request, *args, **kwargs).data
         for q in queryset:
             rg_total += q.montant_rg
             mgf += q.montant_factureTTC
+            mgp += q.penalite
             try:
                 enc += (Encaissement.objects.filter(facture=q).distinct().aggregate(total=Sum('montant_encaisse'))[
                             'total'] or 0)
@@ -415,7 +417,7 @@ class GetFacture(generics.ListAPIView):
                              'rg_total_ttc': round(rg_total + (rg_total * m.tva / 100), 2),
                              'mgenc':enc,
                              'creance': creance,
-
+                             'pen':mgp,
 
                          }}, status=status.HTTP_200_OK)
 
