@@ -589,11 +589,24 @@ class Factures(models.Model):
             return 0
 
     @property
+    def penalite(self):
+        try:
+            p = PenaliteRetard.objects.get(facture__numero_facture=self.numero_facture, facture__num_situation=self.num_situation)
+            if (p):
+                return p.montant
+            else:
+                return 0
+        except PenaliteRetard.DoesNotExist:
+            return 0
+
+
+    @property
     def montant_factureHT(self):
-        return round(self.montant - self.montant_rb - self.montant_rg-self.montant_ava_remb-self.montant_avf_remb-self.montant_ave_remb, 2)
+        return round(self.montant - self.montant_rb - self.montant_rg-self.montant_ava_remb-self.montant_avf_remb-self.montant_ave_remb-self.penalite, 2)
     @property
     def montant_factureTTC(self):
         return round(self.montant_factureHT+(self.montant_factureHT*(self.marche.tva / 100)),2)
+
 
 
 
@@ -671,6 +684,14 @@ class Remboursement(models.Model):
     @property
     def rst_remb(self):
         return self.avance.montant-self.montant_cumule
+
+    class Meta:
+        managed=False
+        db_table='Remboursement'
+        verbose_name = 'Remboursement'
+        verbose_name_plural = 'Remboursements'
+        app_label = 'api_sm'
+        unique_together=(('facture','avance'),)
 
 
 class PenaliteRetard(models.Model):

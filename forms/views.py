@@ -810,7 +810,8 @@ class FactureFieldsApiView(APIView):
             if (flag == 'f'):  # react form
                 field_info = []
                 for field_name, field_instance in fields.items():
-                    if( field_name in ['numero_facture','du','au','num_situation'] ):
+                    print(field_name)
+                    if( field_name in ['numero_facture','du','au','num_situation','penalite'] ):
 
                         obj = {
                             'name': field_name,
@@ -857,7 +858,7 @@ class FactureFieldsApiView(APIView):
                                       'num_travail','code_contrat']):
                         obj['hide']= True
                     if (field_name in ['montant_cumule','montant','montant_precedent','montant_rg','montant_taxe','montant_rb',"montant_factureHT",'montant_factureTTC',
-                                       "avf","ava",'ave','taux_realise']):
+                                       "avf","ava",'ave','penalite','taux_realise']):
                         obj['cellRenderer'] = 'InfoRenderer'
                     field_info.append(obj)
 
@@ -879,7 +880,7 @@ class FactureFieldsStateApiView(APIView):
         field_info = []
         for field_name, field_instance in fields.items():
             default_value = None
-            if (field_name in ['numero_facture','du','au','num_situation']):
+            if (field_name in ['numero_facture','du','au','num_situation','penalite']):
                 if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
                     default_value = []
                 if str(field_instance.__class__.__name__) == 'BooleanField':

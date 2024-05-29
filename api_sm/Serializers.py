@@ -296,11 +296,13 @@ class FactureSerializer(serializers.ModelSerializer):
 
     montant_factureHT = serializers.SerializerMethodField(label="Montant en HT")
     montant_factureTTC = serializers.SerializerMethodField(label="Montant en TTC")
+    penalite = serializers.IntegerField(label="Penalite",read_only=True)
+
 
     class Meta:
         model=Factures
         fields=['marche','numero_facture','num_situation','date','du', 'au','montant_precedent'
-            ,'montant','montant_cumule','montant_rb','montant_rg','ava','avf','ave','montant_factureHT','montant_factureTTC','somme','paye']
+            ,'montant','montant_cumule','montant_rb','montant_rg','ava','avf','ave','penalite','montant_factureHT','montant_factureTTC','somme','paye']
 
 
 
