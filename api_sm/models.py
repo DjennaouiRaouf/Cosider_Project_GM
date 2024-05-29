@@ -673,18 +673,42 @@ class Remboursement(models.Model):
         return self.avance.montant-self.montant_cumule
 
 
+class PenaliteRetard(models.Model):
 
+    id = models.AutoField(db_column='Id_Penalite', primary_key=True)
+    facture = models.ForeignKey(Factures, db_column='Num_Facture', on_delete=models.DO_NOTHING, null=True,
+                                    blank=True, to_field="numero_facture")
 
+    montant = models.FloatField(db_column='Montant', validators=[MinValueValidator(0)], default=0,
+                                    verbose_name="Montant Mois"
+                                    , editable=False)
 
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                          editable=False)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False, default=get_current_user)
+    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
+    @property
+    def montant_cumule(self):
+        try:
+            previous_cumule = PenaliteRetard.objects.filter(facture__marche=self.facture.marche,
+                                                               facture__num_situation__lt=self.facture.num_situation)
+            sum = self.montant
+            if (previous_cumule):
+                for pc in previous_cumule:
+                    sum += pc.montant
+                return sum
+            else:
+                return self.montant
+        except PenaliteRetard.DoesNotExist:
+            return self.montant
 
     class Meta:
         managed=False
-        db_table='Remboursement'
-        verbose_name = 'Remboursement'
-        verbose_name_plural = 'Remboursements'
+        db_table='Penalite_Retard'
+        verbose_name = 'Penalite Retard'
+        verbose_name_plural = 'Penalite Retard'
         app_label = 'api_sm'
-        unique_together=(('facture','avance'),)
 
 
 
