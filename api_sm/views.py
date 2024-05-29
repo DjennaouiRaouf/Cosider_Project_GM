@@ -657,7 +657,9 @@ class AddFactureApiView(generics.CreateAPIView):
                 Remboursement(facture=Factures.objects.get(numero_facture=serializer.initial_data['numero_facture']),
                               avance=avance).save(force_insert=True)
 
+            print(serializer.initial_data)
             return Response('Facture ajoutée', status=status.HTTP_200_OK)
+
         except IntegrityError as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 

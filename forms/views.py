@@ -810,7 +810,7 @@ class FactureFieldsApiView(APIView):
             if (flag == 'f'):  # react form
                 field_info = []
                 for field_name, field_instance in fields.items():
-                    print(field_name)
+
                     if( field_name in ['numero_facture','du','au','num_situation','penalite'] ):
 
                         obj = {
