@@ -683,7 +683,7 @@ class Remboursement(models.Model):
 
     @property
     def rst_remb(self):
-        return self.avance.montant-self.montant_cumule
+        return round(self.avance.montant-self.montant_cumule,2)
 
     class Meta:
         managed=False

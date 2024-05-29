@@ -657,9 +657,10 @@ class AddFactureApiView(generics.CreateAPIView):
                 Remboursement(facture=Factures.objects.get(numero_facture=serializer.initial_data['numero_facture']),
                               avance=avance).save(force_insert=True)
 
-            if(float(serializer.initial_data['penalite']) > 0):
-                PenaliteRetard(facture=Factures.objects.get(numero_facture=serializer.initial_data['numero_facture']),
-                               montant=serializer.initial_data['penalite']).save(force_insert=True)
+
+            #if(float(serializer.initial_data['penalite']) > 0):
+            #    PenaliteRetard(facture=Factures.objects.get(numero_facture=serializer.initial_data['numero_facture']),
+            #                   montant=serializer.initial_data['penalite']).save(force_insert=True)
 
             return Response('Facture ajoutée', status=status.HTTP_200_OK)
 

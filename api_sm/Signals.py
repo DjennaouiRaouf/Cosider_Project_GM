@@ -95,25 +95,14 @@ def pre_save_remboursement(sender, instance, **kwargs):
     print(instance.avance.debut)
     if (instance.avance.remboursee):
             raise ValidationError('Cette avance est remboursée')
-    elif (instance.avance.debut>=tr):
-        raise ValidationError('Cette avance est remboursée')
+    elif (instance.avance.debut>tr):
+        raise ValidationError('Cette avance ne peut pas se rembourser dans cette situation')
     else:
+        instance.montant =round((instance.facture.montant - instance.facture.montant_rb - instance.facture.montant_rg - instance.facture.montant_ava_remb - instance.facture.montant_avf_remb - instance.facture.montant_ave_remb) * (
+                                 instance.avance.taux_remb / 100),2)
 
-        previous_remboursement=Remboursement.objects.filter(facture__marche=instance.facture.marche,avance=instance.avance, facture__num_situation__lt=instance.facture.num_situation).last()
-        print(previous_remboursement)
-
-        if(previous_remboursement == None):
-            instance.montant = (instance.facture.montant - instance.facture.montant_rb - instance.facture.montant_rg - instance.facture.montant_ava_remb - instance.facture.montant_avf_remb - instance.facture.montant_ave_remb) * (
-                                       instance.avance.taux_remb / 100)
-
-        if (previous_remboursement!=None):
-            current_cumule = (instance.facture.montant - instance.facture.montant_rb - instance.facture.montant_rg - instance.facture.montant_ava_remb - instance.facture.montant_avf_remb - instance.facture.montant_ave_remb) * (
-                                     instance.avance.taux_remb / 100) + previous_remboursement.montant_cumule
-            previous_restant = instance.avance.montant - current_cumule
-            if (previous_restant < 0):
-                instance.montant = previous_remboursement.rst_remb
-
-        if (instance.rst_remb == 0):
+        if(instance.rst_remb < 0):
+            instance.montant+=round(instance.rst_remb,2)
             instance.avance.remboursee = True
             instance.avance.save()
 
