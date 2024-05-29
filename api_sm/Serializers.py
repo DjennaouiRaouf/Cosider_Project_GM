@@ -296,7 +296,7 @@ class FactureSerializer(serializers.ModelSerializer):
 
     montant_factureHT = serializers.SerializerMethodField(label="Montant en HT")
     montant_factureTTC = serializers.SerializerMethodField(label="Montant en TTC")
-    penalite = serializers.IntegerField(label="Penalite",read_only=True)
+    penalite = serializers.FloatField(label="Penalite",read_only=True)
 
 
     class Meta:
