@@ -1,3 +1,8 @@
+/******************************************************************/
+/* View Production stockée*/
+    create view as select(NT,code)
+/******************************************************************/
+
 create table [Marche]
 (
     [Num_Contrat]       varchar(25)        not null
