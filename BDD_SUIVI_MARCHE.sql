@@ -540,6 +540,75 @@ go
 
 /***************************************************************************/
 
+
+create table [Penalite_Retard]
+(
+    [Id_Penalite]                int identity
+        constraint PK_Cle_Id_Remb
+            primary key,
+    [Montant]           float     default 0 not null,
+    [Num_Facture]       varchar(30),
+	[Est_Bloquer] BIT DEFAULT 0,
+    [User_ID]           varchar(15),
+    [Date_Modification] DATETIME2 (7)DEFAULT CURRENT_TIMESTAMP
+)
+go
+
+create index [INDEX_Rembourcement_Num_Facture]
+    on [Penalite_Retard] ([Num_Facture])
+go
+
+
+create index [INDEX_Penalite_Retard_Est_Bloquer]
+    on [Penalite_Retard] ([Est_Bloquer])
+go
+
+
+create index [INDEX_Penalite_Retard_User_ID]
+    on [Penalite_Retard] ([User_ID])
+go
+
+create index [INDEX_Penalite_Retard_Date_Modification]
+    on [Penalite_Retard] ([Date_Modification])
+go
+
+
+/***************************************************************************/
+create table [Penalite_Retard]
+(
+    [Id_Penalite]                int identity
+        constraint PK_Cle_Id_Penalite
+            primary key,
+    [Montant]           float     default 0 not null,
+    [Num_Facture]       varchar(30),
+	[Est_Bloquer] BIT DEFAULT 0,
+    [User_ID]           varchar(15),
+    [Date_Modification] DATETIME2 (7)DEFAULT CURRENT_TIMESTAMP
+)
+go
+
+create index [INDEX_Rembourcement_Num_Facture]
+    on [Penalite_Retard] ([Num_Facture])
+go
+
+
+create index [INDEX_Penalite_Retard_Est_Bloquer]
+    on [Penalite_Retard] ([Est_Bloquer])
+go
+
+
+create index [INDEX_Penalite_Retard_User_ID]
+    on [Penalite_Retard] ([User_ID])
+go
+
+create index [INDEX_Penalite_Retard_Date_Modification]
+    on [Penalite_Retard] ([Date_Modification])
+go
+
+
+/***************************************************************************/
+
+
 create table [Encaissements]
 (
     [Id_Enc]                bigint identity
@@ -632,6 +701,11 @@ ALTER TABLE [Detail_Facture] ADD CONSTRAINT FK_Cle_Detail_Detail_facture FOREIGN
 /*Remboursement*/
 ALTER TABLE [Remboursement] ADD CONSTRAINT FK_Cle_Num_Facture_Remboursement FOREIGN KEY  ([Num_Facture]) REFERENCES [Factures] ([Num_facture] );
 ALTER TABLE [Remboursement] ADD CONSTRAINT FK_Cle_Avance_Remboursement FOREIGN KEY  ([Avance]) REFERENCES [Avances] ([Id_Avance]);
+
+/*Penalite_Retard*/
+ALTER TABLE [Penalite_Retard] ADD CONSTRAINT FK_Cle_Num_Facture_Penalite_Retard FOREIGN KEY  ([Num_Facture]) REFERENCES [Factures] ([Num_facture] );
+
+
 
 /*Encaissement*/
 
