@@ -651,7 +651,19 @@ class ECSerializer(serializers.ModelSerializer):
 
 
 class PSSerializer(serializers.ModelSerializer):
+    libelle=serializers.SerializerMethodField(label='Libelle')
     unite=serializers.SerializerMethodField(label='Unite')
+
+
+    def get_libelle(self,obj):
+        try:
+            dqe=DQE.objects.get(code_site=obj.code_site,nt=obj.nt,code_tache=obj.code_tache)
+            if(dqe):
+                return dqe.libelle
+            else:
+                return None
+        except DQE.DoesNotExist:
+            return None
 
     def get_unite(self,obj):
         try:
@@ -664,7 +676,7 @@ class PSSerializer(serializers.ModelSerializer):
             return None
     class Meta:
         model = ProductionStockee
-        fields = ['code_site','nt','code_tache','qte_prod','qte_att','ecart','unite']
+        fields = ['code_site','nt','code_tache','libelle','qte_prod','qte_att','ecart','unite','ind']
     def to_representation(self, instance):
         representation = super().to_representation(instance)
 

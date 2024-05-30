@@ -20,7 +20,7 @@ class ProductionStockee(CPkModel):
     qte_prod=models.FloatField(db_column='Qte_Produite',  verbose_name='Qte Produite',editable=False)
 
     ecart=models.FloatField(db_column='Ecart_Prod_Att',  verbose_name='Ecart (Production et Attachement)',editable=False)
-
+    ind= models.BooleanField(db_column='Indicateur',verbose_name='Indicateur',editable=False)
     class Meta:
         managed = False
         db_table = 'Vue_Production_Stockee'

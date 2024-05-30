@@ -1979,7 +1979,7 @@ class PSFieldsApiView(APIView):
                         }
                         if(field_name in ['code_site','nt','unite']):
                             obj['hide']=True
-                        if(field_name in ['qte_prod','ecart','qte_att'] ):
+                        if(field_name in ['qte_prod','ecart','qte_att','ind'] ):
                             obj['cellRenderer']='InfoRenderer'
 
                         field_info.append(obj)

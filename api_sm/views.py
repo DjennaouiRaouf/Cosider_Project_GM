@@ -1462,6 +1462,10 @@ class GetPSView(generics.ListAPIView):
                          'extra': {
                              'x':x,
                              'y1':y1,
-                             'y2':y2
-
-                         }}, status=status.HTTP_200_OK)
+                             'y2':y2,
+                         },
+                         'extra2':{
+                             'pole': request.query_params.get('code_site', None),
+                             'nt': request.query_params.get('nt', None)
+                         }
+                         }, status=status.HTTP_200_OK)
