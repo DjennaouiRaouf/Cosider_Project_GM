@@ -1,6 +1,22 @@
 /******************************************************************/
 /* View Production stockée*/
-    create view as select(NT,code)
+
+create view Vue_Production_All as (SELECT tp.NT, tp.Code_Site, tp.Code_Tache, SUM(tp.Quantite_1+tp.Quantite_2+tp.Quantite_3) as Qte_Produite
+FROM Tab_Production tp  where tp.Code_Type_Production='01' and tp.Prevu_Realiser = 'R'
+GROUP BY tp.nt, tp.code_site, tp.code_tache) ;
+
+
+create view Vue_Attachements_All as (SELECT att.NT, att.Code_Site, att.Code_Tache, SUM(att.quantite) as Qte_Attachee
+FROM Attachements att
+GROUP BY att.nt, att.Code_Site, att.Code_Tache) ;
+
+
+
+create view Vue_Production_Stockee as (select att.NT, att.Code_Site, att.Code_Tache, att.Qte_Attachee , prod.Qte_Produite , (prod.Qte_Produite-att.Qte_Attachee) as Ecart_Prod_Att from Vue_Attachements_All att , Vue_Production_All prod
+where att.NT = prod.NT and att.Code_Site = prod.Code_site and att.Code_Tache = prod.Code_Tache);
+
+
+
 /******************************************************************/
 
 create table [Marche]
