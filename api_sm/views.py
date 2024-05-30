@@ -899,14 +899,23 @@ class GetAttachements(generics.ListAPIView):
         mtp=0
         mtc=0
         response_data = super().list(request, *args, **kwargs).data
+
         m = Marche.objects.get(nt=self.request.query_params.get('nt', None),
                                code_site=self.request.query_params.get('code_site', None))
+
+        cp=Attachements.objects.filter(marche=m,nt=self.request.query_params.get('nt', None),
+                               code_site=self.request.query_params.get('code_site', None),date__year__lte=self.request.query_params.get('aa', None),
+                                    ).filter(date__month__lt=self.request.query_params.get('mm', None)).aggregate(total_amount=Sum('montant'))['total_amount'] or 0
+
+
+
         for q in queryset:
             mt = mt + q.montant
             mtp = mtp+q.montant_precedent
             mtc= mtc+q.montant_cumule
         try:
-            qt = (mt / m.ht) * 100
+            qt = ((mt+cp) / m.ht) * 100
+
         except Exception as e:
             qt = 0
 
