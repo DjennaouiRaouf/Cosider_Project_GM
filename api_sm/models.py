@@ -8,6 +8,24 @@ from django_currentuser.middleware import get_current_user
 from api_sch.models import *
 
 
+class ProductionStockee(CPkModel):
+    code_site=models.CharField(db_column='Code_Site', primary_key=True, max_length=10 , editable=False,
+                                 verbose_name='Pole')
+    nt=models.CharField(db_column='NT', max_length=20,editable=False,primary_key=True,verbose_name='NT')
+
+    code_tache = models.CharField(db_column='Code_Tache', editable=False, max_length=30
+                                  , verbose_name="Code Tache", primary_key=True)
+
+    qte_att=models.FloatField(db_column='Qte_Attachee',  verbose_name='Qte Attachée',editable=False)
+    qte_prod=models.FloatField(db_column='Qte_Produite',  verbose_name='Qte Produite',editable=False)
+
+    ecart=models.FloatField(db_column='Ecart_Prod_Att',  verbose_name='Ecart (Production et Attachement)',editable=False)
+
+    class Meta:
+        managed = False
+        db_table = 'Vue_Production_Stockee'
+        verbose_name = 'Production_Stockee'
+        verbose_name_plural = 'Production_Stockee'
 
 
 class Clients(models.Model):

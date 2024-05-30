@@ -1954,3 +1954,39 @@ class DetailFieldsApiView(APIView):
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
+
+
+class PSFieldsApiView(APIView):
+    def get(self, request):
+        flag = request.query_params.get('flag', None)
+        if flag == 'l' :
+            serializer = PSSerializer()
+            fields = serializer.get_fields()
+
+            model_class = serializer.Meta.model
+            model_name = model_class.__name__
+
+            if (flag == 'l'):  # data grid list (react ag-grid)
+                field_info = []
+                for field_name, field_instance in fields.items():
+                    if (field_name not in ['']):
+                        obj={
+                            'field': field_name,
+                            'headerName': field_instance.label or field_name,
+                            'info': str(field_instance.__class__.__name__),
+
+                        }
+                        if(field_name in ['code_site','nt','unite']):
+                            obj['hide']=True
+                        if(field_name in ['qte_prod','ecart','qte_att'] ):
+                            obj['cellRenderer']='InfoRenderer'
+
+                        field_info.append(obj)
+
+            return Response({'fields': field_info,
+            'models': model_name}, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)

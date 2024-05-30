@@ -1436,3 +1436,32 @@ class UpdateAttachementApiVew(generics.UpdateAPIView):
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
+
+
+
+class GetPSView(generics.ListAPIView):
+    #permission_classes = [permissions.IsAuthenticated, ViewClientPermission]
+    queryset = ProductionStockee.objects.all()
+    serializer_class = PSSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = PSFilter
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        x=[]
+        y1=[]
+        y2=[]
+        response_data = super().list(request, *args, **kwargs).data
+        for q in queryset:
+            x.append(q.code_tache)
+            y1.append(q.qte_att)
+            y2.append(q.qte_prod)
+
+        return Response({'prod': response_data,
+                         'extra': {
+                             'x':x,
+                             'y1':y1,
+                             'y2':y2
+
+                         }}, status=status.HTTP_200_OK)

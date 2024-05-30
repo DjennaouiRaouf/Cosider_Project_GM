@@ -647,3 +647,26 @@ class ECSerializer(serializers.ModelSerializer):
 
         return representation
 
+
+
+
+class PSSerializer(serializers.ModelSerializer):
+    unite=serializers.SerializerMethodField(label='Unite')
+
+    def get_unite(self,obj):
+        try:
+            dqe=DQE.objects.get(code_site=obj.code_site,nt=obj.nt,code_tache=obj.code_tache)
+            if(dqe):
+                return dqe.unite.libelle
+            else:
+                return None
+        except DQE.DoesNotExist:
+            return None
+    class Meta:
+        model = ProductionStockee
+        fields = ['code_site','nt','code_tache','qte_prod','qte_att','ecart','unite']
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+
+        return representation
