@@ -395,10 +395,13 @@ class GetFacture(generics.ListAPIView):
 
         creance = mgf - enc
 
+
         m = Marche.objects.get(nt=self.request.query_params.get('marche__nt', None),
                                code_site=self.request.query_params.get('marche__code_site', None))
         n = NT.objects.get(nt=self.request.query_params.get('marche__nt', None),
                            code_site=self.request.query_params.get('marche__code_site', None))
+
+
         return Response({'facture': response_data,
                          'extra': {
 
@@ -532,12 +535,15 @@ class DelATT(generics.DestroyAPIView):
     queryset = Attachements.objects.all()
     serializer_class = AttachementsSerializer
     def delete(self, request, *args, **kwargs):
-        pks = self.request.data.get('ids', [])
+        pks = self.request.data.get('id', [])
         print(pks)
         if pks:
-            for pk in pks:
-                Attachements.objects.get(id=pk).delete()
 
+            for pk in pks:
+                try:
+                    Attachements.objects.get(id=pk).delete()
+                except Exception as e:
+                    continue
         return Response(f'Les Attachements suivants {pks} sont Annulés', status=status.HTTP_200_OK)
 
 
@@ -909,12 +915,20 @@ class GetAttachements(generics.ListAPIView):
         m = Marche.objects.get(nt=self.request.query_params.get('nt', None),
                                code_site=self.request.query_params.get('code_site', None))
 
+        s=Attachements.objects.filter(date__year__lte=self.request.query_params.get('aa',None)).filter(
+            date__month__lt=self.request.query_params.get('mm',None)
+        ).aggregate(total_amount=Sum('montant'))['total_amount']
+        if(s is None):
+            s=0
+
         for q in queryset:
             mt = mt + q.montant
             mtp = mtp+q.montant_precedent
             mtc= mtc+q.montant_cumule
+
+
         try:
-            qt = (mt / m.ht) * 100
+            qt = ((mt + s) / m.ht) * 100
         except Exception as e:
             qt = 0
 
@@ -1449,3 +1463,24 @@ class GetPSView(generics.ListAPIView):
     serializer_class = PSSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = PSFilter
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        mt = 0
+        response_data = super().list(request, *args, **kwargs).data
+        x=[]
+        y1=[]
+        y2=[]
+        for q in queryset:
+            x.append(q.code_tache)
+            y1.append(q.qte_prod)
+            y2.append(q.qte_att)
+
+        return Response({'prod': response_data,
+                         'extra': {
+                             'x': x,
+                             'y1':y1,
+                             'y2':y2,
+                         }}, status=status.HTTP_200_OK)
+

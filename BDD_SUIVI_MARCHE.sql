@@ -7,7 +7,7 @@ GROUP BY tp.nt, tp.code_site, tp.code_tache) ;
 
 
 create view Vue_Attachements_All as (SELECT att.NT, att.Code_Site, att.Code_Tache, SUM(att.quantite) as Qte_Attachee
-FROM Attachements att
+FROM Attachements att where  att.Est_Bloquer=1
 GROUP BY att.nt, att.Code_Site, att.Code_Tache) ;
 
 

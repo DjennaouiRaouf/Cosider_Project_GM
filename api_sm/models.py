@@ -491,7 +491,7 @@ class Attachements(DeleteMixin,models.Model):
         username = str(get_current_user())
         id_Att=self.id
         sql_query = f"""
-                 IF NOT EXISTS(SELECT * FROM Detail_Facture WHERE Detail IN (SELECT Id_Attachement FROM Attachements))
+                 IF NOT EXISTS(SELECT * FROM Detail_Facture WHERE Detail = '{id_Att}')
                             BEGIN
                                  DECLARE @Count INT =  (SELECT  COUNT(Est_Bloquer) FROM Attachements WHERE Est_Bloquer = 1);
                                  UPDATE Attachements SET Id_Attachement =CONCAT(Id_Attachement,'-A-',@Count),User_ID='{username}', Date_Modification = GETDATE(),Est_Bloquer = 1 WHERE Id_Attachement = '{id_Att}' ;
