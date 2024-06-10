@@ -3,12 +3,29 @@ from cpkmodel import CPkModel
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
+
 from django.db.models import Q
 from django_currentuser.middleware import get_current_user
 from api_sch.models import *
+from django.db import connection
 
 
-class ProductionStockee(CPkModel):
+
+class GeneralManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(Q(est_bloquer=False) or Q(est_bloquer=None))
+    def deleted(self):
+        return super().get_queryset().filter(Q(est_bloquer=True))
+
+
+
+class DeleteMixin:
+    def delete(self, *args, **kwargs):
+        self.est_bloquer = True
+        self.save()
+
+
+class ProductionStockee(DeleteMixin,CPkModel):
     code_site=models.CharField(db_column='Code_Site', primary_key=True, max_length=10 , editable=False,
                                  verbose_name='Pole')
     nt=models.CharField(db_column='NT', max_length=20,editable=False,primary_key=True,verbose_name='NT')
@@ -28,7 +45,7 @@ class ProductionStockee(CPkModel):
         verbose_name_plural = 'Production_Stockee'
 
 
-class Clients(models.Model):
+class Clients(DeleteMixin,models.Model):
     id =models.CharField(db_column='Code_Client', primary_key=True,
                                    max_length=20,verbose_name="Code Client")
     type_client = models.SmallIntegerField(db_column='Type_Client', blank=True, null=True,verbose_name="Type Client")  
@@ -48,7 +65,7 @@ class Clients(models.Model):
                                       editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
-
+    objects = GeneralManager()
 
     def __str__(self):
         return  self.id
@@ -61,7 +78,7 @@ class Clients(models.Model):
 
 
 
-class Sites(models.Model):
+class Sites(DeleteMixin,models.Model):
     RG=(
         ('',''),
         ('N','Nord'),
@@ -97,7 +114,7 @@ class Sites(models.Model):
                                       editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
-
+    objects = GeneralManager()
 
 
     def __str__(self):
@@ -123,7 +140,7 @@ class Sites(models.Model):
 
 
 
-class NT(CPkModel):
+class NT(DeleteMixin,CPkModel):
     code_site = models.CharField(db_column='Code_site', primary_key=True, max_length=10 ,
                                  verbose_name='Code du Site')
     nt = models.CharField(db_column='NT', max_length=20,null=False,primary_key=True,verbose_name='NT')
@@ -137,6 +154,7 @@ class NT(CPkModel):
                                       editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
+    objects = GeneralManager()
     class Meta:
         managed=False
         db_table = 'Tab_NT'
@@ -154,7 +172,7 @@ class NT(CPkModel):
 
 
 
-class Marche(CPkModel):
+class Marche(DeleteMixin,CPkModel):
     id = models.CharField(db_column='Num_Contrat', primary_key=True,verbose_name='Contrat N°',
                                    max_length=500)
     num_avenant = models.IntegerField(db_column='Num_Avenant',editable=False,verbose_name='Avenant N°',default=0)
@@ -187,7 +205,7 @@ class Marche(CPkModel):
                                       editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
-
+    objects = GeneralManager()
     @property
     def ht(self):
         try:
@@ -237,7 +255,7 @@ class Marche(CPkModel):
 
 
 
-class MarcheAvenant(CPkModel):
+class MarcheAvenant(DeleteMixin,CPkModel):
     id = models.CharField(db_column='Num_Contrat', primary_key=True,verbose_name='Contrat N°',
                                    max_length=500)
     num_avenant = models.IntegerField(db_column='Num_Avenant',primary_key=True,editable=False,verbose_name='Avenant N°',default=0)
@@ -273,7 +291,7 @@ class MarcheAvenant(CPkModel):
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
 
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
-
+    objects = GeneralManager()
     class Meta:
         managed = False
         db_table = 'Marche_Avenant'
@@ -294,7 +312,7 @@ class MarcheAvenant(CPkModel):
         return round(self.ht + (self.ht * self.tva / 100), 4)
 
 
-class DQE(CPkModel):
+class DQE(DeleteMixin,CPkModel):
     code_site = models.CharField(db_column='Code_site',primary_key=True, max_length=10,
                                  verbose_name='Code du Site')
     nt = models.CharField(db_column='NT', max_length=20,primary_key=True, null=False, verbose_name='NT')
@@ -317,7 +335,7 @@ class DQE(CPkModel):
                                       editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
-
+    objects = GeneralManager()
 
     def delete(self, *args, **kwargs):
         self.est_bloquer=True
@@ -343,23 +361,25 @@ class DQE(CPkModel):
 
 
 
-class DQEAvenant(CPkModel):
+
+
+class DQEAvenant(DeleteMixin,CPkModel):
     code_site = models.CharField(db_column='Code_Site', primary_key=True, max_length=10,
                                  verbose_name='Code du Site')
     nt = models.CharField(db_column='NT', max_length=20, primary_key=True, null=False, verbose_name='NT')
     code_tache = models.CharField(db_column='Code_Tache', null=False, max_length=30
                                   , verbose_name="Code Tache", primary_key=True)
-    num_avenant = models.IntegerField(db_column='Num_Avenant', blank=True, null=True,verbose_name='Avenant N°')  # Field name made lowercase.
-    est_tache_composite = models.BooleanField(db_column='Est_Tache_Composite', blank=True, null=True,verbose_name='Est Composée ?')  # Field name made lowercase.
-    est_tache_complementaire = models.BooleanField(db_column='Est_Tache_Complementaire', blank=True, null=True,verbose_name='Est Complémentaire ?')  # Field name made lowercase.
-    libelle = models.TextField(db_column='Libelle_Tache', blank=True, null=True)  # Field name made lowercase.
+    num_avenant = models.IntegerField(db_column='Num_Avenant', blank=True, null=True,verbose_name='Avenant N°')  
+    est_tache_composite = models.BooleanField(db_column='Est_Tache_Composite', blank=True, null=True,verbose_name='Est Composée ?')  
+    est_tache_complementaire = models.BooleanField(db_column='Est_Tache_Complementaire', blank=True, null=True,verbose_name='Est Complémentaire ?')  
+    libelle = models.TextField(db_column='Libelle_Tache', blank=True, null=True)  
     unite =models.ForeignKey('api_sch.TabUniteDeMesure',on_delete=models.DO_NOTHING, null=False,db_column='Code_Unite_Mesure', verbose_name='Unité')
-    quantite = models.FloatField(db_column='Quantite', blank=True, null=True)  # Field name made lowercase.
-    prix_u = models.DecimalField(db_column='Prix_Unitaire', max_digits=19, decimal_places=4, blank=True, null=True,verbose_name='Prix Unit')  # Field name made lowercase.
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', blank=True, null=True)  # Field name made lowercase.
+    quantite = models.FloatField(db_column='Quantite', blank=True, null=True)  
+    prix_u = models.DecimalField(db_column='Prix_Unitaire', max_digits=19, decimal_places=4, blank=True, null=True,verbose_name='Prix Unit')  
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', blank=True, null=True)  
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False, default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
-
+    objects = GeneralManager()
 
     @property
     def prix_q(self):
@@ -379,9 +399,9 @@ class DQEAvenant(CPkModel):
 
 
 
-class TypeAvance(models.Model):
+class TypeAvance(DeleteMixin,models.Model):
     id = models.CharField(db_column='Id_Type_Avance', primary_key=True,
-                                      max_length=3)  # Field name made lowercase.
+                                      max_length=3)  
 
     libelle = models.CharField(db_column='Libelle',max_length=500, null=False, unique=True)
     taux_max = models.FloatField(db_column='Taux',default=0,validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
@@ -390,7 +410,7 @@ class TypeAvance(models.Model):
                                       editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
-
+    objects = GeneralManager()
     def __str__(self):
         return self.libelle
 
@@ -403,7 +423,7 @@ class TypeAvance(models.Model):
 
 
 
-class Avance(models.Model):
+class Avance(DeleteMixin,models.Model):
     id = models.CharField(db_column='Id_Avance', primary_key=True,max_length=30)
     type = models.ForeignKey(TypeAvance, on_delete=models.DO_NOTHING, null=False,db_column='Type_Avance',
                              verbose_name="Type d'avance")
@@ -426,7 +446,7 @@ class Avance(models.Model):
                                       editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
-
+    objects = GeneralManager()
     @property
     def taux_avance (self):
         m=MarcheAvenant.objects.get(id=self.marche.id,num_avenant=0)
@@ -449,8 +469,8 @@ class Avance(models.Model):
 
 
 
-class Attachements(models.Model):
-    id = models.CharField(db_column='Id_Attachement', primary_key=True, max_length=30)  # Field name made lowercase.
+class Attachements(DeleteMixin,models.Model):
+    id = models.CharField(db_column='Id_Attachement', primary_key=True, max_length=30)  
 
     marche = models.ForeignKey('Marche', models.DO_NOTHING, db_column='Num_Marche', blank=True,
                                    null=True)
@@ -469,7 +489,7 @@ class Attachements(models.Model):
                                       editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
-
+    objects = GeneralManager()
     def delete(self, *args, **kwargs):
         self.est_bloquer=True
         super().save(force_update=True,*args, **kwargs)
@@ -542,7 +562,7 @@ class Attachements(models.Model):
 
 
 
-class Factures(models.Model):
+class Factures(DeleteMixin,models.Model):
     numero_facture=models.CharField(max_length=800,db_column='Num_Facture',primary_key=True,verbose_name='Numero de facture')
     num_situation=models.IntegerField(null=False,db_column='Num_Situation',verbose_name='Numero de situation')
     marche=models.ForeignKey(Marche,db_column='Num_Marche',on_delete=models.DO_NOTHING,null=False,verbose_name='Marche',to_field="id")
@@ -570,9 +590,19 @@ class Factures(models.Model):
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
+    objects = GeneralManager()
 
-
-
+    def delete(self, *args, **kwargs):
+        num_f = self.numero_facture
+        username=str(get_current_user())
+        sql_query = f"""
+                   UPDATE Detail_Facture SET Num_Facture = NULL WHERE  Num_Facture = '{num_f}';
+                   DECLARE @Count INT =  (SELECT CASE WHEN COUNT(Est_Bloquer) > 0 THEN COUNT(Est_Bloquer) ELSE 0 END FROM Factures WHERE Est_Bloquer = 1);
+                   UPDATE Factures SET Num_Facture = CONCAT('{num_f}', '-A-',@Count ) , Est_Bloquer = 1,User_ID='{username}',Date_Modification=GETDATE() WHERE Num_Facture = '{num_f}';
+                   UPDATE Detail_Facture SET Num_Facture = CONCAT('{num_f}', '-A-', @Count)  , Est_Bloquer = 1,User_ID='{username}',Date_Modification=GETDATE()  WHERE  Num_Facture IS NULL;
+               """
+        with connection.cursor() as cursor:
+            cursor.execute(sql_query)
 
     @property
     def montant_ava_remb(self):
@@ -670,7 +700,7 @@ class Factures(models.Model):
 
 
 
-class Remboursement(models.Model):
+class Remboursement(DeleteMixin,models.Model):
     id = models.AutoField(db_column='Id_Remb', primary_key=True)
     facture = models.ForeignKey(Factures,db_column='Num_Facture', on_delete=models.DO_NOTHING, null=True, blank=True, to_field="numero_facture")
     avance=models.ForeignKey(Avance,db_column='Avance', on_delete=models.DO_NOTHING, null=True, blank=True)
@@ -684,7 +714,7 @@ class Remboursement(models.Model):
                                       editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
-
+    objects = GeneralManager()
     @property
     def montant_cumule(self):
         try:
@@ -712,7 +742,7 @@ class Remboursement(models.Model):
         unique_together=(('facture','avance'),)
 
 
-class PenaliteRetard(models.Model):
+class PenaliteRetard(DeleteMixin,models.Model):
 
     id = models.AutoField(db_column='Id_Penalite', primary_key=True)
     facture = models.ForeignKey(Factures, db_column='Num_Facture', on_delete=models.DO_NOTHING, null=True,
@@ -726,7 +756,7 @@ class PenaliteRetard(models.Model):
                                           editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False, default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
-
+    objects = GeneralManager()
     @property
     def montant_cumule(self):
         try:
@@ -751,16 +781,16 @@ class PenaliteRetard(models.Model):
 
 
 
-class DetailFacture(models.Model):
+class DetailFacture(DeleteMixin,models.Model):
     id = models.AutoField(db_column='Id_Df', primary_key=True)
-    facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,null=True,blank=True,to_field="numero_facture",db_column='Num_Facture')
-    detail=models.ForeignKey(Attachements,on_delete=models.DO_NOTHING,db_column='Detail')
+    facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,null=True,to_field="numero_facture",db_column='Num_Facture')
+    detail=models.ForeignKey(Attachements,on_delete=models.DO_NOTHING,db_column='Detail',null=True)
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
-
+    objects = GeneralManager()
 
     class Meta:
         managed=False
@@ -771,15 +801,15 @@ class DetailFacture(models.Model):
 
 
 
-class ModePaiement(models.Model):
-    id=models.AutoField(db_column='Id_Mode', primary_key=True)
+class ModePaiement(DeleteMixin,models.Model):
+    id=models.CharField(db_column='Id_Mode', primary_key=True,max_length=3)
     libelle=models.CharField(max_length=500,null=False,unique=True)
 
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
-
+    objects = GeneralManager()
     def __str__(self):
         return  self.libelle
     class Meta:
@@ -792,7 +822,7 @@ class ModePaiement(models.Model):
 
 
 
-class Encaissement(models.Model):
+class Encaissement(DeleteMixin,models.Model):
     id = models.AutoField(db_column='Id_Enc', primary_key=True)
     facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,db_column='Facture',null=True,blank=True,verbose_name="Facture")
     date_encaissement=models.DateField(null=False,db_column='Date_Encaissement',verbose_name="Date d'encaissement")
@@ -807,18 +837,28 @@ class Encaissement(models.Model):
                                       editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
+    objects = GeneralManager()
+
+    def delete(self, *args, **kwargs):
+        username = str(get_current_user())
+        id_Enc=self.id
+        sql_query = f"""
+                UPDATE Encaissements SET Est_Bloquer= 1 , User_ID ='{username}',Date_Modification= GETDATE() WHERE Id_Enc ={id_Enc}
+               """
+        with connection.cursor() as cursor:
+            cursor.execute(sql_query)
 
     @property
     def montant_creance(self):
         try:
-            enc = Encaissement.objects.filter(facture=self.facture, date_encaissement__lt=self.date_encaissement).aggregate(
+            enc = float(Encaissement.objects.filter(facture=self.facture, date_encaissement__lt=self.date_encaissement).aggregate(
                 models.Sum('montant_encaisse'))[
-                "montant_encaisse__sum"]
+                "montant_encaisse__sum"] or 0.0)
 
             if (enc == None):
-                enc = self.montant_encaisse
+                enc = float(self.montant_encaisse)
             else:
-                enc += self.montant_encaisse
+                enc += float(self.montant_encaisse)
 
             return (self.facture.montant_factureTTC - enc)
         except Encaissement.DoesNotExist:
@@ -837,8 +877,8 @@ class Encaissement(models.Model):
 
 
 
-class TypeCaution(models.Model):
-    id= models.CharField(db_column='Id_Type_Caution', primary_key=True, max_length=5)  # Field name made lowercase.
+class TypeCaution(DeleteMixin,models.Model):
+    id= models.CharField(db_column='Id_Type_Caution', primary_key=True, max_length=5)  
 
 
     libelle = models.CharField(max_length=500,null=True,blank=True)
@@ -856,7 +896,7 @@ class TypeCaution(models.Model):
                                       editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
-
+    objects = GeneralManager()
     def __str__(self):
         return self.libelle
 
@@ -873,7 +913,7 @@ class TypeCaution(models.Model):
         app_label = 'api_sm'
 
 
-class Cautions(models.Model):
+class Cautions(DeleteMixin,models.Model):
     id = models.CharField(db_column='Id_Caution', primary_key=True, max_length=30)
 
     marche = models.ForeignKey(Marche,db_column='Num_Marche', on_delete=models.DO_NOTHING, null=True, related_name="Caution_Marche",to_field='id')
@@ -891,12 +931,13 @@ class Cautions(models.Model):
                                       editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
-
+    objects = GeneralManager()
     class Meta:
         managed=False
         db_table='Cautions'
         verbose_name = 'Caution'
         verbose_name_plural = 'Caution'
         app_label = 'api_sm'
+
 
 

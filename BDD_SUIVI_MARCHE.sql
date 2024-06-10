@@ -1,8 +1,6 @@
 /******************************************************************/
 /* View Production stockée*/
 
-
-
 create view Vue_Production_All as (SELECT tp.NT, tp.Code_Site, tp.Code_Tache, SUM(tp.Quantite_1+tp.Quantite_2+tp.Quantite_3) as Qte_Produite
 FROM Tab_Production tp  where tp.Code_Type_Production='01' and tp.Prevu_Realiser = 'R'
 GROUP BY tp.nt, tp.code_site, tp.code_tache) ;
@@ -20,11 +18,6 @@ CASE WHEN prod.Qte_Produite - att.Qte_Attachee <> 0 THEN 1 ELSE 0 END AS Indicat
  from Vue_Attachements_All att , Vue_Production_All prod
 where att.NT = prod.NT and att.Code_Site = prod.Code_site and att.Code_Tache = prod.Code_Tache
 );
-
-
-
-
-
 
 
 /******************************************************************/
@@ -497,8 +490,8 @@ create table [Detail_Facture]
         constraint PK_Cle_Id_Df
             primary key,
 
-	[Num_Facture]       varchar(30) not null,
-    [Detail]            varchar(30)  not null,
+	[Num_Facture]       varchar(30)  null,
+    [Detail]            varchar(30)  null,
 
 
 	[Est_Bloquer] BIT DEFAULT 0,
@@ -649,7 +642,7 @@ create table [Encaissements]
     [Montant_Encaisse]  float         not null,
     [Numero_Piece]      varchar(30) not null,
     [Code_Agence]         varchar(25),
-    [Facture]        varchar(30) not null,
+    [Facture]        varchar(30)  null,
     [Mode_Paiement]  varchar(3) ,
 	[Est_Bloquer] BIT DEFAULT 0,
     [User_ID]           varchar(15),

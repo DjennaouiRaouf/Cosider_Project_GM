@@ -61,7 +61,7 @@ urlpatterns = [
 
 
 
-    path('delfacture/',DeletedFacture.as_view()),
+
     path('flashm/',FlashMonths.as_view()),
     path('attm/',AttMonths.as_view()),
     path('detail/',getDetailFacture.as_view()),

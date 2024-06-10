@@ -673,26 +673,21 @@ class AddEncaissement(generics.CreateAPIView):
     serializer_class = EncaissementSerializer
 
     def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
         try:
+            Encaissement(
+                date_encaissement=serializer.initial_data['date_encaissement'],
+                montant_encaisse=serializer.initial_data['montant_encaisse'],
+                numero_piece=serializer.initial_data['numero_piece'],
+                facture= Factures.objects.get(numero_facture=serializer.initial_data['facture']),
+                mode_paiement= ModePaiement.objects.get(id=serializer.initial_data['mode_paiement']),
+                agence= TabAgence.objects.get(id=serializer.initial_data['agence'])
+            ).save(force_insert=True)
 
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            self.perform_create(serializer)
-            custom_response = {
-                'status': 'success',
-                'message': "L'Encaissement c'est deroulé avec succé",
-                'data': serializer.data,
-            }
+            return Response('Encaissement Effectué', status=status.HTTP_200_OK)
 
-            return Response(custom_response, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            custom_response = {
-                'status': 'error',
-                'message': str(e),
-                'data': None,
-            }
-
-            return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)
+        except IntegrityError as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
 class UpdateMarcheView(generics.UpdateAPIView):
@@ -899,23 +894,15 @@ class GetAttachements(generics.ListAPIView):
         mtp=0
         mtc=0
         response_data = super().list(request, *args, **kwargs).data
-
         m = Marche.objects.get(nt=self.request.query_params.get('nt', None),
                                code_site=self.request.query_params.get('code_site', None))
-
-        cp=Attachements.objects.filter(marche=m,nt=self.request.query_params.get('nt', None),
-                               code_site=self.request.query_params.get('code_site', None),date__year__lte=self.request.query_params.get('aa', None),
-                                    ).filter(date__month__lt=self.request.query_params.get('mm', None)).aggregate(total_amount=Sum('montant'))['total_amount'] or 0
-
-
 
         for q in queryset:
             mt = mt + q.montant
             mtp = mtp+q.montant_precedent
             mtc= mtc+q.montant_cumule
         try:
-            qt = ((mt+cp) / m.ht) * 100
-
+            qt = (mt / m.ht) * 100
         except Exception as e:
             qt = 0
 
@@ -1051,17 +1038,17 @@ class UpdateCautionApiView(generics.UpdateAPIView):
 
 
 class DeleteInvoiceApiView(generics.DestroyAPIView):
-    queryset = DQE.objects.all()
+    queryset = Factures.objects.all()
     serializer_class = FactureSerializer
-
+    lookup_url_kwarg = ['numer_facture']
     def delete(self, request, *args, **kwargs):
-        pk = request.data.get(Factures._meta.pk.name)
-        if pk:
-            queryset = self.filter_queryset(self.get_queryset())
-            queryset = queryset.filter(pk__in=pk)
-            self.perform_destroy(queryset)
+        pk = self.request.query_params.get('numero_facture')
 
-        return Response({'Message': pk}, status=status.HTTP_200_OK)
+        if pk:
+            Factures.objects.get(numero_facture=pk).delete()
+
+
+        return Response('Facture Annulée', status=status.HTTP_200_OK)
 
 
 class UserProfile(APIView):
@@ -1190,19 +1177,19 @@ class GetDQEStateView(generics.ListAPIView):
                             status=status.HTTP_404_NOT_FOUND)
 
 
-class DelEnc(generics.DestroyAPIView, DestroyModelMixin):
+class DelEnc(generics.DestroyAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = Encaissement.objects.all()
     serializer_class = EncaissementSerializer
+    lookup_url_kwarg = ['id']
 
     def delete(self, request, *args, **kwargs):
-        pk_list = request.data.get(Encaissement._meta.pk.name)
-        if pk_list:
-            queryset = self.filter_queryset(self.get_queryset())
-            queryset = queryset.filter(pk__in=pk_list)
-            self.perform_destroy(queryset)
+        pk = self.request.query_params.get('id')
 
-        return Response({'Message': pk_list}, status=status.HTTP_200_OK)
+        if pk:
+            Encaissement.objects.get(id=pk).delete()
+
+        return Response('Enaissement Annulé', status=status.HTTP_200_OK)
 
 
 class DeletedEncaissement(generics.ListAPIView):
@@ -1288,7 +1275,6 @@ class GetDQEAvenent(generics.ListAPIView):
         response_data = super().list(request, *args, **kwargs).data
         for q in queryset:
             mt = mt + q.prix_q
-
         return Response({'dqe': response_data,
                          'extra': {
                              'mt': mt,
@@ -1446,35 +1432,8 @@ class UpdateAttachementApiVew(generics.UpdateAPIView):
 
 
 
-
-
 class GetPSView(generics.ListAPIView):
-    #permission_classes = [permissions.IsAuthenticated, ViewClientPermission]
     queryset = ProductionStockee.objects.all()
     serializer_class = PSSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = PSFilter
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-
-        x=[]
-        y1=[]
-        y2=[]
-        response_data = super().list(request, *args, **kwargs).data
-        for q in queryset:
-            x.append(q.code_tache)
-            y1.append(q.qte_att)
-            y2.append(q.qte_prod)
-
-        return Response({'prod': response_data,
-                         'extra': {
-                             'x':x,
-                             'y1':y1,
-                             'y2':y2,
-                         },
-                         'extra2':{
-                             'pole': request.query_params.get('code_site', None),
-                             'nt': request.query_params.get('nt', None)
-                         }
-                         }, status=status.HTTP_200_OK)

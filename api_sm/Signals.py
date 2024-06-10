@@ -11,6 +11,7 @@ from num2words import num2words
 from .models import *
 
 
+
 # NT
 @receiver(pre_save, sender=NT)
 def pre_save_nt(sender, instance, **kwargs):
@@ -80,11 +81,12 @@ def pre_save_encaissement(sender, instance, **kwargs):
 
         if(not sum):
             sum=0
-        sum=sum+instance.montant_encaisse
-        if(instance.montant_creance == 0):
+
+        sum=sum+float(instance.montant_encaisse)
+        if(float(instance.montant_creance) == 0.0):
             instance.facture.paye=True
             instance.facture.save()
-        if(instance.montant_creance < 0):
+        if(float(instance.montant_creance) < 0):
             raise ValidationError('Le paiement de la facture est terminer')
 
 

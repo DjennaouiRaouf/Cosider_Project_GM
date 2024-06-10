@@ -161,14 +161,14 @@ class DQESerializer(serializers.ModelSerializer):
 class DQEAvenantSerializer(serializers.ModelSerializer):
     prix_q = serializers.SerializerMethodField(label="Montant")
     pole = serializers.PrimaryKeyRelatedField(source='code_site', queryset=Sites.objects.all(), label='Pole')
-
     def get_prix_q(self, obj):
         return obj.prix_q
+
 
     class Meta:
         model = DQEAvenant
         fields = ['pole', 'nt', 'code_tache','num_avenant','libelle', 'est_tache_composite', 'est_tache_complementaire', 'prix_u',
-                  'quantite', 'unite', 'prix_q']
+                  'quantite', 'unite', 'prix_q','lib_activite']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -176,12 +176,10 @@ class DQEAvenantSerializer(serializers.ModelSerializer):
             representation['unite'] = instance.unite.libelle
         else:
             representation['unite'] = None
-
         return representation
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
-
         return fields
 
 
