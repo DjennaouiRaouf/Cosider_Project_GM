@@ -337,10 +337,6 @@ class DQE(DeleteMixin,CPkModel):
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
     objects = GeneralManager()
 
-    def delete(self, *args, **kwargs):
-        self.est_bloquer=True
-        super().save(force_update=True,*args, **kwargs)
-
 
     @property
     def prix_q(self):
@@ -490,9 +486,24 @@ class Attachements(DeleteMixin,models.Model):
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False,default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
     objects = GeneralManager()
+
     def delete(self, *args, **kwargs):
-        self.est_bloquer=True
-        super().save(force_update=True,*args, **kwargs)
+        username = str(get_current_user())
+        id_Att=self.id
+        sql_query = f"""
+                 IF NOT EXISTS(SELECT * FROM Detail_Facture WHERE Detail IN (SELECT Id_Attachement FROM Attachements))
+                            BEGIN
+                                 DECLARE @Count INT =  (SELECT  COUNT(Est_Bloquer) FROM Attachements WHERE Est_Bloquer = 1);
+                                 UPDATE Attachements SET Id_Attachement =CONCAT(Id_Attachement,'-A-',@Count),User_ID='{username}', Date_Modification = GETDATE(),Est_Bloquer = 1 WHERE Id_Attachement = '{id_Att}' ;
+                            END
+                 ELSE
+                            BEGIN
+                                RAISERROR ('Annulation Impossible Déja Facturé', 16, 1)
+                            END     
+               """
+        with connection.cursor() as cursor:
+            cursor.execute(sql_query)
+
 
     @property
     def qte_cumule(self):
@@ -596,14 +607,28 @@ class Factures(DeleteMixin,models.Model):
         num_f = self.numero_facture
         username=str(get_current_user())
         sql_query = f"""
-                   UPDATE Detail_Facture SET Num_Facture = NULL WHERE  Num_Facture = '{num_f}';
-                   DECLARE @Count INT =  (SELECT CASE WHEN COUNT(Est_Bloquer) > 0 THEN COUNT(Est_Bloquer) ELSE 0 END FROM Factures WHERE Est_Bloquer = 1);
-                   UPDATE Factures SET Num_Facture = CONCAT('{num_f}', '-A-',@Count ) , Est_Bloquer = 1,User_ID='{username}',Date_Modification=GETDATE() WHERE Num_Facture = '{num_f}';
-                   UPDATE Detail_Facture SET Num_Facture = CONCAT('{num_f}', '-A-', @Count)  , Est_Bloquer = 1,User_ID='{username}',Date_Modification=GETDATE()  WHERE  Num_Facture IS NULL;
+                        
+                        IF NOT EXISTS (SELECT * FROM Encaissements WHERE Facture = '{num_f}')
+                            BEGIN
+                                   UPDATE Detail_Facture SET Num_Facture = NULL WHERE  Num_Facture = '{num_f}';
+                                   UPDATE Remboursement SET Num_Facture = NULL WHERE  Num_Facture = '{num_f}';
+                                   DECLARE @Count INT =  (SELECT  COUNT(Est_Bloquer) FROM Factures WHERE Est_Bloquer = 1);
+                                   UPDATE Factures SET Num_Facture = CONCAT('{num_f}', '-A-',@Count ) , Est_Bloquer = 1,User_ID='{username}',Date_Modification=GETDATE() WHERE Num_Facture = '{num_f}';
+                                   UPDATE Detail_Facture SET Num_Facture = CONCAT('{num_f}', '-A-', @Count)  , Est_Bloquer = 1,User_ID='{username}',Date_Modification=GETDATE()  WHERE  Num_Facture IS NULL;
+                                   UPDATE Remboursement SET Num_Facture = CONCAT('{num_f}', '-A-', @Count)  , Est_Bloquer = 1,User_ID='{username}',Date_Modification=GETDATE()  WHERE  Num_Facture IS NULL;
+                            END
+                        
+                        ELSE
+                            BEGIN
+                                RAISERROR ('Annulation Impossible', 16, 1)
+                            END     
+               
                """
         with connection.cursor() as cursor:
-            cursor.execute(sql_query)
-
+            try:
+                cursor.execute(sql_query)
+            except Exception as e:
+                raise ValidationError(str(e))
     @property
     def montant_ava_remb(self):
         try:

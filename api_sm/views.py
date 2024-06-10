@@ -528,19 +528,31 @@ class DelDQEByID(generics.DestroyAPIView):
 
 
 class DelATT(generics.DestroyAPIView):
-    # permission_classes = [IsAuthenticated,DeleteDQEPermission]
+    # permission_classes = [IsAuthenticated]
     queryset = Attachements.objects.all()
     serializer_class = AttachementsSerializer
-
     def delete(self, request, *args, **kwargs):
-        pk_list = request.data.get(Attachements._meta.pk.name)
-        if pk_list:
-            queryset = self.filter_queryset(self.get_queryset())
-            queryset = queryset.filter(pk__in=pk_list)
-            for obj in queryset:
-                obj.delete()
+        pks = self.request.data.get('ids', [])
+        print(pks)
+        if pks:
+            for pk in pks:
+                Attachements.objects.get(id=pk).delete()
 
-        return Response({'Message': pk_list}, status=status.HTTP_200_OK)
+        return Response(f'Les Attachements suivants {pks} sont Annulés', status=status.HTTP_200_OK)
+
+
+class RestoreATT(generics.DestroyAPIView):
+    # permission_classes = [IsAuthenticated]
+    queryset = Attachements.objects.deleted()
+    serializer_class = AttachementsSerializer
+    def delete(self, request, *args, **kwargs):
+        pks = self.request.data.get('ids', [])
+        print(pks)
+        if pks:
+            Attachements.objects.filter(id__in=pks).restore()
+
+        return Response(f'Les Attachements suivants {pks} sont Annulés', status=status.HTTP_200_OK)
+
 
 
 class UpdateDQEApiVew(generics.UpdateAPIView):
