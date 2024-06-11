@@ -547,19 +547,6 @@ class DelATT(generics.DestroyAPIView):
         return Response(f'Les Attachements suivants {pks} sont Annulés', status=status.HTTP_200_OK)
 
 
-class RestoreATT(generics.DestroyAPIView):
-    # permission_classes = [IsAuthenticated]
-    queryset = Attachements.objects.deleted()
-    serializer_class = AttachementsSerializer
-    def delete(self, request, *args, **kwargs):
-        pks = self.request.data.get('ids', [])
-        print(pks)
-        if pks:
-            Attachements.objects.filter(id__in=pks).restore()
-
-        return Response(f'Les Attachements suivants {pks} sont Annulés', status=status.HTTP_200_OK)
-
-
 
 class UpdateDQEApiVew(generics.UpdateAPIView):
     queryset = DQE.objects.all()
@@ -1066,14 +1053,18 @@ class UpdateCautionApiView(generics.UpdateAPIView):
 class DeleteInvoiceApiView(generics.DestroyAPIView):
     queryset = Factures.objects.all()
     serializer_class = FactureSerializer
-    lookup_url_kwarg = ['numer_facture']
+
     def delete(self, request, *args, **kwargs):
-        pk = self.request.query_params.get('numero_facture')
+        pks = self.request.data.get('numero_facture', [])
+        print(pks)
+        if pks:
 
-        if pk:
-            Factures.objects.get(numero_facture=pk).delete()
+            for pk in pks:
+                try:
+                    Factures.objects.get(numero_facture=pk).delete()
 
-
+                except Exception as e:
+                    continue
         return Response('Facture Annulée', status=status.HTTP_200_OK)
 
 
