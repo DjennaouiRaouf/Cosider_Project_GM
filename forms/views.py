@@ -997,7 +997,6 @@ class EncaissementFieldsApiView(APIView):
 
                         field_info.append(obj)
 
-
             return Response({'fields': field_info,
             'models': model_name, 'pk': Encaissement._meta.pk.name}, status=status.HTTP_200_OK)
         else:
