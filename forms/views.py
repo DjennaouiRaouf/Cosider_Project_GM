@@ -977,15 +977,21 @@ class EncaissementFieldsApiView(APIView):
             if (flag == 'l'):  # data grid list (react ag-grid)
                 field_info = []
                 for field_name, field_instance in fields.items():
-                    if( field_name not in ['facture']):
+                    if( field_name not in ['']):
                         obj = {
                             'field': field_name,
                             'headerName': field_instance.label or field_name,
                             'info': str(field_instance.__class__.__name__),
                             'cellRenderer': 'InfoRenderer'
                         }
+                        if (field_name in ['facture']):
+                            obj['rowGroup'] = True
+
                         if (field_name in ['id']):
                             obj['hide'] = True
+
+
+
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                             obj['related'] = str(field_instance.queryset.model.__name__)
 

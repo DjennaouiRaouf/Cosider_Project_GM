@@ -433,7 +433,7 @@ class DeletedFacture(generics.ListAPIView):
 
 
 class GetEncaissement(generics.ListAPIView):
-    queryset = Encaissement.objects.all().order_by('-date_encaissement')
+    queryset = Encaissement.objects.all()
     serializer_class = EncaissementSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = EncaissementFilter
@@ -445,8 +445,7 @@ class GetEncaissement(generics.ListAPIView):
         response_data = super().list(request, *args, **kwargs).data
         for q in queryset:
             mp += q.montant_encaisse
-
-            creance = q.montant_creance
+            creance += q.montant_creance
 
         return Response({'enc': response_data,
                          'extra': {
@@ -663,9 +662,9 @@ class AddFactureApiView(generics.CreateAPIView):
                               avance=avance).save(force_insert=True)
 
 
-            #if(float(serializer.initial_data['penalite']) > 0):
-            #    PenaliteRetard(facture=Factures.objects.get(numero_facture=serializer.initial_data['numero_facture']),
-            #                   montant=serializer.initial_data['penalite']).save(force_insert=True)
+            if(float(serializer.initial_data['penalite']) > 0):
+                PenaliteRetard(facture=Factures.objects.get(numero_facture=serializer.initial_data['numero_facture']),
+                               montant=serializer.initial_data['penalite']).save(force_insert=True)
 
             return Response('Facture ajoutée', status=status.HTTP_200_OK)
 

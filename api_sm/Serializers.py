@@ -363,18 +363,16 @@ class ModePaiementSerializer(serializers.ModelSerializer):
 
 
 class EncaissementSerializer(serializers.ModelSerializer):
-
     class Meta:
         model=Encaissement
-        fields='__all__'
+        fields=['id','facture','date_encaissement','mode_paiement','agence','numero_piece']
+
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
         fields.pop('est_bloquer', None)
         fields.pop('user_id', None)
         fields.pop('date_modification', None)
-
-
         return fields
 
 
@@ -383,9 +381,8 @@ class EncaissementSerializer(serializers.ModelSerializer):
         representation['montant_creance']=instance.montant_creance
         representation['montant_encaisse'] = instance.montant_encaisse
         representation['agence'] = instance.agence.libelle
-
-        del representation['facture']
-
+        representation['facture']=instance.facture.numero_facture
+        representation['mode_paiement'] = instance.mode_paiement.libelle
         return representation
 
 

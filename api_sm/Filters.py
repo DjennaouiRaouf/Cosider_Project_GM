@@ -234,7 +234,7 @@ class FactureFilter(django_filters.FilterSet):
 class EncaissementFilter(django_filters.FilterSet):
     class Meta:
         model = Encaissement
-        fields=['date_encaissement','mode_paiement','facture','facture__marche']
+        fields=['date_encaissement','mode_paiement','facture','facture__marche__nt','facture__marche__code_site']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -612,10 +612,15 @@ class Factures(DeleteMixin,models.Model):
                             BEGIN
                                    UPDATE Detail_Facture SET Num_Facture = NULL WHERE  Num_Facture = '{num_f}';
                                    UPDATE Remboursement SET Num_Facture = NULL WHERE  Num_Facture = '{num_f}';
+                                   UPDATE Penalite_Retard SET Num_Facture = NULL WHERE  Num_Facture = '{num_f}';
+                                   
                                    DECLARE @Count INT =  (SELECT  COUNT(Est_Bloquer) FROM Factures WHERE Est_Bloquer = 1);
                                    UPDATE Factures SET Num_Facture = CONCAT('{num_f}', '-A-',@Count ) , Est_Bloquer = 1,User_ID='{username}',Date_Modification=GETDATE() WHERE Num_Facture = '{num_f}';
                                    UPDATE Detail_Facture SET Num_Facture = CONCAT('{num_f}', '-A-', @Count)  , Est_Bloquer = 1,User_ID='{username}',Date_Modification=GETDATE()  WHERE  Num_Facture IS NULL;
                                    UPDATE Remboursement SET Num_Facture = CONCAT('{num_f}', '-A-', @Count)  , Est_Bloquer = 1,User_ID='{username}',Date_Modification=GETDATE()  WHERE  Num_Facture IS NULL;
+                                   UPDATE Penalite_Retard SET Num_Facture = CONCAT('{num_f}', '-A-', @Count)  , Est_Bloquer = 1,User_ID='{username}',Date_Modification=GETDATE()  WHERE  Num_Facture IS NULL;
+                                   
+                            
                             END
                         
                         ELSE
