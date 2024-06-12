@@ -438,23 +438,6 @@ class GetEncaissement(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = EncaissementFilter
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        mp = 0
-        creance = 0
-        response_data = super().list(request, *args, **kwargs).data
-        for q in queryset:
-            mp += q.montant_encaisse
-            creance += q.montant_creance
-
-        return Response({'enc': response_data,
-                         'extra': {
-
-                             'mp': mp,
-                             'creance': creance,
-
-                         }}, status=status.HTTP_200_OK)
-
 
 class getDetFacture(generics.ListAPIView):
     queryset = DetailFacture.objects.all()
@@ -1193,17 +1176,20 @@ class GetDQEStateView(generics.ListAPIView):
                             status=status.HTTP_404_NOT_FOUND)
 
 
+
 class DelEnc(generics.DestroyAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = Encaissement.objects.all()
     serializer_class = EncaissementSerializer
-    lookup_url_kwarg = ['id']
 
     def delete(self, request, *args, **kwargs):
-        pk = self.request.query_params.get('id')
-
-        if pk:
-            Encaissement.objects.get(id=pk).delete()
+        pks = self.request.data.get('ids', [])
+        print(pks)
+        if pks:
+            for pk in pks:
+                Encaissement.objects.get(id=pk).delete()
+        else:
+            return Response('Erreur', status=status.HTTP_400_BAD_REQUEST)
 
         return Response('Enaissement Annulé', status=status.HTTP_200_OK)
 

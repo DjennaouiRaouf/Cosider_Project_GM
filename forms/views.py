@@ -719,6 +719,10 @@ class NTFieldsApiView(APIView):
                             'headerName': field_instance.label or field_name,
                             'info': str(field_instance.__class__.__name__),
                     }
+                    if (field_name in ['site']):
+                        obj['rowGroup'] = True
+
+
                     if(field_name in ['id']):
                         obj['hide']=True
                     field_info.append(obj)
@@ -949,7 +953,7 @@ class EncaissementFieldsApiView(APIView):
             if (flag == 'f'):  # react form
                 field_info = []
                 for field_name, field_instance in fields.items():
-                    if( not field_name in ['montant_creance','facture','id'] ):
+                    if( not field_name in ['montant_creance','facture','id','restant'] ):
                         obj = {
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),
@@ -986,10 +990,16 @@ class EncaissementFieldsApiView(APIView):
                         }
                         if (field_name in ['facture']):
                             obj['rowGroup'] = True
+                            obj['pinned'] = 'left'
+                            obj['checkboxSelection'] = True
+                            obj['headerCheckboxSelection'] = True
+
 
                         if (field_name in ['id']):
                             obj['hide'] = True
 
+                        if(field_name  in ['restant','montant_encaisse']):
+                            obj['aggFunc']='sum'
 
 
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
@@ -1012,7 +1022,7 @@ class EncaissementFieldsStateApiView(APIView):
         field_info = []
         for field_name, field_instance in fields.items():
             default_value = None
-            if (field_name not in  ['montant_creance','facture']):
+            if (field_name not in  ['montant_creance','facture','restant']):
                 if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
                     default_value = []
                 if str(field_instance.__class__.__name__) == 'BooleanField':
@@ -1051,6 +1061,7 @@ class EncaissementFieldsFilterApiView(APIView):
 
                         'label': field_instance.label or field_name,
                     }
+
                     if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                         anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
                         serialized_data = anySerilizer(field_instance.queryset, many=True).data
@@ -1203,6 +1214,10 @@ class AvanceFieldsApiView(APIView):
                             'headerName': field_instance.label or field_name,
                             'info': str(field_instance.__class__.__name__),
                         }
+
+                        if(field_name in ['type']):
+                            obj['rowGroup']=True
+
                         if(field_name in ['id','marche']):
                             obj['hide']=True
                         if(field_name in ['taux_avance','taux_remb','montant','debut','fin']):
@@ -1720,7 +1735,9 @@ class AvenantFieldsApiView(APIView):
                         'headerName': field_instance.label or field_name,
                         'info': str(field_instance.__class__.__name__),
                     }
-
+                    if (field_name in ['id']):
+                        obj['rowGroup'] = True
+                        obj['pinned']='left'
 
                     if (field_name in ['rg','rabais','tva', 'montant_ttc', 'montant_ht']):
                         obj['cellRenderer'] = 'InfoRenderer'

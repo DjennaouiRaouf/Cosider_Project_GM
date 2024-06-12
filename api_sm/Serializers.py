@@ -168,7 +168,7 @@ class DQEAvenantSerializer(serializers.ModelSerializer):
     class Meta:
         model = DQEAvenant
         fields = ['pole', 'nt', 'code_tache','num_avenant','libelle', 'est_tache_composite', 'est_tache_complementaire', 'prix_u',
-                  'quantite', 'unite', 'prix_q','lib_activite']
+                  'quantite', 'unite', 'prix_q']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -363,9 +363,13 @@ class ModePaiementSerializer(serializers.ModelSerializer):
 
 
 class EncaissementSerializer(serializers.ModelSerializer):
+    restant=serializers.SerializerMethodField(label='Montant Restant')
+
+    def get_restant(self,obj):
+        return obj.montant_creance
     class Meta:
         model=Encaissement
-        fields=['id','facture','date_encaissement','mode_paiement','agence','numero_piece']
+        fields=['id','facture','date_encaissement','mode_paiement','agence','numero_piece','montant_encaisse','restant']
 
 
     def get_fields(self, *args, **kwargs):
@@ -605,12 +609,12 @@ class RemboursementSerializer(serializers.ModelSerializer):
 
 class ECSerializer(serializers.ModelSerializer):
     nt = serializers.SerializerMethodField(label='NT',read_only=True)
-    code_site = serializers.SerializerMethodField(label='code_site', read_only=True)
+    code_site = serializers.SerializerMethodField(label='Pole', read_only=True)
 
     client = serializers.SerializerMethodField(label='Client',read_only=True)
 
     mgf = serializers.SerializerMethodField(label='M.G.Facturé')
-    mgp = serializers.SerializerMethodField(label='M.G.Payé')
+    mgp = serializers.SerializerMethodField(label='M.G.Encaissé')
     mgc = serializers.SerializerMethodField(label='M.G.Créance')
 
     def get_nt(self,obj):

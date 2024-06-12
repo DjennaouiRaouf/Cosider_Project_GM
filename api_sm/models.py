@@ -854,10 +854,10 @@ class ModePaiement(DeleteMixin,models.Model):
 
 class Encaissement(DeleteMixin,models.Model):
     id = models.AutoField(db_column='Id_Enc', primary_key=True)
-    facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,db_column='Facture',null=True,blank=True,verbose_name="Facture")
+    facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,db_column='Facture',null=True,blank=True,verbose_name="N° Facture")
     date_encaissement=models.DateField(null=False,db_column='Date_Encaissement',verbose_name="Date d'encaissement")
-    mode_paiement=models.ForeignKey(ModePaiement,on_delete=models.DO_NOTHING,db_column='Mode_Paiement',null=False,verbose_name="Mode de paiement")
-    montant_encaisse=models.FloatField( db_column='Montant_Encaisse',blank=True,verbose_name="Montant encaissé",
+    mode_paiement=models.ForeignKey(ModePaiement,on_delete=models.DO_NOTHING,db_column='Mode_Paiement',null=False,verbose_name="Mode de Paiement")
+    montant_encaisse=models.FloatField( db_column='Montant_Encaisse',blank=True,verbose_name="Montant Encaissé",
                                      validators=[MinValueValidator(0)], default=0)
     agence = models.ForeignKey('api_sch.TabAgence',on_delete=models.DO_NOTHING,db_column='Agence' , null=True, verbose_name='Agence')
 
