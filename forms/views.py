@@ -990,6 +990,7 @@ class EncaissementFieldsApiView(APIView):
                         }
                         if (field_name in ['facture']):
                             obj['rowGroup'] = True
+                            obj['hide'] = True
                             obj['pinned'] = 'left'
                             obj['checkboxSelection'] = True
                             obj['headerCheckboxSelection'] = True
