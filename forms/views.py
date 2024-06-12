@@ -1002,6 +1002,7 @@ class EncaissementFieldsApiView(APIView):
                             obj['aggFunc']='sum'
 
 
+
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                             obj['related'] = str(field_instance.queryset.model.__name__)
 
