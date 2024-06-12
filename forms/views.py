@@ -994,14 +994,11 @@ class EncaissementFieldsApiView(APIView):
                             obj['checkboxSelection'] = True
                             obj['headerCheckboxSelection'] = True
 
-
                         if (field_name in ['id']):
                             obj['hide'] = True
 
                         if(field_name  in ['restant','montant_encaisse']):
                             obj['aggFunc']='sum'
-
-
 
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                             obj['related'] = str(field_instance.queryset.model.__name__)
