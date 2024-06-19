@@ -13,7 +13,7 @@ from django.db import connection
 
 class GeneralManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(Q(est_bloquer=False) or Q(est_bloquer=None))
+        return super().get_queryset().filter(~Q(est_bloquer=True))
     def deleted(self):
         return super().get_queryset().filter(Q(est_bloquer=True))
 

@@ -138,7 +138,7 @@ class DQESerializer(serializers.ModelSerializer):
 
     class Meta:
         model=DQE
-        fields=['pole','nt','code_tache','libelle','est_tache_composite','est_tache_complementaire','prix_u','quantite','unite','prix_q']
+        fields=['pole','nt','code_tache','libelle','prix_u','quantite','unite','prix_q']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -167,7 +167,7 @@ class DQEAvenantSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DQEAvenant
-        fields = ['pole', 'nt', 'code_tache','num_avenant','libelle', 'est_tache_composite', 'est_tache_complementaire', 'prix_u',
+        fields = ['pole', 'nt', 'code_tache','num_avenant','libelle', 'prix_u',
                   'quantite', 'unite', 'prix_q']
 
     def to_representation(self, instance):

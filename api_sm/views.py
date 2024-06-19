@@ -1,5 +1,5 @@
 import json
-
+import pandas
 import openpyxl
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import check_password
@@ -1386,51 +1386,43 @@ class ImportDQEAvenantAPIView(APIView):
             return Response('Impossible d\' ajouter un avenant', status=status.HTTP_200_OK)
 
         try:
-            workbook = openpyxl.load_workbook(dqe_file)
-            sheet = workbook.active
-            newRows = 0
-            updatedRows = 0
 
-            for row in sheet.iter_rows(min_row=2, values_only=True):
+            df=pandas.read_excel(dqe_file, engine='openpyxl')
+            print(df['pole'])
+            for index, row in df.iterrows():
                 try:
-                    dqe = DQE.objects.get(nt=row[1], code_site=row[0],
-                                          code_tache=row[2])
+                    dqe = DQE.objects.get(nt=row['nt'], code_site=row['pole'],
+                                          code_tache=row['code_tache'])
                     DQEAvenant(
-                        code_site=row[0], nt=row[1],
-                        code_tache=row[2], prix_u=row[6],
+                        code_site=row['pole'], nt=row['nt'],
+                        code_tache=row['code_tache'], prix_u=row['prix_u'],
                         num_avenant=num_av,
-                        est_tache_composite=row[4],
-                        est_tache_complementaire=False,
-                        unite=TabUniteDeMesure.objects.get(libelle=row[8]),
-                        libelle=row[3], quantite=row[7], user_id=request.user.username).save(force_insert=True)
+                        unite=TabUniteDeMesure.objects.get(libelle=row['unite']),
+                        libelle=row['libelle'], quantite=row['quantite'], user_id=request.user.username).save(force_insert=True)
 
-                    qte = float(dqe.quantite) + float(row[7])
+                    qte = float(dqe.quantite) + float(row['quantite'])
                     if (qte < 0):
                         qte = 0
                     dqe.quantite = qte
-                    dqe.prix_u = float(row[6])
+                    dqe.prix_u = float(row['prix_u'])
                     dqe.save(force_update=True)
 
                 except DQE.DoesNotExist:
                     DQEAvenant(
-                        code_site=row[0], nt=row[1],
-                        code_tache=row[2], prix_u=row[6],
+                        code_site=row['pole'], nt=row['nt'],
+                        code_tache=row['code_tache'], prix_u=row['prix_u'],
                         num_avenant=num_av,
-                        est_tache_composite=row[4],
-                        est_tache_complementaire=True,
-                        unite=TabUniteDeMesure.objects.get(libelle=row[8]),
-                        libelle=row[3], quantite=row[7], user_id=request.user.username).save(force_insert=True)
+                        unite=TabUniteDeMesure.objects.get(libelle=row['unite']),
+                        libelle=row['libelle'], quantite=row['quantite'], user_id=request.user.username).save(force_insert=True)
 
                     DQE(
-                        code_site=row[0], nt=row[1],
-                        code_tache=row[2], prix_u=row[6],
-                        est_tache_composite=row[4],
-                        est_tache_complementaire=True,
-                        unite=TabUniteDeMesure.objects.get(libelle=row[8]),
-                        libelle=row[3], quantite=row[7], user_id=request.user.username
+                        code_site=row['pole'], nt=row['nt'],
+                        code_tache=row['code_tache'], prix_u=row['prix_u'],
+                        unite=TabUniteDeMesure.objects.get(libelle=row['unite']),
+                        libelle=row['libelle'], quantite=row['quantite'], user_id=request.user.username
                     ).save(force_insert=True)
 
-            return Response(f'Creation de {newRows} ligne(s) \n Mise à jour de {updatedRows} ligne(s) ',
+            return Response(f'Creation des Taches de l\'avenant  n° {num_av}',
                                 status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)

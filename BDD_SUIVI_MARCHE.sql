@@ -18,6 +18,19 @@ CASE WHEN prod.Qte_Produite - att.Qte_Attachee <> 0 THEN 1 ELSE 0 END AS Indicat
  from Vue_Attachements_All att , Vue_Production_All prod
 where att.NT = prod.NT and att.Code_Site = prod.Code_site and att.Code_Tache = prod.Code_Tache
 );
+/******************************************************************/
+
+create view Vue_Dernier_Contrat as  SELECT ma.*
+FROM Marche_Avenant ma
+JOIN (
+    SELECT Num_Contrat, NT, Code_Site, MAX(Num_Avenant) AS Max_Num_Avenant
+    FROM Marche_Avenant
+    GROUP BY Num_Contrat, NT, Code_Site
+) latest ON ma.Num_Contrat = latest.Num_Contrat
+          AND ma.NT = latest.NT
+          AND ma.Code_Site = latest.Code_Site
+          AND ma.Num_Avenant = latest.Max_Num_Avenant;
+
 
 
 /******************************************************************/
