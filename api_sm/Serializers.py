@@ -612,11 +612,13 @@ class ECSerializer(serializers.ModelSerializer):
     code_site = serializers.SerializerMethodField(label='Pole', read_only=True)
 
     client = serializers.SerializerMethodField(label='Client',read_only=True)
-
+    mht = serializers.SerializerMethodField(label='Montant du Marché (en HT)')
     mgf = serializers.SerializerMethodField(label='M.G.Facturé')
     mgp = serializers.SerializerMethodField(label='M.G.Encaissé')
     mgc = serializers.SerializerMethodField(label='M.G.Créance')
 
+    def get_mht(self,obj):
+        return obj.ht
     def get_nt(self,obj):
         return obj.nt
 
@@ -624,7 +626,7 @@ class ECSerializer(serializers.ModelSerializer):
         return obj.code_site
     def get_client(self, obj):
         n=NT.objects.get(nt=obj.nt,code_site=obj.code_site)
-        return n.code_client
+        return n.code_client.libelle
 
     def get_mgf(self, obj):
         return obj.montant_global_f
@@ -638,7 +640,7 @@ class ECSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Marche
-        fields = ['id','nt','code_site','client','mgf','mgp','mgc']
+        fields = ['id','code_site','nt','client','mht','mgf','mgp','mgc']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
