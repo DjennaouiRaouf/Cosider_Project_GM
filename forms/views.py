@@ -1532,6 +1532,7 @@ class AttachementsFieldsApiView(APIView):
                             obj['headerCheckboxSelection']= True
                         if(field_name in ['qte','montant']):
                             obj['editable']= True
+
                         if(field_name in ['id','code_site','nt']):
                             obj['hide'] = True
                         if(field_name in ['prix_u']):

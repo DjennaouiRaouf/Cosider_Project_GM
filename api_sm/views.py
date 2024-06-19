@@ -406,6 +406,8 @@ class GetFacture(generics.ListAPIView):
                          'extra': {
 
                              'contrat': m.id,
+                             'mht':m.ht,
+                             'mttc':m.ttc,
                              'tva':m.tva,
                              'rg':m.rg,
                              'rb':m.rabais,
@@ -860,9 +862,11 @@ class AddAttachementApiView(generics.CreateAPIView):
             marche = Marche.objects.get(code_site=i['code_site'], nt=i['nt'])
             print(marche.id)
             try:
+                qte=i['quantite_1']+i['quantite_2']+i['quantite_3']
+                val=i['valeur_1']+i['valeur_2']+i['valeur_3']
                 Attachements(code_site=i['code_site'], nt=i['nt'],
                              code_tache=i['code_tache'], date=i['mmaa'],
-                             qte=i['quantite_1'],montant=i['valeur_1'], marche=marche).save(force_insert=True)
+                             qte=qte,montant=val, marche=marche).save(force_insert=True)
             except IntegrityError as e:
                 pass
         return Response('Attachement ajouté', status=status.HTTP_200_OK)
