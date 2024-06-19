@@ -1824,6 +1824,7 @@ class AvenantFieldsStateApiView(APIView):
             s=Sites.objects.get(id=state['code_site'])
 
             state['code_site']=[{'value':s.id,'label':s.libelle}]
+            state['num_avenant']=marche.num_avenant+1
 
         return Response({'state': state}, status=status.HTTP_200_OK)
 
@@ -2035,3 +2036,7 @@ class PSFieldsApiView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+
+

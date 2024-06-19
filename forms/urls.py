@@ -63,4 +63,6 @@ urlpatterns = [
     path('avancefilterfields/',AvanceFieldsFilterApiView.as_view()),
     path('prodfields/',PSFieldsApiView.as_view()),
 
+
+
 ]
