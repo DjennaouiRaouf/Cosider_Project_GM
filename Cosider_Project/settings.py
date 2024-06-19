@@ -96,12 +96,12 @@ DATABASES = {
 DATABASES = {
     'default': {
         "ENGINE": "mssql",
-        "NAME": "ca_ch",
+        "NAME": "CA_CH",
         "USER": "",
         "PASSWORD": "",
-        "HOST": "localhost\MSSQLSERVER1",
+        "HOST": "localhost\MSSQLSERVER",
         "PORT": "2448",
-        "OPTIONS": {"driver": "ODBC Driver 18 for SQL Server",
+        "OPTIONS": {"driver": "SQL Server Native Client 11.0",
                     'extra_params': "Encrypt=no;TrustServerCertificate=yes",
                     'MARS_Connection': 'True',  # Enable Multiple Active Result Sets
                     'host_is_server': 'True',  # Optimize connection settings

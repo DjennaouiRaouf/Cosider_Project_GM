@@ -947,7 +947,7 @@ class Cautions(DeleteMixin,models.Model):
     id = models.CharField(db_column='Id_Caution', primary_key=True, max_length=30)
 
     marche = models.ForeignKey(Marche,db_column='Num_Marche', on_delete=models.DO_NOTHING, null=True, related_name="Caution_Marche",to_field='id')
-    type = models.ForeignKey(TypeCaution,db_column='Type_Caution', on_delete=models.DO_NOTHING, null=False,verbose_name="Libellé",to_field='')
+    type = models.ForeignKey(TypeCaution,db_column='Type_Caution', on_delete=models.DO_NOTHING, null=False,verbose_name="Type",to_field='')
     avance = models.ForeignKey(Avance,db_column='Avance', on_delete=models.DO_NOTHING, null=True, blank=True,verbose_name='Avance')
     date_soumission = models.DateField(db_column='Date_Soumission',null=False,verbose_name="Date dépot")
     agence = models.ForeignKey('api_sch.TabAgence',db_column='Agence', on_delete=models.CASCADE,verbose_name="Agence")

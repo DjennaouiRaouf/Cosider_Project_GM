@@ -369,10 +369,13 @@ class MarcheFieldsApiView(APIView):
                         'info': str(field_instance.__class__.__name__),
 
                     }
-
+                    
 
                     if (field_name in ['rg','rabais','tva', 'montant_ttc', 'montant_ht']):
                         obj['cellRenderer'] = 'InfoRenderer'
+                    
+                    if(field_name in ['libelle']):
+                        obj['width']=600
 
                     field_info.append(obj)
             return Response({'fields':field_info,'models':model_name,'pk':Marche._meta.pk.name},status=status.HTTP_200_OK)
@@ -467,25 +470,26 @@ class ClientFieldsStateApiView(APIView):
         fields = serializer.get_fields()
         field_info = []
         for field_name, field_instance in fields.items():
-            default_value = None
-            if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
-                default_value= []
-            if str(field_instance.__class__.__name__) == 'BooleanField':
-                default_value= False
-            if str(field_instance.__class__.__name__) in ['PositiveSmallIntegerField','DecimalField','PositiveIntegerField',
-                                                          'IntegerField',]:
-                default_value = 0
+            if(field_name not in ['type_client','est_client_cosider']):
+                default_value = None
+                if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
+                    default_value= []
+                if str(field_instance.__class__.__name__) == 'BooleanField':
+                    default_value= False
+                if str(field_instance.__class__.__name__) in ['PositiveSmallIntegerField','DecimalField','PositiveIntegerField',
+                                                            'IntegerField',]:
+                    default_value = 0
 
-            field_info.append({
-                field_name:default_value ,
+                field_info.append({
+                    field_name:default_value ,
 
-            })
-            state = {}
+                })
+                state = {}
 
-            for d in field_info:
-                state.update(d)
-        return Response({'state': state}, status=status.HTTP_200_OK)
-
+                for d in field_info:
+                    state.update(d)
+            return Response({'state': state}, status=status.HTTP_200_OK)
+        
 class ClientFieldsApiView(APIView):
         def get(self, request):
             flag = request.query_params.get('flag', None)
@@ -496,23 +500,31 @@ class ClientFieldsApiView(APIView):
                 model_name = model_class.__name__
                 if (flag == 'f'):  # react form
                     field_info = []
+                    obj={}
                     for field_name, field_instance in fields.items():
-                        field_info.append({
-                            'name': field_name,
-                            'type': str(field_instance.__class__.__name__),
-                            "required": field_instance.required,
-                            'label': field_instance.label or field_name,
-                        })
+                        if(field_name not in ['type_client','est_client_cosider']):
+                            obj={
+                                'name': field_name,
+                                'type': str(field_instance.__class__.__name__),
+                                "required": field_instance.required,
+                                'label': field_instance.label or field_name,
+                            }
+                            
+                            field_info.append(obj)
+
                 if (flag == 'l'):  # data grid list (react ag-grid)
                     field_info = []
+                    obj={}
                     for field_name, field_instance in fields.items():
-
-                        field_info.append({
-                            'field': field_name,
-                            'headerName': field_instance.label or field_name,
-                            'info': str(field_instance.__class__.__name__),
-                        })
-
+                        if(field_name not in ['type_client','est_client_cosider']):
+                            obj={
+                                'field': field_name,
+                                'headerName': field_instance.label or field_name,
+                                'info': str(field_instance.__class__.__name__),
+                            }
+                            if(field_name in ['libelle']):
+                                obj['width']=600
+                            field_info.append(obj)
                 return Response({'fields': field_info,'models':model_name,'pk':Clients._meta.pk.name}, status=status.HTTP_200_OK)
             else:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -989,12 +1001,12 @@ class EncaissementFieldsApiView(APIView):
                             'cellRenderer': 'InfoRenderer'
                         }
                         if (field_name in ['facture']):
+                            
                             obj['rowGroup'] = True
-                            obj['hide'] = True
+                          
                             obj['pinned'] = 'left'
                             obj['checkboxSelection'] = True
                             obj['headerCheckboxSelection'] = True
-
                         if (field_name in ['id']):
                             obj['hide'] = True
 
@@ -1219,7 +1231,7 @@ class AvanceFieldsApiView(APIView):
 
                         if(field_name in ['id','marche']):
                             obj['hide']=True
-                        if(field_name in ['taux_avance','taux_remb','montant','debut','fin']):
+                        if(field_name in ['taux_avance','taux_remb','montant','debut','fin','type']):
                             obj['cellRenderer']='InfoRenderer'
 
                         field_info.append(obj)
@@ -1512,6 +1524,9 @@ class AttachementsFieldsApiView(APIView):
                             'info': str(field_instance.__class__.__name__),
 
                         }
+
+                        if (field_name in ['libelle']):
+                            obj['width'] = 600
                         if(field_name =='code_tache'):
                             obj['checkboxSelection']= True
                             obj['headerCheckboxSelection']= True
@@ -1738,7 +1753,10 @@ class AvenantFieldsApiView(APIView):
                         obj['rowGroup'] = True
                         obj['pinned']='left'
 
-                    if (field_name in ['rg','rabais','tva', 'montant_ttc', 'montant_ht']):
+                    if(field_name in ['libelle']):
+                        obj['width']=600
+
+                    if (field_name in ['rg','rabais','tva', 'montant_ttc', 'montant_ht','id']):
                         obj['cellRenderer'] = 'InfoRenderer'
 
                     field_info.append(obj)
@@ -2000,6 +2018,9 @@ class PSFieldsApiView(APIView):
                             'info': str(field_instance.__class__.__name__),
 
                         }
+                        if(field_name in ['libelle']):
+                            obj['width']=600
+
                         if(field_name in ['code_site','nt','unite']):
                             obj['hide']=True
                         if(field_name in ['qte_prod','ecart','qte_att','ind'] ):

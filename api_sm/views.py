@@ -928,13 +928,25 @@ class GetAttachements(generics.ListAPIView):
                          }}, status=status.HTTP_200_OK)
 
 
-class contratKeys(APIView):
+class Poles(APIView):
     # permission_classes = [IsAuthenticated]
     def get(self, request):
         try:
-            nt = NT.objects.all().values_list('nt', flat=True).distinct()
-            pole = NT.objects.all().values_list('code_site', flat=True).distinct()
-            return Response({'nt': nt, 'pole': pole}, status=status.HTTP_200_OK)
+           
+            pole = Sites.objects.all().values_list('id', flat=True).distinct()
+            return Response({'pole': pole}, status=status.HTTP_200_OK)
+        except Marche.DoesNotExist:
+            return Response({'message': 'Pas de contrat'}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+class NTs(APIView):
+    # permission_classes = [IsAuthenticated]
+    def get(self, request):
+        try:
+            cs=request.query_params.get('code_site', None)
+            nt = NT.objects.filter(code_site=cs).values_list('nt', flat=True).distinct()
+            return Response({'nt':nt}, status=status.HTTP_200_OK)
         except Marche.DoesNotExist:
             return Response({'message': 'Pas de contrat'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -1183,14 +1195,15 @@ class DelEnc(generics.DestroyAPIView):
     serializer_class = EncaissementSerializer
 
     def delete(self, request, *args, **kwargs):
-        pks = self.request.data.get('ids', [])
+        pks = self.request.data.get('id', [])
         print(pks)
         if pks:
             for pk in pks:
-                Encaissement.objects.get(id=pk).delete()
-        else:
-            return Response('Erreur', status=status.HTTP_400_BAD_REQUEST)
-
+                try:
+                    Encaissement.objects.get(id=pk).delete()
+                except Exception as e:
+                    continue
+            
         return Response('Enaissement Annulé', status=status.HTTP_200_OK)
 
 

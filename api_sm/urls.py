@@ -79,7 +79,8 @@ urlpatterns = [
     path('getavance/',GetAvance.as_view()),
     path('addavance/',AddAvanceApiView.as_view()),
 
-    path('contractkeys/', contratKeys.as_view()),
+    path('poles/', Poles.as_view()),
+    path('nts/',NTs.as_view()),
 
 
     path('prodparams/',GetProdParams.as_view()),
