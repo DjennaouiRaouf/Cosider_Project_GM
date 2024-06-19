@@ -976,6 +976,7 @@ class EncaissementFieldsApiView(APIView):
 
                         }
 
+
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                             anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
                             serialized_data = anySerilizer(field_instance.queryset, many=True).data
