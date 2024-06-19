@@ -626,7 +626,8 @@ class ECSerializer(serializers.ModelSerializer):
         return obj.code_site
     def get_client(self, obj):
         n=NT.objects.get(nt=obj.nt,code_site=obj.code_site)
-        return n.code_client.libelle
+        c=Clients.objects.get(id=n.code_client)
+        return c.libelle
 
     def get_mgf(self, obj):
         return obj.montant_global_f

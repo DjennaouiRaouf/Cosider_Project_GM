@@ -433,13 +433,13 @@ class EtatCreancesfields(APIView):
         model_name = model_class.__name__
         field_info = []
         for field_name, field_instance in fields.items():
-            if(field_name in ['id','code_site','nt','client','mgf','mgp','mgc']):
+            if(field_name in ['id','code_site','nt','client','mht','mgf','mgp','mgc']):
                 obj={
                             'field': field_name,
                             'headerName': field_instance.label or field_name,
                             'info': str(field_instance.__class__.__name__),
                 }
-                if(field_name in ['mgf','mgp','mgc']):
+                if(field_name in ['mht','mgf','mgp','mgc']):
                     obj['cellRenderer'] = 'InfoRenderer'
 
 
