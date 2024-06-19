@@ -159,6 +159,8 @@ class DQEFieldsApiView(APIView):
                             'label': field_instance.label or field_name,
                             'readOnly': readOnly
                         }
+                        if (field_name in ['libelle']):
+                            obj['width'] = 600
                         if (str(field_instance.style.get("base_template")).find('textarea') != -1):
                             obj['textarea'] = True
 
@@ -1858,6 +1860,8 @@ class DQEAVFieldsApiView(APIView):
                             'label': field_instance.label or field_name,
                             'readOnly': readOnly
                         }
+                        if (field_name in ['libelle']):
+                            obj['width'] = 600
                         if (str(field_instance.style.get("base_template")).find('textarea') != -1):
                             obj['textarea'] = True
 
