@@ -97,6 +97,7 @@ urlpatterns = [
     path('remb/',GetRemb.as_view()),
 
     path('ps/',GetPSView.as_view()),
+    path('num_av/',NumAv.as_view()),
 
 
 ]

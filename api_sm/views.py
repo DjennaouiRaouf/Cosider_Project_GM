@@ -955,6 +955,20 @@ class NTs(APIView):
             return Response({'message': 'Pas de contrat'}, status=status.HTTP_404_NOT_FOUND)
 
 
+
+class NumAv(APIView):
+    # permission_classes = [IsAuthenticated]
+    def get(self, request):
+        try:
+            cs=request.query_params.get('code_site', None)
+            nt = request.query_params.get('nt', None)
+            num_av = MarcheAvenant.objects.filter(code_site=cs,nt=nt).values_list('num_avenant', flat=True).distinct()
+            num_av = [str(num) for num in num_av]
+            return Response({'num_av':num_av}, status=status.HTTP_200_OK)
+        except Marche.DoesNotExist:
+            return Response({'message': 'Pas de contrat'}, status=status.HTTP_404_NOT_FOUND)
+
+
 class FlashMonths(APIView):
     # permission_classes = [IsAuthenticated]
     def get(self, request):
