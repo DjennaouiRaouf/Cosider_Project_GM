@@ -23,6 +23,9 @@ class TabProduction(models.Model):
     valeur_2 = models.DecimalField(db_column='Valeur_2', max_digits=19, decimal_places=4, blank=True, null=True,verbose_name='Valeur')
     quantite_3 = models.FloatField(db_column='Quantite_3', blank=True, null=True,verbose_name='Quantite')
     valeur_3 = models.DecimalField(db_column='Valeur_3', max_digits=19, decimal_places=4, blank=True, null=True,verbose_name='Valeur')
+    coefficient_revison = models.FloatField(db_column='Coefficient_Revison', blank=True,
+                                            null=True)
+
     prevu_realiser = models.CharField(db_column='Prevu_Realiser', max_length=1)
     est_cloturer = models.BooleanField(db_column='Est_Cloturer', blank=True, null=True)
     user_id = models.CharField(db_column='User_ID', max_length=15, blank=True, null=True)
