@@ -381,11 +381,21 @@ class GetFacture(generics.ListAPIView):
         mgf = 0
         enc = 0
         mgp=0
+        ava_remb_c=0
+        avf_remb_c=0
+        ave_remb_c=0
         response_data = super().list(request, *args, **kwargs).data
         for q in queryset:
             rg_total += q.montant_rg
             mgf += q.montant_factureTTC
             mgp += q.penalite
+            ava_remb_c = (Remboursement.objects.filter(avance__type='A', facture__marche_id=q.marche.id).aggregate(total=Sum('montant'))[
+                            'total'] or 0)
+            avf_remb_c = (Remboursement.objects.filter(avance__type='F', facture__marche_id=q.marche.id).aggregate(total=Sum('montant'))[
+                            'total'] or 0)
+            ave_remb_c = (Remboursement.objects.filter(avance__type='E', facture__marche_id=q.marche.id).aggregate(total=Sum('montant'))[
+                            'total'] or 0)
+
             try:
                 enc += (Encaissement.objects.filter(facture=q).distinct().aggregate(total=Sum('montant_encaisse'))[
                             'total'] or 0)
@@ -423,6 +433,10 @@ class GetFacture(generics.ListAPIView):
                              'mgenc':enc,
                              'creance': creance,
                              'pen':mgp,
+                             'mgf':mgf,
+                             'ava':ava_remb_c,
+                             'avf':avf_remb_c,
+                             'ave':ave_remb_c,
 
                          }}, status=status.HTTP_200_OK)
 
@@ -647,7 +661,7 @@ class AddFactureApiView(generics.CreateAPIView):
                               avance=avance).save(force_insert=True)
 
 
-            if(float(serializer.initial_data['penalite']) > 0):
+            if(serializer.initial_data['penalite']):
                 PenaliteRetard(facture=Factures.objects.get(numero_facture=serializer.initial_data['numero_facture']),
                                montant=serializer.initial_data['penalite']).save(force_insert=True)
 
