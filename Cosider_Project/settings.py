@@ -100,7 +100,7 @@ DATABASES = {
         "USER": "",
         "PASSWORD": "",
         "HOST": "localhost\MSSQLSERVER",
-        "PORT": "2448",
+        "PORT": "1433",
         "OPTIONS": {"driver": "SQL Server Native Client 11.0",
                     'extra_params': "Encrypt=no;TrustServerCertificate=yes",
                     'MARS_Connection': 'True',  # Enable Multiple Active Result Sets
