@@ -876,7 +876,10 @@ class AddAttachementApiView(generics.CreateAPIView):
             marche = Marche.objects.get(code_site=i['code_site'], nt=i['nt'])
             print(marche.id)
             try:
-                qte=i['quantite_1']+i['quantite_2']+i['quantite_3']
+                if(marche.revisable== True):
+                    qte=(i['quantite_1']+i['quantite_2']+i['quantite_3'])*i['coefficient_revison']
+                else:
+                    qte = i['quantite_1'] + i['quantite_2'] + i['quantite_3']
                 val=i['valeur_1']+i['valeur_2']+i['valeur_3']
                 Attachements(code_site=i['code_site'], nt=i['nt'],
                              code_tache=i['code_tache'], date=i['mmaa'],

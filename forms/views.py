@@ -1449,7 +1449,7 @@ class FlashFieldsApiView(APIView):
 
 
 
-                    if (str(field_name).startswith('valeur') or str(field_name).startswith('quantite')):
+                    if (str(field_name).startswith('valeur') or str(field_name).startswith('quantite') or field_name in ['coefficient_revison']):
                         obj['cellRenderer'] = 'InfoRenderer'
 
                     if (field_name  in ['quantite_1', 'valeur_1']):
