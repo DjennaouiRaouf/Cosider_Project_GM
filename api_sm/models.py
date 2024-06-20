@@ -4,7 +4,8 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-from django.db.models import Q
+from django.db.models import Q, F, IntegerField, Sum
+from django.db.models.functions import Cast
 from django_currentuser.middleware import get_current_user
 from api_sch.models import *
 from django.db import connection
@@ -686,6 +687,35 @@ class Factures(DeleteMixin,models.Model):
         return round(self.montant_factureHT+(self.montant_factureHT*(self.marche.tva / 100)),2)
 
 
+    @property
+    def cumule_ava_remb(self):
+        cumule_ava = (Remboursement.objects.annotate(
+            facture_int=Cast(F('facture'), IntegerField())
+            ).filter(
+                facture_int__lte=int(self.numero_facture),avance__type='A'
+            ).aggregate(total=Sum('montant'))[
+                            'total'] or 0)
+        return cumule_ava
+
+    @property
+    def cumule_ave_remb(self):
+        cumule_ave = (Remboursement.objects.annotate(
+            facture_int=Cast(F('facture'), IntegerField())
+        ).filter(
+            facture_int__lte=int(self.numero_facture), avance__type='E'
+        ).aggregate(total=Sum('montant'))[
+                          'total'] or 0)
+        return cumule_ave
+
+    @property
+    def cumule_avf_remb(self):
+        cumule_avf = (Remboursement.objects.annotate(
+            facture_int=Cast(F('facture'), IntegerField())
+        ).filter(
+            facture_int__lte=int(self.numero_facture), avance__type='F'
+        ).aggregate(total=Sum('montant'))[
+                          'total'] or 0)
+        return cumule_avf
 
 
 

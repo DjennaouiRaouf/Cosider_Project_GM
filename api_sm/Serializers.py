@@ -296,13 +296,24 @@ class FactureSerializer(serializers.ModelSerializer):
     montant_factureTTC = serializers.SerializerMethodField(label="Montant en TTC")
     penalite = serializers.FloatField(label="Penalite",read_only=True)
 
+    caa= serializers.SerializerMethodField(label="Cumule.AA")
+    caf=serializers.SerializerMethodField(label="Cumule.AF")
+    cae=serializers.SerializerMethodField(label="Cumule.AE")
+
 
     class Meta:
         model=Factures
         fields=['marche','numero_facture','num_situation','date','du', 'au','montant_precedent'
-            ,'montant','montant_cumule','montant_rb','montant_rg','ava','avf','ave','penalite','montant_factureHT','montant_factureTTC','somme','paye']
+            ,'montant','montant_cumule','montant_rb','montant_rg','ava','avf','ave','penalite','montant_factureHT','montant_factureTTC','somme','paye','cae','caf','caa']
 
+    def get_caa(self,obj):
+        return obj.cumule_ava_remb
 
+    def get_caf(self,obj):
+        return obj.cumule_avf_remb
+
+    def get_cae(self,obj):
+        return obj.cumule_ave_remb
 
     def get_somme(self, obj):
         return num2words(obj.montant_factureTTC, to='currency', lang='fr_DZ').upper()
