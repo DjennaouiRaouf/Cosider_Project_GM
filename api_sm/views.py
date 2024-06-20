@@ -1062,12 +1062,13 @@ class GetECF(generics.ListAPIView):
 class UpdateCautionApiView(generics.UpdateAPIView):
     queryset = Cautions.objects.all()
     serializer_class = CautionSerializer
-    lookup_field = "pk"
+
 
     def get_object(self):
-        pk = self.request.data.get(Cautions._meta.pk.name)
+        id = self.request.data.get('id')
+        print(id)
         try:
-            obj = Cautions.objects.get(pk=pk)
+            obj = Cautions.objects.get(id=id)
         except Cautions.DoesNotExist:
             raise NotFound("Object n'éxiste pas")
 
@@ -1075,6 +1076,14 @@ class UpdateCautionApiView(generics.UpdateAPIView):
 
         return obj
 
+    def update(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.est_recupere=True
+            instance.save(force_update=True)
+            return Response('Caution Récupérée', status=status.HTTP_200_OK)
+        except IntegrityError as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 class DeleteInvoiceApiView(generics.DestroyAPIView):
     queryset = Factures.objects.all()
