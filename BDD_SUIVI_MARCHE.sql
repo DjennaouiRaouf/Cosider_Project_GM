@@ -706,6 +706,58 @@ go
 
 /***************************************************************************/
 
+create table [Encaissements_RG]
+(
+    [Id_Enc_RG]                bigint identity
+        constraint PK_Cle_Id_Enc_RG
+            primary key,
+    [Date_Encaissement] date          not null,
+    [Montant_Encaisse]  float         not null,
+    [Numero_Piece]      varchar(30) not null,
+    [Code_Agence]         varchar(15),
+    [Code_Site]         varchar(10)         not null,
+    [NT]                varchar(20)         not null,
+    [Mode_Paiement]  varchar(3) ,
+	[Est_Bloquer] BIT DEFAULT 0,
+    [User_ID]           varchar(15),
+    [Date_Modification] DATETIME2 (7)DEFAULT CURRENT_TIMESTAMP
+
+)
+go
+
+
+create index [INDEX_Encaissements_RG_NT]
+    on [Encaissements_RG] ([NT])
+go
+
+
+create index [INDEX_Encaissements_RG_Code_Site]
+    on [Encaissements_RG] ([Code_Site])
+go
+
+
+create index [INDEX_Encaissements_RG_Mode_Paiement]
+    on [Encaissements_RG] ([Mode_Paiement])
+go
+create index [INDEX_Encaissements_RG_Date_Encaissement]
+    on [Encaissements_RG] ([Date_Encaissement])
+go
+
+create index [INDEX_Encaissements_RG_Est_Bloquer]
+    on [Encaissements_RG] ([Est_Bloquer])
+go
+
+
+create index [INDEX_Encaissements_RG_User_ID]
+    on [Encaissements_RG] ([User_ID])
+go
+
+create index [INDEX_Encaissements_RG_Date_Modification]
+    on [Encaissements_RG] ([Date_Modification])
+go
+
+
+
 /***************************************************************************/
 /*Marche*/
 ALTER TABLE [Marche] ADD CONSTRAINT FK_Cle_Code_Site_NT_Marche FOREIGN KEY  ([Code_Site],[NT]) REFERENCES [Tab_NT] ([Code_site],[NT]);
@@ -766,5 +818,13 @@ ALTER TABLE [Encaissements] ADD CONSTRAINT FK_Cle_Facture_Encaissements FOREIGN 
 ALTER TABLE [Encaissements] ADD CONSTRAINT FK_Cle_Code_Agence_Encaissements FOREIGN KEY  ([Code_Agence]) REFERENCES [Tab_Agence] ([Code_Agence] );
 ALTER TABLE [Encaissements] ADD CONSTRAINT FK_Cle_Mode_Paiement_Encaissements FOREIGN KEY  ([Mode_Paiement]) REFERENCES [Mode_Paiement] ([Id_Mode] );
 
+
+
+
+/*Encaissement_RG*/
+
+alter table Encaissements_RG add constraint FK_Cle_NT_Code_Site_Encaissements_RG foreign key (Code_Site, NT) references Tab_NT
+ALTER TABLE [Encaissements_RG] ADD CONSTRAINT FK_Cle_Mode_Paiement_Encaissements_RG FOREIGN KEY  ([Mode_Paiement]) REFERENCES [Mode_Paiement] ([Id_Mode] );
+ALTER TABLE [Encaissements_RG] ADD CONSTRAINT FK_Cle_Code_Agence_Encaissements_RG FOREIGN KEY  ([Code_Agence]) REFERENCES [Tab_Agence] ([Code_Agence] );
 
 
