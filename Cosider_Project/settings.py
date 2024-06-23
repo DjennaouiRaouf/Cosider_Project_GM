@@ -24,7 +24,7 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
 
-
+    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'api_sm',
     'api_sch',
     'forms',
+    'images',
 
 
 
@@ -99,8 +100,8 @@ DATABASES = {
         "NAME": "CA_CH",
         "USER": "",
         "PASSWORD": "",
-        "HOST": "localhost\MSSQLSERVER",
-        "PORT": "1433",
+        "HOST": "localhost\MSSQLSERVER1",
+        "PORT": "2448",
         "OPTIONS": {"driver": "SQL Server Native Client 11.0",
                     'extra_params': "Encrypt=no;TrustServerCertificate=yes",
                     'MARS_Connection': 'True',  # Enable Multiple Active Result Sets

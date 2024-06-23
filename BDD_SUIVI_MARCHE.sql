@@ -1,4 +1,18 @@
 /******************************************************************/
+
+create table Image_login
+(
+     [Id_Img]                int identity
+        constraint PK_Cle_Id_Img
+            primary key,
+    [Src]               varchar(100) not null,
+
+	[Est_Bloquer] BIT DEFAULT 0,
+    [User_ID]           varchar(15),
+    [Date_Modification] DATETIME2 (7)DEFAULT CURRENT_TIMESTAMP,
+);
+
+/******************************************************************/
 /* View Production stockée*/
 
 create view Vue_Production_All as (SELECT tp.NT, tp.Code_Site, tp.Code_Tache, SUM(tp.Quantite_1+tp.Quantite_2+tp.Quantite_3) as Qte_Produite
