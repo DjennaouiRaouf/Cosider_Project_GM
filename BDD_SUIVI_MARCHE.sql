@@ -692,18 +692,19 @@ create index [INDEX_Encaissements_Date_Encaissement]
 go
 
 create index [INDEX_Encaissements_Est_Bloquer]
-    on [Remboursement] ([Est_Bloquer])
+    on [Encaissements] ([Est_Bloquer])
 go
 
 
 create index [INDEX_Encaissements_User_ID]
-    on [Remboursement] ([User_ID])
+    on [Encaissements] ([User_ID])
 go
 
 create index [INDEX_Encaissements_Date_Modification]
-    on [Remboursement] ([Date_Modification])
+    on [Encaissements] ([Date_Modification])
 go
 
+/***************************************************************************/
 
 /***************************************************************************/
 /*Marche*/
