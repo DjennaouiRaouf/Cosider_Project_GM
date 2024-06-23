@@ -896,6 +896,24 @@ class EncaissementsRg(DeleteMixin,models.Model):
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False, default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
 
+    objects=GeneralManager()
+
+    @property
+    def total_encaisse(self):
+        try:
+            enc = float(EncaissementsRg.objects.filter(nt=self.nt,code_site=self.code_site, date_encaissement__lt=self.date_encaissement).aggregate(
+                models.Sum('montant_encaisse'))[
+                "montant_encaisse__sum"] or 0.0)
+
+            if (enc == None):
+                enc = float(self.montant_encaisse)
+            else:
+                enc += float(self.montant_encaisse)
+
+            return enc
+        except EncaissementsRg.DoesNotExist:
+            return 0
+
     def delete(self, *args, **kwargs):
         username = str(get_current_user())
         id_Enc=self.id

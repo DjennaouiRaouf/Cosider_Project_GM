@@ -403,6 +403,32 @@ class EncaissementSerializer(serializers.ModelSerializer):
 
 
 
+class EncaissementRGSerializer(serializers.ModelSerializer):
+    tc=serializers.SerializerMethodField(label='Total Encaissé')
+
+    def get_tc(self,obj):
+        return obj.total_encaisse
+    class Meta:
+        model=Encaissement
+        fields=['id','date_encaissement','mode_paiement','agence','numero_piece','montant_encaisse','tc']
+
+
+    def get_fields(self, *args, **kwargs):
+        fields = super().get_fields(*args, **kwargs)
+        fields.pop('est_bloquer', None)
+        fields.pop('user_id', None)
+        fields.pop('date_modification', None)
+        return fields
+
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['agence'] = instance.agence.libelle
+        representation['mode_paiement'] = instance.mode_paiement.libelle
+        return representation
+
+
+
 
 
 

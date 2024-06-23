@@ -671,6 +671,29 @@ class AddFactureApiView(generics.CreateAPIView):
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
+class AddEncaissementRG(generics.CreateAPIView):
+    queryset = EncaissementsRg.objects.all()
+    serializer_class = EncaissementRGSerializer
+
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        try:
+            EncaissementsRg(
+                date_encaissement=serializer.initial_data['date_encaissement'],
+                montant_encaisse=serializer.initial_data['montant_encaisse'],
+                numero_piece=serializer.initial_data['numero_piece'],
+                mode_paiement= ModePaiement.objects.get(id=serializer.initial_data['mode_paiement']),
+                agence= TabAgence.objects.get(id=serializer.initial_data['agence'])
+            ).save(force_insert=True)
+
+            return Response('Encaissement de la Retenue de Garantie Effectué', status=status.HTTP_200_OK)
+
+        except IntegrityError as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
+
 class AddEncaissement(generics.CreateAPIView):
     queryset = Encaissement.objects.all()
     serializer_class = EncaissementSerializer
