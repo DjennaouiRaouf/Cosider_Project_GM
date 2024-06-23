@@ -882,6 +882,37 @@ class ModePaiement(DeleteMixin,models.Model):
 
 
 
+class EncaissementsRg(DeleteMixin,models.Model):
+    id= models.BigAutoField(db_column='Id_Enc_RG', primary_key=True)  # Field name made lowercase.
+    date_encaissement = models.DateField(db_column='Date_Encaissement')  # Field name made lowercase.
+    montant_encaisse = models.FloatField(db_column='Montant_Encaisse')  # Field name made lowercase.
+    numero_piece = models.CharField(db_column='Numero_Piece', max_length=30)  # Field name made lowercase.
+    code_agence = models.CharField(db_column='Code_Agence', max_length=15, blank=True, null=True)  # Field name made lowercase.
+    code_site = models.CharField(db_column='Code_Site', max_length=10)  # Field name made lowercase.
+    nt = models.CharField(db_column='NT', max_length=20)  # Field name made lowercase.
+    mode_paiement = models.CharField(db_column='Mode_Paiement', max_length=3, blank=True, null=True)  # Field name made lowercase.
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
+                                      editable=False)
+    user_id = models.CharField(db_column='User_ID', max_length=15, editable=False, default=get_current_user)
+    date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
+
+    def delete(self, *args, **kwargs):
+        username = str(get_current_user())
+        id_Enc=self.id
+        sql_query = f"""
+                UPDATE Encaissements_RG SET Est_Bloquer= 1 , User_ID ='{username}',Date_Modification= GETDATE() WHERE Id_Enc ={id_Enc}
+               """
+        with connection.cursor() as cursor:
+            cursor.execute(sql_query)
+
+
+    class Meta:
+        managed = False
+        db_table = 'Encaissements_RG'
+
+
+
+
 class Encaissement(DeleteMixin,models.Model):
     id = models.AutoField(db_column='Id_Enc', primary_key=True)
     facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,db_column='Facture',null=True,blank=True,verbose_name="N° Facture")
