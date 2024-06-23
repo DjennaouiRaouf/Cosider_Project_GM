@@ -1382,14 +1382,10 @@ class AjoutDQEAvenantApiView(generics.CreateAPIView):
                            num_avenant=serializer.initial_data['num_avenant'],
                            nt=serializer.initial_data['nt'],
                            code_tache=serializer.initial_data['code_tache'], prix_u=serializer.initial_data['prix_u'],
-                           est_tache_composite=serializer.initial_data['est_tache_composite'],
-                           est_tache_complementaire=True, quantite=serializer.initial_data['quantite'],
                            unite=TabUniteDeMesure.objects.get(id=serializer.initial_data['unite']), libelle=
                            serializer.initial_data['libelle']).save(force_insert=True)
                 DQE(code_site=serializer.initial_data['pole'], nt=serializer.initial_data['nt'],
                     code_tache=serializer.initial_data['code_tache'], prix_u=serializer.initial_data['prix_u'],
-                    est_tache_composite=serializer.initial_data['est_tache_composite'],
-                    est_tache_complementaire=True,
                     quantite=serializer.initial_data['quantite'],
                     unite=TabUniteDeMesure.objects.get(id=serializer.initial_data['unite']),
                     libelle=serializer.initial_data['libelle']).save(force_insert=True)

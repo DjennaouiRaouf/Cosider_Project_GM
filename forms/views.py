@@ -159,8 +159,6 @@ class DQEFieldsApiView(APIView):
                             'label': field_instance.label or field_name,
                             'readOnly': readOnly
                         }
-                        if (field_name in ['libelle']):
-                            obj['width'] = 600
                         if (str(field_instance.style.get("base_template")).find('textarea') != -1):
                             obj['textarea'] = True
 
@@ -189,6 +187,8 @@ class DQEFieldsApiView(APIView):
                             'info': str(field_instance.__class__.__name__),
 
                         }
+                        if (field_name in ['libelle']):
+                            obj['width'] = 600
                         if( field_name in ['pole','nt']):
                             obj['hide'] = True
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField") and field_name not in ['marche']:
@@ -624,13 +624,18 @@ class SiteFieldsApiView(APIView):
                         field_info.append(obj)
             if (flag == 'l'):  # data grid list (react ag-grid)
                 field_info = []
+                obj={}
                 for field_name, field_instance in fields.items():
-                    field_info.append({
+                    obj={
                         'field': field_name,
                         'headerName': field_instance.label or field_name,
                         'info': str(field_instance.__class__.__name__),
-                    })
+                    }
 
+                    if (field_name in ['libelle']):
+                        obj['width'] = 600
+
+                    field_info.append(obj)
             return Response({'fields': field_info}, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -736,6 +741,8 @@ class NTFieldsApiView(APIView):
                     if (field_name in ['site']):
                         obj['rowGroup'] = True
 
+                    if (field_name in ['libelle']):
+                        obj['width'] = 600
 
                     if(field_name in ['id']):
                         obj['hide']=True
@@ -1862,8 +1869,7 @@ class DQEAVFieldsApiView(APIView):
                             'label': field_instance.label or field_name,
                             'readOnly': readOnly
                         }
-                        if (field_name in ['libelle']):
-                            obj['width'] = 600
+
                         if (str(field_instance.style.get("base_template")).find('textarea') != -1):
                             obj['textarea'] = True
 
@@ -1892,6 +1898,9 @@ class DQEAVFieldsApiView(APIView):
                             'info': str(field_instance.__class__.__name__),
 
                         }
+                        if (field_name in ['libelle']):
+                            obj['width'] = 600
+
                         if( field_name in ['pole','nt','num_avenant']):
                             obj['hide'] = True
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField") and field_name not in ['marche']:
