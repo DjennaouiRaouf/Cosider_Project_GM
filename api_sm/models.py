@@ -883,19 +883,18 @@ class ModePaiement(DeleteMixin,models.Model):
 
 
 class EncaissementsRg(DeleteMixin,models.Model):
-    id= models.BigAutoField(db_column='Id_Enc_RG', primary_key=True)  # Field name made lowercase.
-    date_encaissement = models.DateField(db_column='Date_Encaissement')  # Field name made lowercase.
-    montant_encaisse = models.FloatField(db_column='Montant_Encaisse')  # Field name made lowercase.
-    numero_piece = models.CharField(db_column='Numero_Piece', max_length=30)  # Field name made lowercase.
-    code_agence = models.CharField(db_column='Code_Agence', max_length=15, blank=True, null=True)  # Field name made lowercase.
-    code_site = models.CharField(db_column='Code_Site', max_length=10)  # Field name made lowercase.
-    nt = models.CharField(db_column='NT', max_length=20)  # Field name made lowercase.
-    mode_paiement = models.CharField(db_column='Mode_Paiement', max_length=3, blank=True, null=True)  # Field name made lowercase.
+    id= models.BigAutoField(db_column='Id_Enc_RG', primary_key=True)  
+    date_encaissement = models.DateField(db_column='Date_Encaissement',verbose_name='Date d\' Encaissement')
+    montant_encaisse = models.FloatField(db_column='Montant_Encaisse',verbose_name='Montant')
+    numero_piece = models.CharField(db_column='Numero_Piece', max_length=30,verbose_name='N° de piéce')
+    code_agence = models.CharField(db_column='Code_Agence', max_length=15, blank=True, null=True,verbose_name='Agence')  
+    code_site = models.CharField(db_column='Code_Site', max_length=10)  
+    nt = models.CharField(db_column='NT', max_length=20)  
+    mode_paiement = models.CharField(db_column='Mode_Paiement', max_length=3, blank=True, null=True,verbose_name='Mode Paiement')  
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', default=False,
                                       editable=False)
     user_id = models.CharField(db_column='User_ID', max_length=15, editable=False, default=get_current_user)
     date_modification = models.DateTimeField(db_column='Date_Modification', auto_now=True)
-
     objects=GeneralManager()
 
     @property

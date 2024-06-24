@@ -455,6 +455,12 @@ class GetEncaissement(generics.ListAPIView):
     filterset_class = EncaissementFilter
 
 
+class GetEncaissementRG(generics.ListAPIView):
+    queryset = EncaissementsRg.objects.all().order_by('date_encaissement')
+    serializer_class = EncaissementRGSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = EncaissementRGFilter
+
 class getDetFacture(generics.ListAPIView):
     queryset = DetailFacture.objects.all()
     serializer_class = DetailFactureSerializer
@@ -678,13 +684,16 @@ class AddEncaissementRG(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
+        print(serializer.initial_data)
         try:
             EncaissementsRg(
+                nt=serializer.initial_data['nt'],
+                code_site=serializer.initial_data['code_site'],
                 date_encaissement=serializer.initial_data['date_encaissement'],
                 montant_encaisse=serializer.initial_data['montant_encaisse'],
                 numero_piece=serializer.initial_data['numero_piece'],
-                mode_paiement= ModePaiement.objects.get(id=serializer.initial_data['mode_paiement']),
-                agence= TabAgence.objects.get(id=serializer.initial_data['agence'])
+                mode_paiement= serializer.initial_data['mode_paiement'],
+                code_agence= serializer.initial_data['code_agence']
             ).save(force_insert=True)
 
             return Response('Encaissement de la Retenue de Garantie Effectué', status=status.HTTP_200_OK)

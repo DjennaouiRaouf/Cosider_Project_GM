@@ -405,12 +405,14 @@ class EncaissementSerializer(serializers.ModelSerializer):
 
 class EncaissementRGSerializer(serializers.ModelSerializer):
     tc=serializers.SerializerMethodField(label='Total Encaissé')
+    code_agence = serializers.PrimaryKeyRelatedField(queryset=TabAgence.objects.all().distinct(), label='Agence')
+    mode_paiement = serializers.PrimaryKeyRelatedField(queryset=ModePaiement.objects.all().distinct(), label='Mode Paiement')
 
     def get_tc(self,obj):
         return obj.total_encaisse
     class Meta:
-        model=Encaissement
-        fields=['id','date_encaissement','mode_paiement','agence','numero_piece','montant_encaisse','tc']
+        model=EncaissementsRg
+        fields=['id','date_encaissement','mode_paiement','code_agence','numero_piece','montant_encaisse','tc']
 
 
     def get_fields(self, *args, **kwargs):
@@ -423,8 +425,13 @@ class EncaissementRGSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['agence'] = instance.agence.libelle
-        representation['mode_paiement'] = instance.mode_paiement.libelle
+        if(instance.code_agence):
+            a=TabAgence.objects.get(id=instance.code_agence)
+            representation['code_agence'] = a.libelle
+        if(instance.mode_paiement):
+            m=ModePaiement.objects.get(id=instance.mode_paiement)
+            representation['mode_paiement'] = m.libelle
+
         return representation
 
 

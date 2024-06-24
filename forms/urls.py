@@ -28,6 +28,9 @@ urlpatterns = [
 
     path('dqeavfields/',DQEAVFieldsApiView.as_view()),
 
+    path('ergstate/',EncaissementRGFieldsStateApiView.as_view()),
+
+    path('ergfields/',EncaissementRGFieldsApiView.as_view()),
     path('dqefilterfields/',DQEFieldsFilterApiView.as_view()),
     path('dqefields/', DQEFieldsApiView.as_view()),
     path('dqefieldsstate/',DQEFieldsStateApiView.as_view()),

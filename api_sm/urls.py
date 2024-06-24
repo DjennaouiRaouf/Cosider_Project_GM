@@ -54,7 +54,11 @@ urlpatterns = [
     path('ecf/',GetECF.as_view()),
 
     path('encaisser/',AddEncaissement.as_view()),
+
+    path('encaisserrg/',AddEncaissementRG.as_view()),
+    path('encrg/',GetEncaissementRG.as_view()),
     path('encaissements/',GetEncaissement.as_view()),
+
     path('cinvoice/',CInvoice.as_view()),
 
     path('getlibmp/',LibMP.as_view()),
