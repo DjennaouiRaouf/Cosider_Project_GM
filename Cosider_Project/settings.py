@@ -7,7 +7,6 @@ from django.core.management.utils import get_random_secret_key
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -18,7 +17,6 @@ SECRET_KEY = get_random_secret_key()
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
@@ -39,10 +37,6 @@ INSTALLED_APPS = [
     'forms',
     'images',
 
-
-
-
-
 ]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -55,15 +49,13 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_currentuser.middleware.ThreadLocalUserMiddleware',
     'django.middleware.locale.LocaleMiddleware',
-]
 
+]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 CORS_ALLOW_CREDENTIALS = True
-
-
 
 ROOT_URLCONF = 'Cosider_Project.urls'
 
@@ -98,21 +90,20 @@ DATABASES = {
     'default': {
         "ENGINE": "mssql",
         "NAME": "CA_CH",
-        "USER": "",
-        "PASSWORD": "",
+        "USER": "django",
+        "PASSWORD": "django",
         "HOST": "localhost\MSSQLSERVER1",
         "PORT": "2448",
         "OPTIONS": {"driver": "SQL Server Native Client 11.0",
                     'extra_params': "Encrypt=no;TrustServerCertificate=yes",
                     'MARS_Connection': 'True',  # Enable Multiple Active Result Sets
                     'host_is_server': 'True',  # Optimize connection settings
+
                     },
 
     },
 
-
 }
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -129,38 +120,27 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
-
 LANGUAGE_CODE = 'fr'
-
-
-
 
 STATIC_URL = 'static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'templates','build', 'static'),
+    os.path.join(BASE_DIR, 'templates', 'build', 'static'),
     os.path.join(BASE_DIR, "media"),
 ]
 
-
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-
-
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend'
-     ],
+    ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication'
     ],
