@@ -49,6 +49,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_currentuser.middleware.ThreadLocalUserMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+'whitenoise.middleware.WhiteNoiseMiddleware',
 
 ]
 
@@ -128,7 +129,7 @@ STATIC_URL = 'static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'templates', 'build', 'static'),
+    os.path.join(BASE_DIR, 'static'),
     os.path.join(BASE_DIR, "media"),
 ]
 
