@@ -1,25 +1,6 @@
-/* View Production stockée*/
-
-create view Vue_Production_All as (SELECT tp.NT, tp.Code_Site, tp.Code_Tache, SUM(tp.Quantite_1+tp.Quantite_2+tp.Quantite_3) as Qte_Produite
-FROM Tab_Production tp  where tp.Code_Type_Production='01' and tp.Prevu_Realiser = 'R'
-GROUP BY tp.nt, tp.code_site, tp.code_tache) ;
-
-
-create view Vue_Attachements_All as (SELECT att.NT, att.Code_Site, att.Code_Tache, SUM(att.quantite) as Qte_Attachee
-FROM Attachements att where  att.Est_Bloquer=1
-GROUP BY att.nt, att.Code_Site, att.Code_Tache) ;
-
-
-
-create view Vue_Production_Stockee as (
-select att.NT, att.Code_Site, att.Code_Tache, att.Qte_Attachee , prod.Qte_Produite , (prod.Qte_Produite-att.Qte_Attachee) as Ecart_Prod_Att ,
-CASE WHEN prod.Qte_Produite - att.Qte_Attachee <> 0 THEN 1 ELSE 0 END AS Indicateur
- from Vue_Attachements_All att , Vue_Production_All prod
-where att.NT = prod.NT and att.Code_Site = prod.Code_site and att.Code_Tache = prod.Code_Tache
-);
 /******************************************************************/
 
-create view Vue_Dernier_Contrat as  SELECT ma.*
+/*create view Vue_Dernier_Contrat as  SELECT ma.*
 FROM Marche_Avenant ma
 JOIN (
     SELECT Num_Contrat, NT, Code_Site, MAX(Num_Avenant) AS Max_Num_Avenant
@@ -30,7 +11,7 @@ JOIN (
           AND ma.Code_Site = latest.Code_Site
           AND ma.Num_Avenant = latest.Max_Num_Avenant;
 
-
+*/
 
 /******************************************************************/
 
@@ -727,6 +708,28 @@ go
 
 
 /***************************************************************************/
+/* View Production stockée*/
+
+create view Vue_Production_All as (SELECT tp.NT, tp.Code_Site, tp.Code_Tache, SUM(tp.Quantite_1+tp.Quantite_2+tp.Quantite_3) as Qte_Produite
+FROM Tab_Production tp  where tp.Code_Type_Production='01' and tp.Prevu_Realiser = 'R'
+GROUP BY tp.nt, tp.code_site, tp.code_tache) ;
+
+
+create view Vue_Attachements_All as (SELECT att.NT, att.Code_Site, att.Code_Tache, SUM(att.quantite) as Qte_Attachee
+FROM Attachements att where  att.Est_Bloquer=1
+GROUP BY att.nt, att.Code_Site, att.Code_Tache) ;
+
+
+
+create view Vue_Production_Stockee as (
+select att.NT, att.Code_Site, att.Code_Tache, att.Qte_Attachee , prod.Qte_Produite , (prod.Qte_Produite-att.Qte_Attachee) as Ecart_Prod_Att ,
+CASE WHEN prod.Qte_Produite - att.Qte_Attachee <> 0 THEN 1 ELSE 0 END AS Indicateur
+ from Vue_Attachements_All att , Vue_Production_All prod
+where att.NT = prod.NT and att.Code_Site = prod.Code_site and att.Code_Tache = prod.Code_Tache
+);
+/******************************************************************/
+
+
 /*Marche*/
 ALTER TABLE [Marche] ADD CONSTRAINT FK_Cle_Code_Site_NT_Marche FOREIGN KEY  ([Code_Site],[NT]) REFERENCES [Tab_NT] ([Code_site],[NT]);
 
