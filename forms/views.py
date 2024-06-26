@@ -541,7 +541,7 @@ class SiteFieldsStateApiView(APIView):
         fields = serializer.get_fields()
         field_info = []
         for field_name, field_instance in fields.items():
-
+            
             default_value = None
             if str(field_instance.__class__.__name__) == 'ChoiceField':
                 default_value= ''
@@ -593,7 +593,7 @@ class SiteFieldsApiView(APIView):
                 field_info = []
                 obj = {}
                 for field_name, field_instance in fields.items():
-                    if(field_name not in ['code_filiale']):
+                    if(field_name not in ['code_filiale','type_site']):
                         obj={
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),
@@ -626,16 +626,18 @@ class SiteFieldsApiView(APIView):
                 field_info = []
                 obj={}
                 for field_name, field_instance in fields.items():
-                    obj={
-                        'field': field_name,
-                        'headerName': field_instance.label or field_name,
-                        'info': str(field_instance.__class__.__name__),
-                    }
+                    if(field_name not in ['type_site']):
 
-                    if (field_name in ['libelle']):
-                        obj['width'] = 600
+                        obj={
+                            'field': field_name,
+                            'headerName': field_instance.label or field_name,
+                            'info': str(field_instance.__class__.__name__),
+                        }
 
-                    field_info.append(obj)
+                        if (field_name in ['libelle']):
+                            obj['width'] = 600
+
+                        field_info.append(obj)
             return Response({'fields': field_info}, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)

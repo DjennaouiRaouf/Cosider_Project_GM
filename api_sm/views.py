@@ -264,40 +264,30 @@ class ImportDQEAPIView(APIView):
         nt = request.data.get('nt')
         cs = request.data.get('cs')
         try:
-            workbook = openpyxl.load_workbook(dqe_file)
-            sheet = workbook.active
-            newRows = 0
-            updatedRows = 0
             m = Marche.objects.get(nt=nt, code_site=cs)
-
-            for row in sheet.iter_rows(min_row=2, values_only=True):
+            df = pandas.read_excel(dqe_file, engine='openpyxl')
+            for index, row in df.iterrows():
                 try:
                     try:
                         if (m.num_avenant == 0):
                             DQE(
-                                code_site=row[0], nt=row[1],
-                                code_tache=row[2], prix_u=row[6],
-                                est_tache_composite=row[4],
-                                est_tache_complementaire=row[5],
-                                unite=TabUniteDeMesure.objects.get(libelle=row[8]),
-                                libelle=row[3], quantite=row[7], user_id=request.user.username
-                            ).save(force_insert=True)
-                            newRows += 1
+                                code_site=cs, nt=nt,
+                                code_tache=row['code_tache'], prix_u=row['prix_u'],
+                                unite=TabUniteDeMesure.objects.get(libelle=row['unite']),
+                                libelle=row['libelle'], quantite=row['quantite'], user_id=request.user.username).save(
+                                force_insert=True)
+
                     except:
                         pass
                 except IntegrityError as e:
                     try:
                         if (m.num_avenant == 0):
                             DQE(
-                                code_site=row[0], nt=row[1],
-                                code_tache=row[2], prix_u=row[6],
-                                est_tache_composite=row[4],
-                                est_tache_complementaire=row[5],
-                                unite=TabUniteDeMesure.objects.get(libelle=row[8]),
-                                libelle=row[3], quantite=row[7], user_id=request.user.username
-                            ).save(force_update=True)
+                                code_site=cs, nt=nt,
+                                code_tache=row['code_tache'], prix_u=row['prix_u'],
+                                unite=TabUniteDeMesure.objects.get(libelle=row['unite']),
+                                libelle=row['libelle'], quantite=row['quantite'], user_id=request.user.username).save(force_update=True)
 
-                            updatedRows += 1
 
                     except:
                         pass
@@ -306,26 +296,22 @@ class ImportDQEAPIView(APIView):
                     if (m.num_avenant == 0):
                         DQEAvenant(
                             num_avenant=m.num_avenant,
-                            code_site=row[0], nt=row[1],
-                            code_tache=row[2], prix_u=row[6],
-                            est_tache_composite=row[4],
-                            est_tache_complementaire=row[5],
-                            unite=TabUniteDeMesure.objects.get(libelle=row[8]),
-                            libelle=row[3], quantite=row[7], user_id=request.user.username
+                            code_site=cs, nt=nt,
+                            code_tache=row['code_tache'], prix_u=row['prix_u'],
+                            unite=TabUniteDeMesure.objects.get(libelle=row['unite']),
+                            libelle=row['libelle'], quantite=row['quantite'], user_id=request.user.username
                         ).save(force_insert=True)
                 except IntegrityError as e:
                     if (m.num_avenant == 0):
                         DQEAvenant(
-                            code_site=row[0], nt=row[1],
-                            code_tache=row[2], prix_u=row[6],
                             num_avenant=m.num_avenant,
-                            est_tache_composite=row[4],
-                            est_tache_complementaire=row[5],
-                            unite=TabUniteDeMesure.objects.get(libelle=row[8]),
-                            libelle=row[3], quantite=row[7], user_id=request.user.username
+                            code_site=cs, nt=nt,
+                            code_tache=row['code_tache'], prix_u=row['prix_u'],
+                            unite=TabUniteDeMesure.objects.get(libelle=row['unite']),
+                            libelle=row['libelle'], quantite=row['quantite'], user_id=request.user.username
                         ).save(force_update=True)
 
-            return Response(f'Creation de {newRows} ligne(s) \n Mise à jour de {updatedRows} ligne(s) ',
+            return Response(f'Mise à jour',
                             status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
