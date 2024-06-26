@@ -90,7 +90,7 @@ DATABASES = {
 DATABASES = {
     'default': {
         "ENGINE": "mssql",
-        "NAME": "CA_CH",
+        "NAME": "TP_SC",
         "USER": "django",
         "PASSWORD": "django",
         "HOST": "localhost\MSSQLSERVER1",

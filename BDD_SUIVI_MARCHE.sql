@@ -1,19 +1,3 @@
-/******************************************************************/
-
-
-create table Image_login
-(
-     [Id_Img]                int identity
-        constraint PK_Cle_Id_Img
-            primary key,
-    [Src]               varchar(100) not null,
-
-	[Est_Bloquer] BIT DEFAULT 0,
-    [User_ID]           varchar(15),
-    [Date_Modification] DATETIME2 (7)DEFAULT CURRENT_TIMESTAMP,
-);
-
-/******************************************************************/
 /* View Production stockée*/
 
 create view Vue_Production_All as (SELECT tp.NT, tp.Code_Site, tp.Code_Tache, SUM(tp.Quantite_1+tp.Quantite_2+tp.Quantite_3) as Qte_Produite
@@ -47,6 +31,22 @@ JOIN (
           AND ma.Num_Avenant = latest.Max_Num_Avenant;
 
 
+
+/******************************************************************/
+
+
+
+create table Image_login
+(
+     [Id_Img]                int identity
+        constraint PK_Cle_Id_Img
+            primary key,
+    [Src]               varchar(100) not null,
+
+	[Est_Bloquer] BIT DEFAULT 0,
+    [User_ID]           varchar(15),
+    [Date_Modification] DATETIME2 (7)DEFAULT CURRENT_TIMESTAMP,
+);
 
 /******************************************************************/
 
@@ -590,39 +590,7 @@ create index [INDEX_Remboursement_Date_Modification]
 go
 
 
-/***************************************************************************/
 
-
-create table [Penalite_Retard]
-(
-    [Id_Penalite]                int identity
-        constraint PK_Cle_Id_Remb
-            primary key,
-    [Montant]           float     default 0 not null,
-    [Num_Facture]       varchar(30),
-	[Est_Bloquer] BIT DEFAULT 0,
-    [User_ID]           varchar(15),
-    [Date_Modification] DATETIME2 (7)DEFAULT CURRENT_TIMESTAMP
-)
-go
-
-create index [INDEX_Rembourcement_Num_Facture]
-    on [Penalite_Retard] ([Num_Facture])
-go
-
-
-create index [INDEX_Penalite_Retard_Est_Bloquer]
-    on [Penalite_Retard] ([Est_Bloquer])
-go
-
-
-create index [INDEX_Penalite_Retard_User_ID]
-    on [Penalite_Retard] ([User_ID])
-go
-
-create index [INDEX_Penalite_Retard_Date_Modification]
-    on [Penalite_Retard] ([Date_Modification])
-go
 
 
 /***************************************************************************/
@@ -714,7 +682,7 @@ create table [Encaissements_RG]
     [Date_Encaissement] date          not null,
     [Montant_Encaisse]  float         not null,
     [Numero_Piece]      varchar(30) not null,
-    [Code_Agence]         varchar(15),
+    [Code_Agence]         varchar(25),
     [Code_Site]         varchar(10)         not null,
     [NT]                varchar(20)         not null,
     [Mode_Paiement]  varchar(3) ,
