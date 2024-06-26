@@ -1428,7 +1428,7 @@ class ImportDQEAvenantAPIView(APIView):
         try:
 
             df=pandas.read_excel(dqe_file, engine='openpyxl')
-            print(df['pole'])
+           
             for index, row in df.iterrows():
                 try:
                     dqe = DQE.objects.get(nt=nt, code_site=cs,
