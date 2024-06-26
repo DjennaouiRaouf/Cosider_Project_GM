@@ -91,8 +91,8 @@ DATABASES = {
     'default': {
         "ENGINE": "mssql",
         "NAME": "TP_SC",
-        "USER": "",
-        "PASSWORD": "",
+        "USER": "django",
+        "PASSWORD": "django",
         "HOST": "localhost\MSSQLSERVER1",
         "PORT": "2448",
         "OPTIONS": {"driver": "SQL Server Native Client 11.0",
