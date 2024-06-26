@@ -1431,10 +1431,10 @@ class ImportDQEAvenantAPIView(APIView):
             print(df['pole'])
             for index, row in df.iterrows():
                 try:
-                    dqe = DQE.objects.get(nt=row['nt'], code_site=row['pole'],
+                    dqe = DQE.objects.get(nt=nt, code_site=cs,
                                           code_tache=row['code_tache'])
                     DQEAvenant(
-                        code_site=row['pole'], nt=row['nt'],
+                        code_site=cs, nt=nt,
                         code_tache=row['code_tache'], prix_u=row['prix_u'],
                         num_avenant=num_av,
                         unite=TabUniteDeMesure.objects.get(libelle=row['unite']),
@@ -1449,14 +1449,14 @@ class ImportDQEAvenantAPIView(APIView):
 
                 except DQE.DoesNotExist:
                     DQEAvenant(
-                        code_site=row['pole'], nt=row['nt'],
+                        code_site=cs, nt=nt,
                         code_tache=row['code_tache'], prix_u=row['prix_u'],
                         num_avenant=num_av,
                         unite=TabUniteDeMesure.objects.get(libelle=row['unite']),
                         libelle=row['libelle'], quantite=row['quantite'], user_id=request.user.username).save(force_insert=True)
 
                     DQE(
-                        code_site=row['pole'], nt=row['nt'],
+                        code_site=cs, nt=nt,
                         code_tache=row['code_tache'], prix_u=row['prix_u'],
                         unite=TabUniteDeMesure.objects.get(libelle=row['unite']),
                         libelle=row['libelle'], quantite=row['quantite'], user_id=request.user.username
