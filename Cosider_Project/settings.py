@@ -91,10 +91,10 @@ DATABASES = {
     'default': {
         "ENGINE": "mssql",
         "NAME": "TP_SC",
-        "USER": "DjangoAPI",
-        "PASSWORD": "DjangoAPI",
-        "HOST": "localhost\MSSQLSERVER1",
-        "PORT": "2448",
+        "USER": "",
+        "PASSWORD": "",
+        "HOST": "localhost\MSSQLSERVER",
+        "PORT": "1433",
         "OPTIONS": {"driver": "SQL Server Native Client 11.0",
                     'extra_params': "Encrypt=no;TrustServerCertificate=yes",
                     'MARS_Connection': 'True',  # Enable Multiple Active Result Sets
