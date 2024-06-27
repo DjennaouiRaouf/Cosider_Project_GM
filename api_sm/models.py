@@ -937,7 +937,7 @@ class Encaissement(DeleteMixin,models.Model):
     mode_paiement=models.ForeignKey(ModePaiement,on_delete=models.DO_NOTHING,db_column='Mode_Paiement',null=False,verbose_name="Mode de Paiement")
     montant_encaisse=models.FloatField( db_column='Montant_Encaisse',blank=True,verbose_name="Montant Encaissé",
                                      validators=[MinValueValidator(0)], default=0)
-    agence = models.ForeignKey('api_sch.TabAgence',on_delete=models.DO_NOTHING,db_column='Agence' , null=True, verbose_name='Agence')
+    agence = models.ForeignKey('api_sch.TabAgence',on_delete=models.DO_NOTHING,db_column='Code_Agence' , null=True, verbose_name='Agence')
 
     numero_piece = models.CharField(db_column='Numero_Piece',max_length=300,null=False,verbose_name="Numero de piéce")
 
@@ -1028,7 +1028,7 @@ class Cautions(DeleteMixin,models.Model):
     type = models.ForeignKey(TypeCaution,db_column='Type_Caution', on_delete=models.DO_NOTHING, null=False,verbose_name="Type",to_field='')
     avance = models.ForeignKey(Avance,db_column='Avance', on_delete=models.DO_NOTHING, null=True, blank=True,verbose_name='Avance')
     date_soumission = models.DateField(db_column='Date_Soumission',null=False,verbose_name="Date dépot")
-    agence = models.ForeignKey('api_sch.TabAgence',db_column='Agence', on_delete=models.CASCADE,verbose_name="Agence")
+    agence = models.ForeignKey('api_sch.TabAgence',db_column='Code_Agence', on_delete=models.CASCADE,verbose_name="Agence")
     montant = models.FloatField(
         verbose_name="Montant",
         validators=[MinValueValidator(0)], default=0,

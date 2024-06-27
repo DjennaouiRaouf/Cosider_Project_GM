@@ -91,8 +91,8 @@ DATABASES = {
     'default': {
         "ENGINE": "mssql",
         "NAME": "TP_SC",
-        "USER": "",
-        "PASSWORD": "",
+        "USER": "ERP_COSIDER",
+        "PASSWORD": "Dev@Erp2020*",
         "HOST": "localhost\MSSQLSERVER",
         "PORT": "1433",
         "OPTIONS": {"driver": "SQL Server Native Client 11.0",

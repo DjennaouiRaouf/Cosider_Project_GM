@@ -1585,3 +1585,6 @@ class EditUserProfile(APIView):
 
         except User.DoesNotExist:
             return Response({"message": "Erreur ... !"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
