@@ -103,5 +103,6 @@ urlpatterns = [
     path('ps/',GetPSView.as_view()),
     path('num_av/',NumAv.as_view()),
 
-
+    path('userprofile/', UserProfile.as_view()),
+    path('editusr/', EditUserProfile.as_view()),
 ]

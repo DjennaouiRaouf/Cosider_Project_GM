@@ -1523,3 +1523,65 @@ class GetPSView(generics.ListAPIView):
                              'y2':y2,
                          }}, status=status.HTTP_200_OK)
 
+
+
+
+
+
+
+
+class UserProfile(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        uid=request.user.id
+        try:
+            user=User.objects.get(id=uid)
+
+            return Response({
+                "full_name":user.get_full_name(),
+                "username":user.username,
+                "email":user.email,
+                "joined":user.date_joined.strftime("Le %Y-%m-%d à %H:%M:%S"),
+                "login":Token.objects.get(user=user).created.strftime("Le %Y-%m-%d à %H:%M:%S"),
+                "current_password":'',
+                "new_password": '',
+                "confirm_new_password": '',
+
+            }, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"message":"Erreur ... !"}, status=status.HTTP_400_BAD_REQUEST)
+
+class EditUserProfile(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        username = request.data.get('username')
+        email = request.data.get('email')
+        current_password = request.data.get('current_password')
+        new_password=request.data.get('new_password')
+        confirm_new_password=request.data.get('confirm_new_password')
+
+        uid = request.user.id
+        user = User.objects.get(id=uid)
+        try:
+            if(username):
+                user.username=username
+
+            if (email):
+                user.email = email
+
+            if(current_password and new_password and confirm_new_password):
+                if(check_password(current_password,user.password)):
+                    if(new_password!=confirm_new_password):
+                        return Response({"message": "Vous n'avez pas confirmé votre mot de passe"}, status=status.HTTP_400_BAD_REQUEST)
+                    else:
+
+                        user.set_password(new_password)
+                else:
+                    return Response({"message": "Mot de pass incorrect"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+            user.save()
+            return Response({"message": "Votre profile est mis à jour"}, status=status.HTTP_200_OK)
+
+        except User.DoesNotExist:
+            return Response({"message": "Erreur ... !"}, status=status.HTTP_400_BAD_REQUEST)
